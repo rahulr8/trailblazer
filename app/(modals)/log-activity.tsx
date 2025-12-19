@@ -1,12 +1,16 @@
-import { useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import { Button } from 'heroui-native';
-import { X } from 'lucide-react-native';
+import { useCallback, useRef } from "react";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { router } from "expo-router";
+
+import { Button } from "heroui-native";
+
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import { X } from "lucide-react-native";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function LogActivityModal() {
   const { colors } = useTheme();
@@ -26,14 +30,14 @@ export default function LogActivityModal() {
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      snapPoints={['85%']}
+      snapPoints={["85%"]}
       enablePanDownToClose
       onClose={handleDismiss}
       backdropComponent={renderBackdrop}
       backgroundStyle={{
         backgroundColor: colors.background,
-        borderTopLeftRadius: BorderRadius['3xl'],
-        borderTopRightRadius: BorderRadius['3xl'],
+        borderTopLeftRadius: BorderRadius["3xl"],
+        borderTopRightRadius: BorderRadius["3xl"],
       }}
       handleIndicatorStyle={{
         backgroundColor: colors.textSecondary,
@@ -72,26 +76,26 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: Spacing.md,
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   closeButton: {
     width: 32,
     height: 32,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   body: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   placeholder: {
     fontSize: 16,

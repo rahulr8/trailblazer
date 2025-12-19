@@ -1,23 +1,26 @@
 import {
+  type ReactNode,
   createContext,
+  useCallback,
   useContext,
-  useState,
   useEffect,
   useMemo,
-  useCallback,
-  type ReactNode,
-} from 'react';
-import { useColorScheme as useSystemColorScheme } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+  useState,
+} from "react";
+
+import { useColorScheme as useSystemColorScheme } from "react-native";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 import {
-  Colors,
-  Shadows,
-  Gradients,
   type ColorScheme,
   type ColorTokens,
-  type ShadowTokens,
+  Colors,
   type GradientTokens,
-} from '@/constants';
+  Gradients,
+  type ShadowTokens,
+  Shadows,
+} from "@/constants";
 
 interface ThemeContextValue {
   colorScheme: ColorScheme;
@@ -31,7 +34,7 @@ interface ThemeContextValue {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
-const STORAGE_KEY = '@trailblazer_theme';
+const STORAGE_KEY = "@trailblazer_theme";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -39,14 +42,14 @@ interface ThemeProviderProps {
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const systemScheme = useSystemColorScheme();
-  const [colorScheme, setColorSchemeState] = useState<ColorScheme>('dark');
+  const [colorScheme, setColorSchemeState] = useState<ColorScheme>("dark");
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     async function loadTheme() {
       try {
         const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (saved === 'light' || saved === 'dark') {
+        if (saved === "light" || saved === "dark") {
           setColorSchemeState(saved);
         } else if (systemScheme) {
           setColorSchemeState(systemScheme);
@@ -68,7 +71,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
   }, []);
 
   const toggleColorScheme = useCallback(() => {
-    setColorScheme(colorScheme === 'dark' ? 'light' : 'dark');
+    setColorScheme(colorScheme === "dark" ? "light" : "dark");
   }, [colorScheme, setColorScheme]);
 
   const value = useMemo<ThemeContextValue>(
@@ -76,7 +79,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       colorScheme,
       setColorScheme,
       toggleColorScheme,
-      isDark: colorScheme === 'dark',
+      isDark: colorScheme === "dark",
       colors: Colors[colorScheme],
       shadows: Shadows[colorScheme],
       gradients: Gradients[colorScheme],
@@ -94,7 +97,7 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 export function useTheme(): ThemeContextValue {
   const context = useContext(ThemeContext);
   if (!context) {
-    throw new Error('useTheme must be used within ThemeProvider');
+    throw new Error("useTheme must be used within ThemeProvider");
   }
   return context;
 }

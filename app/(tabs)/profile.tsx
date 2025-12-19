@@ -1,20 +1,22 @@
-import { View, Text, ScrollView, StyleSheet, Pressable, Platform, Switch } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { User, Award, Settings, ChevronRight, Moon } from 'lucide-react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { router } from "expo-router";
+
+import { Award, ChevronRight, Moon, Settings, User } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function ProfileScreen() {
   const { colors, shadows, isDark, toggleColorScheme } = useTheme();
   const insets = useSafeAreaInsets();
 
   const stats = [
-    { label: 'Total KM', value: '156.4' },
-    { label: 'Activities', value: '47' },
-    { label: 'Streak', value: '12' },
-    { label: 'Badges', value: '8' },
+    { label: "Total KM", value: "156.4" },
+    { label: "Activities", value: "47" },
+    { label: "Streak", value: "12" },
+    { label: "Badges", value: "8" },
   ];
 
   return (
@@ -25,13 +27,13 @@ export default function ProfileScreen() {
           styles.content,
           {
             paddingTop: insets.top + Spacing.lg,
-            paddingBottom: Platform.OS === 'ios' ? 100 : insets.bottom + Spacing.lg,
+            paddingBottom: Platform.OS === "ios" ? 100 : insets.bottom + Spacing.lg,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
+          <View style={[styles.avatar, { backgroundColor: colors.primary + "20" }]}>
             <User size={40} color={colors.primary} />
           </View>
           <Text style={[styles.name, { color: colors.textPrimary }]}>Trailblazer</Text>
@@ -51,7 +53,9 @@ export default function ProfileScreen() {
             {stats.map((stat, index) => (
               <View key={stat.label} style={styles.statItem}>
                 <Text style={[styles.statValue, { color: colors.textPrimary }]}>{stat.value}</Text>
-                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>{stat.label}</Text>
+                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
+                  {stat.label}
+                </Text>
               </View>
             ))}
           </View>
@@ -63,11 +67,8 @@ export default function ProfileScreen() {
             { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
           ]}
         >
-          <Pressable
-            style={styles.menuItem}
-            onPress={() => router.push('/(modals)/badge-detail')}
-          >
-            <View style={[styles.menuIcon, { backgroundColor: colors.accent + '20' }]}>
+          <Pressable style={styles.menuItem} onPress={() => router.push("/(modals)/badge-detail")}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.accent + "20" }]}>
               <Award size={20} color={colors.accent} />
             </View>
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Achievements</Text>
@@ -77,22 +78,22 @@ export default function ProfileScreen() {
           <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
 
           <View style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.purple + '20' }]}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.purple + "20" }]}>
               <Moon size={20} color={colors.purple} />
             </View>
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Dark Mode</Text>
             <Switch
               value={isDark}
               onValueChange={toggleColorScheme}
-              trackColor={{ false: colors.progressTrack, true: colors.primary + '60' }}
-              thumbColor={isDark ? colors.primary : '#fff'}
+              trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+              thumbColor={isDark ? colors.primary : "#fff"}
             />
           </View>
 
           <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
 
           <Pressable style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: colors.textSecondary + '20' }]}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}>
               <Settings size={20} color={colors.textSecondary} />
             </View>
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Settings</Text>
@@ -102,7 +103,7 @@ export default function ProfileScreen() {
 
         <Pressable
           style={[styles.resetButton, { borderColor: colors.danger }]}
-          onPress={() => router.push('/(modals)/reset-challenge')}
+          onPress={() => router.push("/(modals)/reset-challenge")}
         >
           <Text style={[styles.resetButtonText, { color: colors.danger }]}>Reset Challenge</Text>
         </Pressable>
@@ -123,38 +124,38 @@ const styles = StyleSheet.create({
     gap: Spacing.xl,
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     gap: Spacing.sm,
   },
   avatar: {
     width: 80,
     height: 80,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   name: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   memberSince: {
     fontSize: 14,
   },
   statsCard: {
     padding: Spacing.xl,
-    borderRadius: BorderRadius['2xl'],
+    borderRadius: BorderRadius["2xl"],
     borderWidth: 1,
   },
   statsGrid: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   statLabel: {
     fontSize: 12,
@@ -163,11 +164,11 @@ const styles = StyleSheet.create({
   section: {
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     padding: Spacing.lg,
     gap: Spacing.md,
   },
@@ -175,13 +176,13 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: BorderRadius.md,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   menuLabel: {
     flex: 1,
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   divider: {
     height: StyleSheet.hairlineWidth,
@@ -191,10 +192,10 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   resetButtonText: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

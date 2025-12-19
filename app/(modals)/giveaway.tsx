@@ -1,12 +1,16 @@
-import { useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import { Button } from 'heroui-native';
-import { X, Gift, Calendar } from 'lucide-react-native';
+import { useCallback, useRef } from "react";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { router } from "expo-router";
+
+import { Button } from "heroui-native";
+
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import { Calendar, Gift, X } from "lucide-react-native";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function GiveawayModal() {
   const { colors, shadows } = useTheme();
@@ -26,14 +30,14 @@ export default function GiveawayModal() {
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      snapPoints={['60%']}
+      snapPoints={["60%"]}
       enablePanDownToClose
       onClose={handleDismiss}
       backdropComponent={renderBackdrop}
       backgroundStyle={{
         backgroundColor: colors.background,
-        borderTopLeftRadius: BorderRadius['3xl'],
-        borderTopRightRadius: BorderRadius['3xl'],
+        borderTopLeftRadius: BorderRadius["3xl"],
+        borderTopRightRadius: BorderRadius["3xl"],
       }}
       handleIndicatorStyle={{
         backgroundColor: colors.textSecondary,
@@ -53,18 +57,23 @@ export default function GiveawayModal() {
         </View>
 
         <View style={styles.body}>
-          <View style={[styles.iconContainer, { backgroundColor: colors.highlight + '20' }, shadows.md]}>
+          <View
+            style={[styles.iconContainer, { backgroundColor: colors.highlight + "20" }, shadows.md]}
+          >
             <Gift size={40} color={colors.highlight} />
           </View>
 
-          <Text style={[styles.prizeName, { color: colors.textPrimary }]}>
-            $100 MEC Gift Card
-          </Text>
+          <Text style={[styles.prizeName, { color: colors.textPrimary }]}>$100 MEC Gift Card</Text>
           <Text style={[styles.description, { color: colors.textSecondary }]}>
             Complete activities this week to earn entries into the weekly giveaway draw.
           </Text>
 
-          <View style={[styles.entriesCard, { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder }]}>
+          <View
+            style={[
+              styles.entriesCard,
+              { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
+            ]}
+          >
             <Text style={[styles.entriesLabel, { color: colors.textSecondary }]}>Your entries</Text>
             <Text style={[styles.entriesValue, { color: colors.primary }]}>12</Text>
           </View>
@@ -91,50 +100,50 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: Spacing.md,
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   closeButton: {
     width: 32,
     height: 32,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   body: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: Spacing.md,
   },
   iconContainer: {
     width: 80,
     height: 80,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   prizeName: {
     fontSize: 22,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: Spacing.sm,
   },
   description: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     paddingHorizontal: Spacing.lg,
   },
   entriesCard: {
     paddingVertical: Spacing.lg,
-    paddingHorizontal: Spacing['2xl'],
+    paddingHorizontal: Spacing["2xl"],
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: Spacing.md,
   },
   entriesLabel: {
@@ -142,11 +151,11 @@ const styles = StyleSheet.create({
   },
   entriesValue: {
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   countdown: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.sm,
   },
   countdownText: {

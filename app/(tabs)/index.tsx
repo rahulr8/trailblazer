@@ -1,11 +1,14 @@
-import { View, Text, ScrollView, StyleSheet, Pressable, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { Button } from 'heroui-native';
-import { Plus } from 'lucide-react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { router } from "expo-router";
+
+import { Button } from "heroui-native";
+
+import { Plus } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function HomeScreen() {
   const { colors, shadows } = useTheme();
@@ -19,7 +22,7 @@ export default function HomeScreen() {
           styles.content,
           {
             paddingTop: insets.top + Spacing.lg,
-            paddingBottom: Platform.OS === 'ios' ? 100 : insets.bottom + Spacing.lg,
+            paddingBottom: Platform.OS === "ios" ? 100 : insets.bottom + Spacing.lg,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -40,7 +43,7 @@ export default function HomeScreen() {
           </Text>
 
           <View style={[styles.progressTrack, { backgroundColor: colors.progressTrack }]}>
-            <View style={[styles.progressFill, { backgroundColor: colors.accent, width: '45%' }]} />
+            <View style={[styles.progressFill, { backgroundColor: colors.accent, width: "45%" }]} />
           </View>
 
           <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
@@ -49,7 +52,7 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.buttonContainer}>
-          <Button onPress={() => router.push('/(modals)/log-activity')}>
+          <Button onPress={() => router.push("/(modals)/log-activity")}>
             <Plus size={20} color="#000" style={{ marginRight: 8 }} />
             Log Activity
           </Button>
@@ -85,7 +88,7 @@ export default function HomeScreen() {
             { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
             shadows.md,
           ]}
-          onPress={() => router.push('/chat')}
+          onPress={() => router.push("/chat")}
         >
           <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Ask Parker</Text>
           <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
@@ -110,22 +113,22 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 15,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: -4,
   },
   card: {
     padding: Spacing.xl,
-    borderRadius: BorderRadius['2xl'],
+    borderRadius: BorderRadius["2xl"],
     borderWidth: 1,
     gap: Spacing.sm,
   },
   cardTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   cardSubtitle: {
     fontSize: 14,
@@ -136,7 +139,7 @@ const styles = StyleSheet.create({
     marginTop: Spacing.sm,
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: BorderRadius.full,
   },
   progressLabel: {
@@ -147,16 +150,16 @@ const styles = StyleSheet.create({
     marginVertical: Spacing.sm,
   },
   statsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginTop: Spacing.md,
   },
   statItem: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   statValue: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   statLabel: {
     fontSize: 12,

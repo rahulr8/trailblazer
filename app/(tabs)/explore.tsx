@@ -1,18 +1,19 @@
-import { View, Text, ScrollView, StyleSheet, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Platform, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function ExploreScreen() {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
 
   const adventures = [
-    { id: 1, name: 'Garibaldi Lake Trail', location: 'Squamish', difficulty: 'Moderate' },
-    { id: 2, name: 'Joffre Lakes', location: 'Pemberton', difficulty: 'Easy' },
-    { id: 3, name: 'Grouse Grind', location: 'North Vancouver', difficulty: 'Hard' },
-    { id: 4, name: 'Stawamus Chief', location: 'Squamish', difficulty: 'Moderate' },
+    { id: 1, name: "Garibaldi Lake Trail", location: "Squamish", difficulty: "Moderate" },
+    { id: 2, name: "Joffre Lakes", location: "Pemberton", difficulty: "Easy" },
+    { id: 3, name: "Grouse Grind", location: "North Vancouver", difficulty: "Hard" },
+    { id: 4, name: "Stawamus Chief", location: "Squamish", difficulty: "Moderate" },
   ];
 
   return (
@@ -23,7 +24,7 @@ export default function ExploreScreen() {
           styles.content,
           {
             paddingTop: insets.top + Spacing.lg,
-            paddingBottom: Platform.OS === 'ios' ? 100 : insets.bottom + Spacing.lg,
+            paddingBottom: Platform.OS === "ios" ? 100 : insets.bottom + Spacing.lg,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -56,11 +57,11 @@ export default function ExploreScreen() {
                     styles.difficultyBadge,
                     {
                       backgroundColor:
-                        adventure.difficulty === 'Hard'
-                          ? colors.danger + '20'
-                          : adventure.difficulty === 'Moderate'
-                            ? colors.highlight + '20'
-                            : colors.accent + '20',
+                        adventure.difficulty === "Hard"
+                          ? colors.danger + "20"
+                          : adventure.difficulty === "Moderate"
+                            ? colors.highlight + "20"
+                            : colors.accent + "20",
                     },
                   ]}
                 >
@@ -69,9 +70,9 @@ export default function ExploreScreen() {
                       styles.difficultyText,
                       {
                         color:
-                          adventure.difficulty === 'Hard'
+                          adventure.difficulty === "Hard"
                             ? colors.danger
-                            : adventure.difficulty === 'Moderate'
+                            : adventure.difficulty === "Moderate"
                               ? colors.highlight
                               : colors.accent,
                       },
@@ -102,22 +103,22 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   subtitle: {
     fontSize: 15,
     marginTop: -8,
   },
   grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: "row",
+    flexWrap: "wrap",
     gap: Spacing.md,
   },
   card: {
-    width: '48%',
+    width: "48%",
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   imagePlaceholder: {
     height: 120,
@@ -128,13 +129,13 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   cardLocation: {
     fontSize: 13,
   },
   difficultyBadge: {
-    alignSelf: 'flex-start',
+    alignSelf: "flex-start",
     paddingHorizontal: Spacing.sm,
     paddingVertical: 4,
     borderRadius: BorderRadius.sm,
@@ -142,6 +143,6 @@ const styles = StyleSheet.create({
   },
   difficultyText: {
     fontSize: 11,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });

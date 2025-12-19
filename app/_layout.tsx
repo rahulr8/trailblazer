@@ -1,17 +1,26 @@
-import '../global.css';
-import { DarkTheme, DefaultTheme, ThemeProvider as NavigationThemeProvider } from '@react-navigation/native';
-import { Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { BottomSheetModalProvider } from '@gorhom/bottom-sheet';
-import { HeroUINativeProvider } from 'heroui-native';
-import 'react-native-reanimated';
+import { StyleSheet } from "react-native";
 
-import { ThemeProvider, useTheme } from '@/contexts/theme-context';
+import { Stack } from "expo-router";
+import { StatusBar } from "expo-status-bar";
+
+import {
+  DarkTheme,
+  DefaultTheme,
+  ThemeProvider as NavigationThemeProvider,
+} from "@react-navigation/native";
+
+import { HeroUINativeProvider } from "heroui-native";
+
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import "react-native-reanimated";
+
+import { ThemeProvider, useTheme } from "@/contexts/theme-context";
+
+import "../global.css";
 
 export const unstable_settings = {
-  anchor: '(tabs)',
+  anchor: "(tabs)",
 };
 
 function RootLayoutNav() {
@@ -24,21 +33,21 @@ function RootLayoutNav() {
         <Stack.Screen
           name="(modals)"
           options={{
-            presentation: 'transparentModal',
-            animation: 'fade',
+            presentation: "transparentModal",
+            animation: "fade",
           }}
         />
         <Stack.Screen
           name="chat"
           options={{
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_bottom',
+            presentation: "fullScreenModal",
+            animation: "slide_from_bottom",
           }}
         />
         <Stack.Screen
           name="login"
           options={{
-            presentation: 'fullScreenModal',
+            presentation: "fullScreenModal",
           }}
         />
       </Stack>

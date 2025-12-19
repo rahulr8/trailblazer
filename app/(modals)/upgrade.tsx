@@ -1,11 +1,14 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import { BlurView } from 'expo-blur';
-import { Button } from 'heroui-native';
-import { Crown, X, Check } from 'lucide-react-native';
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { BlurView } from "expo-blur";
+import { router } from "expo-router";
+
+import { Button } from "heroui-native";
+
+import { Check, Crown, X } from "lucide-react-native";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function UpgradeModal() {
   const { colors, shadows, isDark } = useTheme();
@@ -13,19 +16,19 @@ export default function UpgradeModal() {
   const handleDismiss = () => router.back();
 
   const features = [
-    'Exclusive partner rewards',
-    'Priority trail reservations',
-    'Ad-free experience',
-    'Extended activity history',
+    "Exclusive partner rewards",
+    "Priority trail reservations",
+    "Ad-free experience",
+    "Extended activity history",
   ];
 
   return (
     <Pressable style={styles.backdrop} onPress={handleDismiss}>
-      <BlurView intensity={isDark ? 40 : 20} tint={isDark ? 'dark' : 'light'} style={styles.blur}>
+      <BlurView intensity={isDark ? 40 : 20} tint={isDark ? "dark" : "light"} style={styles.blur}>
         <Pressable
           style={[
             styles.card,
-            { backgroundColor: colors.background, borderColor: colors.gold + '40' },
+            { backgroundColor: colors.background, borderColor: colors.gold + "40" },
             shadows.lg,
           ]}
           onPress={(e) => e.stopPropagation()}
@@ -37,7 +40,7 @@ export default function UpgradeModal() {
             <X size={18} color={colors.textSecondary} />
           </Pressable>
 
-          <View style={[styles.iconContainer, { backgroundColor: colors.gold + '20' }]}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.gold + "20" }]}>
             <Crown size={40} color={colors.gold} />
           </View>
 
@@ -49,7 +52,7 @@ export default function UpgradeModal() {
           <View style={styles.features}>
             {features.map((feature) => (
               <View key={feature} style={styles.featureRow}>
-                <View style={[styles.checkIcon, { backgroundColor: colors.gold + '20' }]}>
+                <View style={[styles.checkIcon, { backgroundColor: colors.gold + "20" }]}>
                   <Check size={14} color={colors.gold} />
                 </View>
                 <Text style={[styles.featureText, { color: colors.textPrimary }]}>{feature}</Text>
@@ -79,74 +82,74 @@ const styles = StyleSheet.create({
   },
   blur: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: Spacing.xl,
   },
   card: {
-    width: '100%',
+    width: "100%",
     maxWidth: 340,
-    padding: Spacing['2xl'],
-    borderRadius: BorderRadius['2xl'],
+    padding: Spacing["2xl"],
+    borderRadius: BorderRadius["2xl"],
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: Spacing.md,
     right: Spacing.md,
     width: 28,
     height: 28,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   iconContainer: {
     width: 80,
     height: 80,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: Spacing.lg,
   },
   title: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   subtitle: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: Spacing.xs,
   },
   features: {
-    width: '100%',
+    width: "100%",
     marginTop: Spacing.xl,
     gap: Spacing.md,
   },
   featureRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.md,
   },
   checkIcon: {
     width: 24,
     height: 24,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   featureText: {
     fontSize: 15,
   },
   priceContainer: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
+    flexDirection: "row",
+    alignItems: "baseline",
     marginTop: Spacing.xl,
     marginBottom: Spacing.lg,
   },
   price: {
     fontSize: 32,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   period: {
     fontSize: 16,

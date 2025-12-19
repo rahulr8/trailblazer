@@ -1,11 +1,14 @@
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import { BlurView } from 'expo-blur';
-import { Button } from 'heroui-native';
-import { AlertTriangle, X } from 'lucide-react-native';
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { BlurView } from "expo-blur";
+import { router } from "expo-router";
+
+import { Button } from "heroui-native";
+
+import { AlertTriangle, X } from "lucide-react-native";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function ResetChallengeModal() {
   const { colors, shadows, isDark } = useTheme();
@@ -19,7 +22,7 @@ export default function ResetChallengeModal() {
 
   return (
     <Pressable style={styles.backdrop} onPress={handleDismiss}>
-      <BlurView intensity={isDark ? 40 : 20} tint={isDark ? 'dark' : 'light'} style={styles.blur}>
+      <BlurView intensity={isDark ? 40 : 20} tint={isDark ? "dark" : "light"} style={styles.blur}>
         <Pressable
           style={[
             styles.card,
@@ -35,7 +38,7 @@ export default function ResetChallengeModal() {
             <X size={18} color={colors.textSecondary} />
           </Pressable>
 
-          <View style={[styles.iconContainer, { backgroundColor: colors.danger + '20' }]}>
+          <View style={[styles.iconContainer, { backgroundColor: colors.danger + "20" }]}>
             <AlertTriangle size={32} color={colors.danger} />
           </View>
 
@@ -68,62 +71,62 @@ const styles = StyleSheet.create({
   },
   blur: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: Spacing.xl,
   },
   card: {
-    width: '100%',
+    width: "100%",
     maxWidth: 340,
-    padding: Spacing['2xl'],
-    borderRadius: BorderRadius['2xl'],
+    padding: Spacing["2xl"],
+    borderRadius: BorderRadius["2xl"],
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   closeButton: {
-    position: 'absolute',
+    position: "absolute",
     top: Spacing.md,
     right: Spacing.md,
     width: 28,
     height: 28,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   iconContainer: {
     width: 64,
     height: 64,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginBottom: Spacing.lg,
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   description: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
     lineHeight: 20,
     marginTop: Spacing.sm,
   },
   buttons: {
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: Spacing.md,
     marginTop: Spacing.xl,
-    width: '100%',
+    width: "100%",
   },
   cancelButton: {
     flex: 1,
     paddingVertical: Spacing.md,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   cancelButtonText: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   resetButtonContainer: {
     flex: 1,

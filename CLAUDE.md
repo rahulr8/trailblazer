@@ -32,12 +32,14 @@ lib/                    # Utilities and data
 ## Code Standards
 
 ### TypeScript
+
 - Never use `any` - use `unknown`, generics, or proper types
 - All function parameters and return types must be typed
 - Use type inference where obvious, explicit types where it aids clarity
 - Prefer `interface` for object shapes, `type` for unions/intersections
 
 ### Code Quality
+
 - No unnecessary comments - code should be self-documenting
 - No redundant comments like `// increment counter` above `counter++`
 - Only comment complex business logic or non-obvious decisions
@@ -46,11 +48,13 @@ lib/                    # Utilities and data
 - Avoid premature abstraction - wait for 3+ repetitions before extracting
 
 ### Styling (Uniwind)
+
 - Use `className` prop with Tailwind classes for styling
 - Avoid inline `style` objects unless dynamic values are needed
 - Use HeroUI Native components before creating custom ones
 
 ### Architecture
+
 - Route-based modals: Use `router.push('/(modals)/...')` not context-based modals
 - Dynamic routes for detail screens: `[id].tsx` pattern
 - Keep navigation state in URLs, app state in contexts
@@ -59,6 +63,7 @@ lib/                    # Utilities and data
 ## Provider Hierarchy
 
 Order matters - outermost to innermost:
+
 1. `GestureHandlerRootView` (required for gestures)
 2. `HeroUINativeProvider` (HeroUI theming)
 3. `ThemeProvider` (React Navigation theming)

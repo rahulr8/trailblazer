@@ -1,14 +1,14 @@
-import { Platform, ViewStyle } from 'react-native';
+import { Platform, ViewStyle } from "react-native";
 
 type ShadowStyle = Pick<
   ViewStyle,
-  'shadowColor' | 'shadowOffset' | 'shadowOpacity' | 'shadowRadius' | 'elevation'
+  "shadowColor" | "shadowOffset" | "shadowOpacity" | "shadowRadius" | "elevation"
 >;
 
 function createShadow(opacity: number, radius: number, elevation: number): ShadowStyle {
   return Platform.select({
     ios: {
-      shadowColor: '#000',
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: radius / 2 },
       shadowOpacity: opacity,
       shadowRadius: radius,

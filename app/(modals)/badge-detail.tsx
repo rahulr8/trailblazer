@@ -1,11 +1,14 @@
-import { useCallback, useRef } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
-import { router } from 'expo-router';
-import BottomSheet, { BottomSheetView, BottomSheetBackdrop } from '@gorhom/bottom-sheet';
-import { X, Award } from 'lucide-react-native';
+import { useCallback, useRef } from "react";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+import { router } from "expo-router";
+
+import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import { Award, X } from "lucide-react-native";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function BadgeDetailModal() {
   const { colors, shadows } = useTheme();
@@ -25,14 +28,14 @@ export default function BadgeDetailModal() {
   return (
     <BottomSheet
       ref={bottomSheetRef}
-      snapPoints={['50%']}
+      snapPoints={["50%"]}
       enablePanDownToClose
       onClose={handleDismiss}
       backdropComponent={renderBackdrop}
       backgroundStyle={{
         backgroundColor: colors.background,
-        borderTopLeftRadius: BorderRadius['3xl'],
-        borderTopRightRadius: BorderRadius['3xl'],
+        borderTopLeftRadius: BorderRadius["3xl"],
+        borderTopRightRadius: BorderRadius["3xl"],
       }}
       handleIndicatorStyle={{
         backgroundColor: colors.textSecondary,
@@ -52,7 +55,7 @@ export default function BadgeDetailModal() {
         </View>
 
         <View style={styles.body}>
-          <View style={[styles.badgeIcon, { backgroundColor: colors.accent + '20' }, shadows.md]}>
+          <View style={[styles.badgeIcon, { backgroundColor: colors.accent + "20" }, shadows.md]}>
             <Award size={48} color={colors.accent} />
           </View>
           <Text style={[styles.badgeName, { color: colors.textPrimary }]}>Trailblazer</Text>
@@ -60,7 +63,7 @@ export default function BadgeDetailModal() {
             Complete 10 different trails to earn this badge.
           </Text>
           <View style={[styles.progressContainer, { backgroundColor: colors.progressTrack }]}>
-            <View style={[styles.progressFill, { backgroundColor: colors.accent, width: '70%' }]} />
+            <View style={[styles.progressFill, { backgroundColor: colors.accent, width: "70%" }]} />
           </View>
           <Text style={[styles.progressText, { color: colors.textSecondary }]}>7 of 10 trails</Text>
         </View>
@@ -75,25 +78,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.xl,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: Spacing.md,
   },
   title: {
     fontSize: 20,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   closeButton: {
     width: 32,
     height: 32,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   body: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
     gap: Spacing.md,
     paddingTop: Spacing.lg,
   },
@@ -101,27 +104,27 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: BorderRadius.full,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   badgeName: {
     fontSize: 24,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: Spacing.sm,
   },
   description: {
     fontSize: 15,
-    textAlign: 'center',
+    textAlign: "center",
     paddingHorizontal: Spacing.xl,
   },
   progressContainer: {
-    width: '100%',
+    width: "100%",
     height: 8,
     borderRadius: BorderRadius.full,
     marginTop: Spacing.md,
   },
   progressFill: {
-    height: '100%',
+    height: "100%",
     borderRadius: BorderRadius.full,
   },
   progressText: {

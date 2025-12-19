@@ -1,20 +1,22 @@
-import { View, Text, ScrollView, StyleSheet, Pressable, Platform } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
-import { Crown } from 'lucide-react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { useTheme } from '@/contexts/theme-context';
-import { Spacing, BorderRadius } from '@/constants';
+import { router } from "expo-router";
+
+import { Crown } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { BorderRadius, Spacing } from "@/constants";
+import { useTheme } from "@/contexts/theme-context";
 
 export default function RewardsScreen() {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
 
   const rewards = [
-    { id: 1, name: 'Free Trail Map', partner: 'BC Parks', points: 100 },
-    { id: 2, name: '15% Off Gear', partner: 'MEC', points: 250 },
-    { id: 3, name: 'Free Coffee', partner: "Tim Hortons", points: 50 },
-    { id: 4, name: 'Campsite Discount', partner: 'BC Parks', points: 500 },
+    { id: 1, name: "Free Trail Map", partner: "BC Parks", points: 100 },
+    { id: 2, name: "15% Off Gear", partner: "MEC", points: 250 },
+    { id: 3, name: "Free Coffee", partner: "Tim Hortons", points: 50 },
+    { id: 4, name: "Campsite Discount", partner: "BC Parks", points: 500 },
   ];
 
   return (
@@ -25,7 +27,7 @@ export default function RewardsScreen() {
           styles.content,
           {
             paddingTop: insets.top + Spacing.lg,
-            paddingBottom: Platform.OS === 'ios' ? 100 : insets.bottom + Spacing.lg,
+            paddingBottom: Platform.OS === "ios" ? 100 : insets.bottom + Spacing.lg,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -35,7 +37,7 @@ export default function RewardsScreen() {
           Redeem your activity points
         </Text>
 
-        <View style={[styles.pointsCard, { backgroundColor: colors.primary + '15' }]}>
+        <View style={[styles.pointsCard, { backgroundColor: colors.primary + "15" }]}>
           <Text style={[styles.pointsLabel, { color: colors.primary }]}>Available Points</Text>
           <Text style={[styles.pointsValue, { color: colors.primary }]}>1,250</Text>
         </View>
@@ -43,9 +45,9 @@ export default function RewardsScreen() {
         <Pressable
           style={[
             styles.upgradeCard,
-            { backgroundColor: colors.gold + '15', borderColor: colors.gold + '40' },
+            { backgroundColor: colors.gold + "15", borderColor: colors.gold + "40" },
           ]}
-          onPress={() => router.push('/(modals)/upgrade')}
+          onPress={() => router.push("/(modals)/upgrade")}
         >
           <Crown size={24} color={colors.gold} />
           <View style={styles.upgradeContent}>
@@ -67,16 +69,20 @@ export default function RewardsScreen() {
                 { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
                 shadows.sm,
               ]}
-              onPress={() => router.push({ pathname: '/(modals)/reward-detail', params: { id: reward.id } })}
+              onPress={() =>
+                router.push({ pathname: "/(modals)/reward-detail", params: { id: reward.id } })
+              }
             >
               <View style={[styles.rewardIcon, { backgroundColor: colors.glassBg }]} />
               <View style={styles.rewardContent}>
-                <Text style={[styles.rewardName, { color: colors.textPrimary }]}>{reward.name}</Text>
+                <Text style={[styles.rewardName, { color: colors.textPrimary }]}>
+                  {reward.name}
+                </Text>
                 <Text style={[styles.rewardPartner, { color: colors.textSecondary }]}>
                   {reward.partner}
                 </Text>
               </View>
-              <View style={[styles.pointsBadge, { backgroundColor: colors.accent + '20' }]}>
+              <View style={[styles.pointsBadge, { backgroundColor: colors.accent + "20" }]}>
                 <Text style={[styles.pointsBadgeText, { color: colors.accent }]}>
                   {reward.points} pts
                 </Text>
@@ -102,7 +108,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: '700',
+    fontWeight: "700",
   },
   subtitle: {
     fontSize: 15,
@@ -110,24 +116,24 @@ const styles = StyleSheet.create({
   },
   pointsCard: {
     padding: Spacing.xl,
-    borderRadius: BorderRadius['2xl'],
-    alignItems: 'center',
+    borderRadius: BorderRadius["2xl"],
+    alignItems: "center",
   },
   pointsLabel: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   pointsValue: {
     fontSize: 40,
-    fontWeight: '700',
+    fontWeight: "700",
     marginTop: 4,
   },
   upgradeCard: {
     padding: Spacing.lg,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.md,
   },
   upgradeContent: {
@@ -135,7 +141,7 @@ const styles = StyleSheet.create({
   },
   upgradeTitle: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   upgradeSubtitle: {
     fontSize: 13,
@@ -143,7 +149,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   rewardsList: {
     gap: Spacing.md,
@@ -152,8 +158,8 @@ const styles = StyleSheet.create({
     padding: Spacing.lg,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: Spacing.md,
   },
   rewardIcon: {
@@ -166,7 +172,7 @@ const styles = StyleSheet.create({
   },
   rewardName: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   rewardPartner: {
     fontSize: 13,
@@ -179,6 +185,6 @@ const styles = StyleSheet.create({
   },
   pointsBadgeText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
   },
 });
