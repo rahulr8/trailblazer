@@ -47,7 +47,7 @@ npx expo install expo-web-browser expo-linking
 
 OAuth is handled by `StravaProvider` (in `contexts/strava-context.tsx`):
 - Uses `WebBrowser.openAuthSessionAsync()` which returns the redirect URL directly
-- No need for deep link listeners or expo-auth-session
+- No deep link listeners needed - result comes back as a promise
 - Always mounted at root level via `_layout.tsx`
 
 ```tsx

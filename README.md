@@ -1,50 +1,112 @@
-# Welcome to your Expo app 👋
+# Trailblazer+
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+BC Parks outdoor activity tracking app built with Expo, Firebase, and Strava integration.
 
-## Get started
+## Tech Stack
 
-1. Install dependencies
+- **Framework**: Expo 54 with Expo Router
+- **Styling**: Uniwind (Tailwind CSS v4 for React Native) + HeroUI Native
+- **Backend**: Firebase (Auth, Firestore, Cloud Functions)
+- **Integrations**: Strava OAuth for activity sync
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18+
+- Expo CLI (`npm install -g expo-cli`)
+- Firebase CLI (`npm install -g firebase-tools`)
+- iOS Simulator or Android Emulator (or physical device)
+
+### Installation
+
+1. Install dependencies:
 
    ```bash
    npm install
+   cd functions && npm install && cd ..
    ```
 
-2. Start the app
+2. Set up environment variables:
 
    ```bash
-   npx expo start
+   cp .env.example .env
    ```
 
-In the output, you'll find options to open the app in a
+   Required variables:
+   - `EXPO_PUBLIC_STRAVA_CLIENT_ID` - Strava API client ID
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+3. Set up Firebase:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   ```bash
+   firebase login
+   firebase use <your-project-id>
+   ```
 
-## Get a fresh project
+4. Deploy Cloud Functions:
 
-When you're ready, run:
+   ```bash
+   npm run firebase:deploy
+   ```
+
+### Running the App
 
 ```bash
-npm run reset-project
+# Start Expo dev server
+npx expo start
+
+# Run on iOS
+npx expo run:ios
+
+# Run on Android
+npx expo run:android
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Project Structure
 
-## Learn more
+```
+app/                    # Expo Router pages
+├── _layout.tsx         # Root layout with providers
+├── (tabs)/             # Bottom tab navigation
+├── (modals)/           # Modal screens
+└── chat.tsx            # AI chat screen
 
-To learn more about developing your project with Expo, look at the following resources:
+components/             # Reusable UI components
+contexts/               # React contexts (auth, theme, strava)
+lib/
+├── db/                 # Firestore operations
+├── strava/             # Strava client integration
+└── firebase.ts         # Firebase initialization
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+functions/              # Firebase Cloud Functions
+└── src/strava/         # Strava OAuth, webhooks, sync
+```
 
-## Join the community
+## Features
 
-Join our community of developers creating universal apps.
+- Activity tracking (manual logging + Strava sync)
+- 60-day outdoor challenge
+- AI trail assistant (Parker)
+- User stats and streaks
+- Saved adventures
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## Scripts
+
+```bash
+npm start               # Start Expo dev server
+npm run typecheck       # TypeScript type checking
+npm run format          # Format code with Prettier
+npm run firebase:deploy # Build and deploy Cloud Functions
+```
+
+## Documentation
+
+See `CLAUDE.md` files throughout the codebase for detailed documentation:
+- `/CLAUDE.md` - Project overview and code standards
+- `/lib/strava/CLAUDE.md` - Strava integration
+- `/lib/db/CLAUDE.md` - Database operations
+- `/functions/CLAUDE.md` - Cloud Functions
+
+## License
+
+Proprietary - BC Parks Foundation
