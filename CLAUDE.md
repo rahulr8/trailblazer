@@ -60,6 +60,16 @@ lib/                    # Utilities and data
 - Keep navigation state in URLs, app state in contexts
 - Colocate related code: component + types + utils in same directory
 
+### Expo Router Auth Navigation
+
+Expo Router maintains navigation state separately from conditional Stack rendering. Changing which screens are defined in `_layout.tsx` based on auth state does NOT automatically navigate the user.
+
+**Always use explicit navigation after auth changes:**
+- After sign in: `router.replace("/(tabs)")`
+- After sign out: `router.replace("/login")`
+
+Use `replace` (not `push`) to prevent back-navigation to invalid screens.
+
 ## Provider Hierarchy
 
 Order matters - outermost to innermost:
@@ -80,6 +90,10 @@ Order matters - outermost to innermost:
 Available: Button, TextField, Select, Checkbox, Radio, Switch, Avatar, Chip, Skeleton, Spinner, Card, Divider, Dialog, Popover, Toast, Accordion, Tabs, Surface
 
 Import from: `import { Button, Card } from 'heroui-native'`
+
+## Document updates
+
+Anytime you update a folder (like components, db, functions, lib, etc.) make sure to update the `CLAUDE.md` file within that folder so that all subsequent Claude code sessions has the most up-to-date context on what is going on with the app.
 
 ## Anti-Patterns to Avoid
 
