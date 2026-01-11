@@ -2,10 +2,13 @@ import {
   collection,
   addDoc,
   getDocs,
+  getCountFromServer,
   query,
   orderBy,
+  where,
   limit as firestoreLimit,
   serverTimestamp,
+  writeBatch,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { collections, querySnapshotToArray, timestampToDate } from "./utils";
@@ -13,14 +16,11 @@ import {
   LogActivityInput,
   Activity,
   ActivityDocument,
+  ActivitySource,
   QueryOptions,
 } from "./types";
 import { incrementUserStats, updateStreak } from "./users";
-
-// Calculate steps from distance (1300 steps per km)
-function calculateSteps(distanceKm: number): number {
-  return Math.round(distanceKm * 1300);
-}
+import { calculateSteps, STEP_COUNTING_ACTIVITIES } from "@/lib/constants";
 
 // Log new activity (creates activity + updates user stats)
 export async function logActivity(
@@ -41,11 +41,7 @@ export async function logActivity(
   });
 
   // Update user stats atomically
-  // Only count steps for walking, hiking, and running activities
-  const stepsActivities = ["walk", "hike", "run"];
-  const steps = stepsActivities.includes(input.type)
-    ? calculateSteps(input.distance)
-    : 0;
+  const steps = calculateSteps(input.type, input.distance);
 
   await incrementUserStats(uid, {
     km: input.distance,
@@ -126,4 +122,33 @@ export async function getWeeklyActivityCount(uid: string): Promise<number> {
 export async function isEligibleForGiveaway(uid: string): Promise<boolean> {
   const count = await getWeeklyActivityCount(uid);
   return count >= 3;
+}
+
+// Get count of activities by source (for source switching dialogs)
+export async function getActivityCountBySource(
+  uid: string,
+  source: ActivitySource
+): Promise<number> {
+  const activitiesRef = collection(db, collections.activities(uid));
+  const q = query(activitiesRef, where("source", "==", source));
+  const snapshot = await getCountFromServer(q);
+  return snapshot.data().count;
+}
+
+// Delete all activities from a specific source (for source switching)
+export async function deleteActivitiesBySource(
+  uid: string,
+  source: ActivitySource
+): Promise<number> {
+  const activitiesRef = collection(db, collections.activities(uid));
+  const q = query(activitiesRef, where("source", "==", source));
+  const snapshot = await getDocs(q);
+
+  if (snapshot.empty) return 0;
+
+  const batch = writeBatch(db);
+  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
+  await batch.commit();
+
+  return snapshot.size;
 }

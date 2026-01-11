@@ -35,16 +35,17 @@ stravaWebhookQueue/{docId}        # Webhook processing queue (Cloud Functions)
 - `membershipTier`: `"free"` | `"platinum"`
 - `stats`: `{ totalKm, totalMinutes, totalSteps, currentStreak }`
 - `stravaConnection?`: Strava OAuth tokens and athlete info (encrypted)
+- `healthConnection?`: Apple Health authorization status
 
 ### ActivityDocument
-- `source`: `"manual"` | `"strava"` - tracks where activity came from
-- `externalId`: Strava activity ID (null for manual)
+- `source`: `"manual"` | `"strava"` | `"apple_health"` - tracks where activity came from
+- `externalId`: External activity ID (null for manual)
 - `type`: `"run"` | `"hike"` | `"bike"` | `"walk"` | etc.
 - `duration`: seconds
 - `distance`: kilometers
 - `location`: city name or null
 - `date`, `createdAt`: Timestamps
-- Strava-specific optional fields: `elapsedTime`, `elevationGain`, `name`, `sportType`
+- Optional fields: `elapsedTime`, `elevationGain`, `name`, `sportType`
 
 ### StravaConnection (on UserDocument)
 - `athleteId`: Strava athlete ID (indexed for webhook lookups)
@@ -53,6 +54,11 @@ stravaWebhookQueue/{docId}        # Webhook processing queue (Cloud Functions)
 - `tokenExpiresAt`: Token expiration timestamp
 - `scopes`: Authorized scopes
 - `connectedAt`, `lastSyncAt`: Sync timestamps
+
+### HealthConnection (on UserDocument)
+- `isAuthorized`: Boolean indicating HealthKit permission granted
+- `connectedAt`: When connected
+- `lastSyncAt`: Last successful sync timestamp
 
 ## Collection Paths
 
@@ -72,12 +78,31 @@ collections.stravaWebhookQueue       // "stravaWebhookQueue"
 When logging activities, the `source` field is automatically set:
 - Manual activities via `logActivity()`: `source: "manual"`, `externalId: null`
 - Strava activities (via Cloud Functions): `source: "strava"`, `externalId: "<strava_id>"`
+- Apple Health activities (via client sync): `source: "apple_health"`, `externalId: "<sourceId>_<startTime>"`
 
 User stats are automatically updated when activities are logged.
+
+## Source Switching Helper Functions
+
+For switching between data sources (Strava ↔ Apple Health):
+
+```typescript
+// Get count of activities from a specific source
+await getActivityCountBySource(uid, "apple_health"); // Returns number
+
+// Delete all activities from a specific source
+await deleteActivitiesBySource(uid, "strava"); // Returns count deleted
+
+// Recalculate user stats from remaining activities
+await recalculateUserStats(uid);
+```
 
 ## Firestore Indexes
 
 Required index for Strava webhook processing (in `firestore.indexes.json`):
 - `users` collection, `stravaConnection.athleteId` field (ASCENDING)
+
+Required composite index for activity queries by source:
+- `users/{uid}/activities`, `source` + `externalId` fields
 
 Deploy with: `firebase deploy --only firestore:indexes`

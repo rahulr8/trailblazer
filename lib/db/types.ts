@@ -13,6 +13,13 @@ export interface StravaConnection {
   lastSyncAt: Timestamp | null;
 }
 
+// Apple Health connection stored on user document (client-side only, no tokens needed)
+export interface HealthConnection {
+  isAuthorized: boolean;
+  connectedAt: Timestamp;
+  lastSyncAt: Timestamp | null;
+}
+
 // Firestore document types
 export interface UserDocument {
   email: string;
@@ -24,6 +31,7 @@ export interface UserDocument {
   lastActivityDate?: Timestamp;
   stats: UserStats;
   stravaConnection?: StravaConnection;
+  healthConnection?: HealthConnection;
 }
 
 export interface UserStats {
@@ -33,7 +41,7 @@ export interface UserStats {
   currentStreak: number;
 }
 
-export type ActivitySource = "manual" | "strava";
+export type ActivitySource = "manual" | "strava" | "apple_health";
 
 export interface ActivityDocument {
   source: ActivitySource;

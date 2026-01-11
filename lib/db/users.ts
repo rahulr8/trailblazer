@@ -12,6 +12,7 @@ import {
 import { db } from "@/lib/firebase";
 import { getDocData, collections } from "./utils";
 import { UserDocument, CreateUserInput, UserStats, StatDeltas } from "./types";
+import { calculateSteps } from "@/lib/constants";
 
 // Create new user document
 export async function createUser(
@@ -249,4 +250,31 @@ export async function resetUserChallenge(uid: string): Promise<void> {
     deleteDoc(doc.ref)
   );
   await Promise.all(deleteSavedPromises);
+}
+
+// Recalculate user stats from all activities (for source switching)
+export async function recalculateUserStats(uid: string): Promise<void> {
+  // Dynamic import to avoid circular dependency
+  const { getUserActivities } = await import("./activities");
+  const activities = await getUserActivities(uid);
+
+  const stats = activities.reduce(
+    (acc, activity) => ({
+      totalKm: acc.totalKm + activity.distance,
+      totalMinutes: acc.totalMinutes + Math.round(activity.duration / 60),
+      totalSteps: acc.totalSteps + calculateSteps(activity.type, activity.distance),
+    }),
+    { totalKm: 0, totalMinutes: 0, totalSteps: 0 }
+  );
+
+  const userRef = doc(db, collections.users, uid);
+  await updateDoc(userRef, {
+    "stats.totalKm": stats.totalKm,
+    "stats.totalMinutes": stats.totalMinutes,
+    "stats.totalSteps": stats.totalSteps,
+    updatedAt: serverTimestamp(),
+  });
+
+  // Also recalculate streak
+  await recalculateStreak(uid, activities);
 }
