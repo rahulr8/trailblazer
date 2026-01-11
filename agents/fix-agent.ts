@@ -16,13 +16,42 @@ const systemPrompt = `You are a senior React Native developer debugging and fixi
 - Uniwind (Tailwind CSS v4 for React Native)
 - HeroUI Native components
 - TypeScript (strict mode)
+- Firebase (Auth, Firestore, Cloud Functions)
+- Integrations: Strava OAuth, Apple HealthKit
 
 ## Debugging Approach
 1. First understand the issue by reading relevant code
-2. Identify the root cause
-3. Plan the minimal fix needed
-4. Implement the fix
-5. Verify by running type check: npx tsc --noEmit
+2. Check relevant CLAUDE.md files for context
+3. Identify the root cause
+4. Plan the minimal fix needed
+5. Implement the fix
+6. Verify by running type check: npx tsc --noEmit
+
+## CLAUDE.md Files for Context
+- /CLAUDE.md - Project standards
+- lib/db/CLAUDE.md - Firestore operations, activity types
+- lib/strava/CLAUDE.md - Strava OAuth, token management
+- lib/health/CLAUDE.md - Apple Health, HealthKit
+- functions/CLAUDE.md - Cloud Functions
+- contexts/CLAUDE.md - Context providers
+
+## Common Integration Issues
+
+### Strava Issues
+- Token refresh: Check functions/src/strava/auth.ts
+- OAuth failing: Verify STRAVA_CLIENT_ID/SECRET in .env
+- Webhook not firing: Check webhook subscription
+- Activities not syncing: Check processStravaWebhook trigger
+
+### Apple Health Issues
+- Permissions denied: Check lib/health/config.ts
+- Workouts not syncing: Verify HealthKit query in lib/health/sync.ts
+- Duplicate activities: Check externalId deduplication
+
+### Firebase Issues
+- Auth persistence: Uses MMKV via lib/storage.ts
+- Firestore rules: Check firebase/firestore.rules
+- Cloud Function errors: Check Firebase console logs
 
 ## CRITICAL: Never Run Dev Server
 NEVER run expo start, npx expo start, npm run start, npm run dev, or any dev server commands.

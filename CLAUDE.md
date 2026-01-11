@@ -8,6 +8,8 @@ BC Parks outdoor activity tracking app built with Expo, HeroUI Native, and Uniwi
 - **Styling**: Uniwind (Tailwind CSS v4 for React Native)
 - **Components**: HeroUI Native
 - **Language**: TypeScript (strict mode)
+- **Backend**: Firebase (Auth, Firestore, Cloud Functions)
+- **Integrations**: Strava OAuth, Apple HealthKit
 
 ## Commands
 
@@ -20,14 +22,34 @@ npx expo export         # Build for production
 ## Project Structure
 
 ```
-app/                    # Expo Router pages
-├── _layout.tsx         # Root layout (providers)
+app/                    # Expo Router pages (see app/CLAUDE.md)
+├── _layout.tsx         # Root layout (providers + auth routing)
 ├── (tabs)/             # Bottom tab navigation
 └── (modals)/           # Modal screens
-components/             # Reusable components
-contexts/               # React contexts
-lib/                    # Utilities and data
+components/             # Reusable components (see components/CLAUDE.md)
+contexts/               # React contexts (see contexts/CLAUDE.md)
+hooks/                  # Custom React hooks (see hooks/CLAUDE.md)
+lib/                    # Business logic
+├── db/                 # Firestore operations (see lib/db/CLAUDE.md)
+├── strava/             # Strava client integration (see lib/strava/CLAUDE.md)
+├── health/             # Apple Health integration (see lib/health/CLAUDE.md)
+└── constants/          # Activity constants (see lib/constants/CLAUDE.md)
+functions/              # Firebase Cloud Functions (see functions/CLAUDE.md)
+firebase/               # Firebase config (see firebase/CLAUDE.md)
+agents/                 # AI development agents (see agents/CLAUDE.md)
 ```
+
+## Data Sources
+
+Users sync activities from ONE source at a time:
+
+| Source | ID | Description |
+|--------|-----|-------------|
+| Manual | `manual` | User-entered activities |
+| Strava | `strava` | OAuth + webhooks sync |
+| Apple Health | `apple_health` | HealthKit workouts |
+
+Source configuration lives in `lib/constants/sources.ts` - single source of truth for colors, emojis, labels.
 
 ## Code Standards
 
@@ -72,11 +94,14 @@ Use `replace` (not `push`) to prevent back-navigation to invalid screens.
 
 ## Provider Hierarchy
 
-Order matters - outermost to innermost:
+Order matters - outermost to innermost in `app/_layout.tsx`:
 
 1. `GestureHandlerRootView` (required for gestures)
 2. `HeroUINativeProvider` (HeroUI theming)
-3. `ThemeProvider` (React Navigation theming)
+3. `ThemeProvider` (app theme + colors)
+4. `AuthProvider` (Firebase Auth state)
+5. `StravaProvider` (Strava OAuth flow)
+6. `BottomSheetModalProvider` (bottom sheet modals)
 
 ## Uniwind Setup Notes
 
@@ -103,3 +128,18 @@ Anytime you update a folder (like components, db, functions, lib, etc.) make sur
 - Don't mix StyleSheet and className on same element
 - Don't use context for modal state (use routes)
 - Don't skip type checking before commits
+
+## AI Development Agents
+
+Located in `agents/` directory. Run from the agents folder:
+
+```bash
+cd agents && npm install  # First time setup
+
+npm run feature "Add offline mode for saved trails"
+npm run fix "TypeScript errors in components folder"
+npm run review "../app/(tabs)"
+npm run integration "Debug Strava token refresh"
+```
+
+See `agents/CLAUDE.md` for full documentation.

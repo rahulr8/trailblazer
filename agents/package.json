@@ -6,7 +6,8 @@
   "scripts": {
     "feature": "tsx feature-agent.ts",
     "review": "tsx review-agent.ts",
-    "fix": "tsx fix-agent.ts"
+    "fix": "tsx fix-agent.ts",
+    "integration": "tsx integration-agent.ts"
   },
   "dependencies": {
     "@anthropic-ai/claude-agent-sdk": "latest"
