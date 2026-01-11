@@ -9,6 +9,8 @@ import { router, Stack } from "expo-router";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  OAuthProvider,
   AuthError,
 } from "firebase/auth";
 
@@ -137,14 +139,29 @@ export default function LoginScreen() {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
   };
 
-  const handleGoogleSignIn = () => {
+  const handleGoogleSignIn = async () => {
     // TODO: Implement Google Sign-In with Firebase
-    console.log("[Auth] Google sign-in button pressed");
+    // Uses @react-native-google-signin/google-signin + GoogleAuthProvider
+    // 1. Configure GoogleSignin with webClientId from Firebase Console
+    // 2. Call GoogleSignin.signIn() to get idToken
+    // 3. Create credential with GoogleAuthProvider.credential(idToken)
+    // 4. Call signInWithCredential(auth, credential)
+    // 5. Create user document if new user
+    // 6. Navigate to (tabs)
+    console.log("[Auth] Google sign-in button pressed - integration pending");
+    const _googleProvider = new GoogleAuthProvider();
   };
 
-  const handleAppleSignIn = () => {
+  const handleAppleSignIn = async () => {
     // TODO: Implement Apple Sign-In with Firebase
-    console.log("[Auth] Apple sign-in button pressed");
+    // Uses expo-apple-authentication + OAuthProvider
+    // 1. Call AppleAuthentication.signInAsync() to get credential
+    // 2. Create OAuthProvider credential with identityToken and nonce
+    // 3. Call signInWithCredential(auth, credential)
+    // 4. Create user document if new user
+    // 5. Navigate to (tabs)
+    console.log("[Auth] Apple sign-in button pressed - integration pending");
+    const _appleProvider = new OAuthProvider("apple.com");
   };
 
   return (
