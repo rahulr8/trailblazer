@@ -15,6 +15,7 @@ import {
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { SocialAuthButtons } from "@/components/SocialAuthButtons";
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
 import { createUser } from "@/lib/db/users";
@@ -201,6 +202,8 @@ export default function LoginScreen() {
                 "Create Account"
               )}
             </Button>
+
+            <SocialAuthButtons mode={mode} />
           </View>
 
           <View style={styles.toggleContainer}>
