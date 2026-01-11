@@ -1,0 +1,11 @@
+# Environment variables
+.env
+
+# Processed issues state
+processed-issues.json
+
+# Log files (keep directory, ignore contents)
+logs/*.log
+
+# Node modules
+node_modules/

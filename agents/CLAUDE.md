@@ -55,22 +55,19 @@ npm run fix "Profile image not loading on the settings screen"
 **Model**: Opus | **Max Turns**: 50 | **Tools**: Read, Write, Edit, Glob, Grep, Bash
 
 ### Integration Agent
-Specialized for Strava, Apple Health, and Firebase integrations.
+Specialized for Apple Health and Firebase integrations.
 
 ```bash
-npm run integration "Debug Strava connection not syncing"
 npm run integration "Add Apple Watch sync support"
-npm run integration "Fix token refresh for expired Strava tokens"
 npm run integration "Troubleshoot HealthKit permissions issue"
+npm run integration "Fix sync not updating user stats"
 ```
 
 **Model**: Opus | **Max Turns**: 75 | **Tools**: Read, Write, Edit, Glob, Grep, Bash
 
 Use this agent for:
-- OAuth flow issues (Strava)
-- Token management and refresh
-- Webhook processing
 - HealthKit permissions
+- Apple Health sync logic
 - Firestore sync logic
 - Cloud Function debugging
 
@@ -83,7 +80,6 @@ Use this agent for:
 | Fix TypeScript errors | `fix` | Focused troubleshooting |
 | Fix runtime bugs | `fix` | Can debug and edit code |
 | Code quality check | `review` | Read-only, comprehensive review |
-| Strava OAuth issues | `integration` | Specialized knowledge of OAuth/tokens |
 | Apple Health sync | `integration` | Knows HealthKit patterns |
 | Firebase/Firestore | `integration` | Understands backend architecture |
 
@@ -93,7 +89,6 @@ Use this agent for:
 
 **CLAUDE.md Awareness**: Agents know to check CLAUDE.md files in relevant directories for context. Key documentation:
 - `/CLAUDE.md` - Project standards
-- `/lib/strava/CLAUDE.md` - Strava integration
 - `/lib/health/CLAUDE.md` - Apple Health integration
 - `/lib/db/CLAUDE.md` - Database operations
 - `/functions/CLAUDE.md` - Cloud Functions
@@ -114,6 +109,64 @@ Use this agent for:
 4. Set appropriate `model` and `maxTurns`
 5. Add script to `package.json`
 
-## Future: Linear Automation
+## Linear Automation
 
-See `LINEAR-AUTOMATION-PLAN.md` for the planned Linear ticket auto-implementation pipeline. This will allow qualified Linear tickets to be automatically implemented and submitted as PRs.
+Automatically implement Linear tickets when moved to "In Progress" with the `Agent` label.
+
+### Setup
+
+1. Get a Linear API key from https://linear.app/settings/api
+2. Create `.env` file in the agents folder:
+   ```bash
+   cp .env.example .env
+   # Edit .env and add your LINEAR_API_KEY
+   ```
+3. Install dependencies: `npm install`
+
+### Usage
+
+```bash
+# Start the Linear runner (polls every 30 seconds)
+npm run linear
+
+# Run once and exit (for testing)
+npm run linear:once
+```
+
+### How It Works
+
+1. Create a Linear issue with labels `Agent` + `feature` (or `Agent` + `bug`)
+2. Drag the issue to "In Progress"
+3. Runner detects it within 30 seconds
+4. Creates a branch, runs the appropriate agent
+5. Creates a PR when complete
+6. Updates the Linear issue with the PR link
+
+### Monitoring
+
+Watch agent progress in real-time:
+
+```bash
+# Watch all logs
+tail -f ./logs/*.log
+
+# Watch a specific issue
+tail -f ./logs/TRB-123*.log
+```
+
+### Label Routing
+
+| Labels | Agent Used |
+|--------|------------|
+| `Agent` + `feature` | Feature Agent |
+| `Agent` + `bug` | Fix Agent |
+| `Agent` only | Feature Agent (default) |
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `linear-client.ts` | Linear API wrapper |
+| `linear-runner.ts` | Main polling script |
+| `processed-issues.json` | Tracks completed issues (auto-generated) |
+| `logs/*.log` | Agent output logs |

@@ -38,7 +38,6 @@ const systemPrompt = `You are a code reviewer for Trailblazer+, a React Native a
 - components/CLAUDE.md - Component patterns
 - contexts/CLAUDE.md - Context providers
 - lib/db/CLAUDE.md - Database operations
-- lib/strava/CLAUDE.md - Strava integration
 - lib/health/CLAUDE.md - Apple Health integration
 
 ## CRITICAL: Never Run Dev Server

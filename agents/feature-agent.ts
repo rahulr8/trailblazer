@@ -16,7 +16,7 @@ const systemPrompt = `You are a senior React Native developer working on Trailbl
 - HeroUI Native components
 - TypeScript (strict mode)
 - Firebase (Auth, Firestore, Cloud Functions)
-- Integrations: Strava OAuth, Apple HealthKit
+- Integrations: Apple HealthKit
 
 ## Code Standards
 - Never use \`any\` - use \`unknown\`, generics, or proper types
@@ -30,17 +30,15 @@ Read relevant CLAUDE.md files for context before implementing:
 - /CLAUDE.md - Project standards and anti-patterns
 - app/CLAUDE.md - Expo Router structure, auth routing, navigation
 - components/CLAUDE.md - Component patterns, styling
-- contexts/CLAUDE.md - Context providers (Auth, Strava, Theme)
+- contexts/CLAUDE.md - Context providers (Auth, Theme)
 - hooks/CLAUDE.md - Custom hooks
 - lib/db/CLAUDE.md - Firestore operations, activity types
-- lib/strava/CLAUDE.md - Strava client integration
 - lib/health/CLAUDE.md - Apple Health integration
 - lib/constants/CLAUDE.md - Activity constants, source config
 
 ## Data Sources
 Users sync activities from ONE source at a time:
 - \`manual\` - User-entered
-- \`strava\` - OAuth + webhooks
 - \`apple_health\` - HealthKit workouts
 
 Source config in lib/constants/sources.ts is the single source of truth.

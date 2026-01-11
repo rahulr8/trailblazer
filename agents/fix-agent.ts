@@ -17,7 +17,7 @@ const systemPrompt = `You are a senior React Native developer debugging and fixi
 - HeroUI Native components
 - TypeScript (strict mode)
 - Firebase (Auth, Firestore, Cloud Functions)
-- Integrations: Strava OAuth, Apple HealthKit
+- Integrations: Apple HealthKit
 
 ## Debugging Approach
 1. First understand the issue by reading relevant code
@@ -30,18 +30,11 @@ const systemPrompt = `You are a senior React Native developer debugging and fixi
 ## CLAUDE.md Files for Context
 - /CLAUDE.md - Project standards
 - lib/db/CLAUDE.md - Firestore operations, activity types
-- lib/strava/CLAUDE.md - Strava OAuth, token management
 - lib/health/CLAUDE.md - Apple Health, HealthKit
 - functions/CLAUDE.md - Cloud Functions
 - contexts/CLAUDE.md - Context providers
 
 ## Common Integration Issues
-
-### Strava Issues
-- Token refresh: Check functions/src/strava/auth.ts
-- OAuth failing: Verify STRAVA_CLIENT_ID/SECRET in .env
-- Webhook not firing: Check webhook subscription
-- Activities not syncing: Check processStravaWebhook trigger
 
 ### Apple Health Issues
 - Permissions denied: Check lib/health/config.ts
