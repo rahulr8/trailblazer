@@ -67,6 +67,53 @@ Source configuration lives in `lib/constants/sources.ts` - single source of trut
 - Single responsibility: One component/function does one thing
 - Avoid premature abstraction - wait for 3+ repetitions before extracting
 
+### Logic Centralization & DRY
+
+Write declarative, centralized code. Before writing any logic, search for existing implementations:
+
+**Helper Functions**: Extract repeated logic into standalone functions
+
+```typescript
+// BAD: Same error detection logic in multiple places
+const isAuthError = msg.includes("denied") || msg.includes("Code=5");
+
+// GOOD: Single helper function, used everywhere
+function isHealthKitAuthError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes("denied") || message.includes("Code=5");
+}
+```
+
+**Shared Operations**: Centralize database/API operations
+
+```typescript
+// BAD: Same Firestore update in 3 places
+await updateDoc(userRef, { healthConnection: deleteField() });
+
+// GOOD: One function, reused everywhere
+async function clearHealthConnection(uid: string): Promise<void> {
+  await updateDoc(doc(db, "users", uid), { healthConnection: deleteField() });
+}
+```
+
+**Constants**: Single source of truth for magic values
+
+```typescript
+// BAD: Hardcoded strings scattered across files
+if (source === "apple_health") { ... }
+
+// GOOD: Constants file with all values
+import { SOURCES } from "@/lib/constants";
+if (source === SOURCES.APPLE_HEALTH) { ... }
+```
+
+**Before adding new code, ask:**
+
+1. Does similar logic exist elsewhere in the codebase?
+2. Can I extract a reusable helper function?
+3. Is there a constants file this should live in?
+4. Will this logic be needed in more than one place?
+
 ### Styling (Uniwind)
 
 - Use `className` prop with Tailwind classes for styling

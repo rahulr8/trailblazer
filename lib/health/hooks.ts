@@ -12,6 +12,25 @@ import { HealthConnection } from "@/lib/db/types";
 import { isHealthKitAvailableAsync, initHealthKit } from "./config";
 import { syncHealthWorkouts } from "./sync";
 
+// Detect HealthKit authorization errors
+function isHealthKitAuthError(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error);
+  return (
+    message.includes("Authorization not determined") ||
+    message.includes("authorization denied") ||
+    message.includes("Code=5")
+  );
+}
+
+// Clear health connection from Firestore
+async function clearHealthConnection(uid: string): Promise<void> {
+  const userRef = doc(db, "users", uid);
+  await updateDoc(userRef, {
+    healthConnection: deleteField(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
 interface HealthConnectionState {
   isConnected: boolean;
   isLoading: boolean;
@@ -104,22 +123,10 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
         console.error("[Health] Auto-sync failed:", error);
         setState((prev) => ({ ...prev, isSyncing: false }));
 
-        // Check if this is an authorization error
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        const isAuthError =
-          errorMessage.includes("Authorization not determined") ||
-          errorMessage.includes("authorization denied") ||
-          errorMessage.includes("Code=5");
-
-        if (isAuthError) {
+        if (isHealthKitAuthError(error)) {
           console.log("[Health] Authorization lost, disconnecting...");
-          // Clear the connection in Firestore so user can reconnect
           try {
-            const userRef = doc(db, "users", uid);
-            await updateDoc(userRef, {
-              healthConnection: deleteField(),
-              updatedAt: serverTimestamp(),
-            });
+            await clearHealthConnection(uid);
             console.log("[Health] Disconnected due to authorization loss");
             Alert.alert(
               "Apple Health Disconnected",
@@ -201,19 +208,12 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const userRef = doc(db, "users", uid);
-      await updateDoc(userRef, {
-        healthConnection: deleteField(),
-        updatedAt: serverTimestamp(),
-      });
+      await clearHealthConnection(uid);
       console.log("[Health] Disconnected successfully");
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to disconnect";
       console.error("[Health] Disconnect error:", error);
-      setState((prev) => ({
-        ...prev,
-        error: errorMsg,
-      }));
+      setState((prev) => ({ ...prev, error: errorMsg }));
       Alert.alert("Disconnect Failed", errorMsg);
     } finally {
       setState((prev) => ({ ...prev, isLoading: false }));
@@ -245,20 +245,10 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       const errorMsg = error instanceof Error ? error.message : "Failed to sync";
       console.error("[Health] Sync error:", error);
 
-      // Check if this is an authorization error
-      const isAuthError =
-        errorMsg.includes("Authorization not determined") ||
-        errorMsg.includes("authorization denied") ||
-        errorMsg.includes("Code=5");
-
-      if (isAuthError) {
+      if (isHealthKitAuthError(error)) {
         console.log("[Health] Authorization lost during sync, disconnecting...");
         try {
-          const userRef = doc(db, "users", uid);
-          await updateDoc(userRef, {
-            healthConnection: deleteField(),
-            updatedAt: serverTimestamp(),
-          });
+          await clearHealthConnection(uid);
           Alert.alert(
             "Apple Health Disconnected",
             "HealthKit authorization was revoked. Please reconnect to continue syncing workouts."
@@ -267,10 +257,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
           console.error("[Health] Failed to disconnect after auth error:", disconnectError);
         }
       } else {
-        setState((prev) => ({
-          ...prev,
-          error: errorMsg,
-        }));
+        setState((prev) => ({ ...prev, error: errorMsg }));
         Alert.alert("Sync Failed", errorMsg);
       }
       return 0;
