@@ -42,14 +42,14 @@ The library uses an Expo config plugin. In `app.json`:
 }
 ```
 
-## Key Difference from Strava
+## Key Characteristics
 
-| Aspect | Strava | Apple Health |
-|--------|--------|--------------|
-| Auth | OAuth (server-side) | On-device HealthKit permission |
-| Sync trigger | Webhooks (real-time) | Manual pull or app open |
-| Token storage | Firestore (encrypted) | None needed |
-| Data location | Strava → Cloud Function → Firestore | On-device → Direct to Firestore |
+| Aspect | Apple Health |
+|--------|--------------|
+| Auth | On-device HealthKit permission |
+| Sync trigger | Manual pull or app open |
+| Token storage | None needed |
+| Data location | On-device → Direct to Firestore |
 
 **Apple Health sync is client-side only** - no Cloud Functions needed.
 
@@ -85,16 +85,11 @@ HealthKit activity types are mapped to app types:
 | `functionalStrengthTraining`, `crossTraining` | workout |
 | (others) | other |
 
-## Mutual Exclusivity with Strava
+## Data Sources
 
-Users can only have ONE sync source connected at a time:
-- `none` - Manual logging only
-- `strava` - Strava connected
-- `apple_health` - Apple Health connected
-
-When switching sources, users are prompted to:
-1. **Keep existing** - Activities from old source remain, new source starts syncing
-2. **Start fresh** - Delete activities from old source, recalculate stats
+Users can use:
+- `manual` - Manual activity logging
+- `apple_health` - Apple Health connected (iOS only)
 
 ## Database Fields
 
@@ -111,7 +106,7 @@ When switching sources, users are prompted to:
 ### ActivityDocument.source
 
 ```typescript
-source: "manual" | "strava" | "apple_health"
+source: "manual" | "apple_health"
 ```
 
 ## Sync Flow
@@ -131,7 +126,7 @@ source: "manual" | "strava" | "apple_health"
 
 ## iOS-Only Feature
 
-HealthKit is iOS-only. The Apple Health option only appears on iOS devices where HealthKit is available. Android users should use Strava or manual logging.
+HealthKit is iOS-only. The Apple Health option only appears on iOS devices where HealthKit is available. Android users should use manual logging.
 
 ## Shared Constants
 

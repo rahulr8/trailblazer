@@ -24,26 +24,6 @@ const { user, uid, isLoading } = useAuth();
 - Persists auth state via MMKV (see `lib/firebase.ts`)
 - `isLoading` is true until initial auth check completes
 
-### StravaContext (`strava-context.tsx`)
-
-Strava OAuth flow management.
-
-```typescript
-interface StravaContextValue {
-  initiateOAuth: () => Promise<void>;  // Start OAuth flow
-  isConnecting: boolean;                // True during OAuth
-  error: string | null;                 // OAuth error message
-}
-
-// Usage
-const { initiateOAuth, isConnecting, error } = useStrava();
-```
-
-**Behavior**:
-- Opens Strava OAuth in system browser via `expo-web-browser`
-- On success, calls Cloud Function `stravaTokenExchange` to store tokens
-- Does NOT manage connection status - use `useStravaConnection` hook for that
-
 ### ThemeContext (`theme-context.tsx`)
 
 Light/dark theme management with persistence.
@@ -77,11 +57,9 @@ Order is critical - defined in `app/_layout.tsx`:
   <HeroUINativeProvider>
     <ThemeProvider>
       <AuthProvider>
-        <StravaProvider>
-          <BottomSheetModalProvider>
-            {children}
-          </BottomSheetModalProvider>
-        </StravaProvider>
+        <BottomSheetModalProvider>
+          {children}
+        </BottomSheetModalProvider>
       </AuthProvider>
     </ThemeProvider>
   </HeroUINativeProvider>
@@ -92,9 +70,8 @@ Order is critical - defined in `app/_layout.tsx`:
 1. `GestureHandlerRootView` - Required for gesture handling (React Native Gesture Handler)
 2. `HeroUINativeProvider` - HeroUI theming (needs gesture handler)
 3. `ThemeProvider` - App theme (provides colors to subsequent providers)
-4. `AuthProvider` - Auth state (needed by StravaProvider)
-5. `StravaProvider` - Strava OAuth (depends on auth state)
-6. `BottomSheetModalProvider` - Bottom sheet modals
+4. `AuthProvider` - Auth state
+5. `BottomSheetModalProvider` - Bottom sheet modals
 
 ## Creating New Contexts
 
@@ -137,5 +114,4 @@ export function useMy(): MyContextValue {
 
 **Examples**:
 - `AuthContext` - auth state used everywhere
-- `useStravaConnection` - hook that reads Firestore, not context
 - `useHealthConnection` - hook that interacts with HealthKit, not context

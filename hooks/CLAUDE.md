@@ -24,21 +24,6 @@ const colorScheme = useColorScheme(); // "light" | "dark" | null
 
 These hooks live in `lib/` with their related code, not in `hooks/`:
 
-### useStravaConnection (`lib/strava/hooks.ts`)
-```typescript
-const {
-  isConnected,
-  isLoading,
-  isSyncing,
-  athleteName,
-  lastSyncAt,
-  error,
-  connect,      // Start OAuth flow
-  disconnect,   // Revoke access
-  sync,         // Sync activities from Strava
-} = useStravaConnection();
-```
-
 ### useHealthConnection (`lib/health/hooks.ts`)
 ```typescript
 const {
@@ -92,4 +77,4 @@ export function useMyHook(param: string) {
 | `lib/{feature}/hooks.ts` | Feature-specific hooks with related code |
 | `components/` | Component-specific hooks (rare) |
 
-**Colocate hooks with related code** - `useStravaConnection` lives in `lib/strava/` because it uses Strava config, types, and API functions.
+**Colocate hooks with related code** - `useHealthConnection` lives in `lib/health/` because it uses HealthKit config, types, and sync functions.

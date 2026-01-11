@@ -38,8 +38,7 @@ The rules in `firestore.rules` enforce:
 
 ## Indexes
 
-`firestore.indexes.json` contains required composite indexes:
-- `stravaConnection.athleteId` on `users` collection (for webhook athlete lookup)
+`firestore.indexes.json` contains required composite indexes for efficient querying.
 
 ## Adding New Indexes
 

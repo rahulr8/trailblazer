@@ -47,7 +47,6 @@ const healthConfig = SOURCE_CONFIG["apple_health"];
 | Source | Color | Emoji | Label |
 |--------|-------|-------|-------|
 | `apple_health` | `#007AFF` | ❤️ | Apple Health |
-| `strava` | `#FC4C02` | 🏃 | Strava |
 | `manual` | `#6B7280` | ✏️ | Manual |
 
 ### Adding New Sources

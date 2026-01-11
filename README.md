@@ -1,13 +1,13 @@
 # Trailblazer+
 
-BC Parks outdoor activity tracking app built with Expo, Firebase, and Strava integration.
+BC Parks outdoor activity tracking app built with Expo and Firebase.
 
 ## Tech Stack
 
 - **Framework**: Expo 54 with Expo Router
 - **Styling**: Uniwind (Tailwind CSS v4 for React Native) + HeroUI Native
 - **Backend**: Firebase (Auth, Firestore, Cloud Functions)
-- **Integrations**: Strava OAuth for activity sync
+- **Integrations**: Apple HealthKit for activity sync
 
 ## Getting Started
 
@@ -32,9 +32,6 @@ BC Parks outdoor activity tracking app built with Expo, Firebase, and Strava int
    ```bash
    cp .env.example .env
    ```
-
-   Required variables:
-   - `EXPO_PUBLIC_STRAVA_CLIENT_ID` - Strava API client ID
 
 3. Set up Firebase:
 
@@ -72,19 +69,18 @@ app/                    # Expo Router pages
 └── chat.tsx            # AI chat screen
 
 components/             # Reusable UI components
-contexts/               # React contexts (auth, theme, strava)
+contexts/               # React contexts (auth, theme)
 lib/
 ├── db/                 # Firestore operations
-├── strava/             # Strava client integration
+├── health/             # Apple Health integration
 └── firebase.ts         # Firebase initialization
 
 functions/              # Firebase Cloud Functions
-└── src/strava/         # Strava OAuth, webhooks, sync
 ```
 
 ## Features
 
-- Activity tracking (manual logging + Strava sync)
+- Activity tracking (manual logging + Apple Health sync)
 - 60-day outdoor challenge
 - AI trail assistant (Parker)
 - User stats and streaks
@@ -101,12 +97,9 @@ npm run firebase:deploy # Build and deploy Cloud Functions
 
 ## Documentation
 
-### Guides
-- `/docs/strava-integration.md` - Complete Strava OAuth and sync flow
-
 ### Code Reference (CLAUDE.md files)
 - `/CLAUDE.md` - Project overview and code standards
-- `/lib/strava/CLAUDE.md` - Strava client module
+- `/lib/health/CLAUDE.md` - Apple Health integration
 - `/lib/db/CLAUDE.md` - Database operations
 - `/functions/CLAUDE.md` - Cloud Functions
 

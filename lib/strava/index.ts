@@ -1,1 +1,0 @@
-export { useStravaConnection } from "./hooks";

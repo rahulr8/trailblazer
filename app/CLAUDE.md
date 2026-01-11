@@ -94,9 +94,8 @@ GestureHandlerRootView
   └── HeroUINativeProvider
       └── ThemeProvider
           └── AuthProvider
-              └── StravaProvider
-                  └── BottomSheetModalProvider
-                      └── RootLayoutNav
+              └── BottomSheetModalProvider
+                  └── RootLayoutNav
 ```
 
 ## Adding New Screens

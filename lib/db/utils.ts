@@ -39,5 +39,4 @@ export const collections = {
   savedAdventures: (uid: string) => `users/${uid}/savedAdventures`,
   conversations: "conversations",
   messages: (sessionId: string) => `conversations/${sessionId}/messages`,
-  stravaWebhookQueue: "stravaWebhookQueue",
 } as const;

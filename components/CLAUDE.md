@@ -36,7 +36,7 @@ import { ActivitySourceCard } from "@/components/ActivitySourceCard";
 ```
 
 **Props:**
-- `source: ActivitySource` - Data source ("apple_health" | "strava" | "manual")
+- `source: ActivitySource` - Data source ("apple_health" | "manual")
 - `activities: Activity[]` - All activities (will be filtered by source)
 - `isConnected: boolean` - Whether source is connected
 - `isSyncing: boolean` - Whether sync is in progress
@@ -57,10 +57,10 @@ Small status card showing connection state for a data source.
 import { ConnectionStatusBox } from "@/components/ConnectionStatusBox";
 
 <ConnectionStatusBox
-  source="strava"
-  isConnected={strava.isConnected}
-  isSyncing={strava.isSyncing}
-  detail={`@${strava.athleteUsername}`}
+  source="apple_health"
+  isConnected={health.isConnected}
+  isSyncing={health.isSyncing}
+  lastSyncAt={health.lastSyncAt}
 />
 ```
 
@@ -68,8 +68,8 @@ import { ConnectionStatusBox } from "@/components/ConnectionStatusBox";
 - `source: ActivitySource` - Data source
 - `isConnected: boolean` - Whether source is connected
 - `isSyncing: boolean` - Whether sync is in progress
-- `lastSyncAt?: Date | null` - Last sync timestamp (shown for Apple Health)
-- `detail?: string | null` - Custom detail text (shown for Strava username)
+- `lastSyncAt?: Date | null` - Last sync timestamp
+- `detail?: string | null` - Custom detail text
 
 ## Design Patterns
 

@@ -1,18 +1,6 @@
 import { Timestamp } from "firebase/firestore";
 import { Adventure } from "@/lib/data";
 
-// Strava connection stored on user document
-export interface StravaConnection {
-  athleteId: number;
-  athleteUsername: string | null;
-  accessToken: string;
-  refreshToken: string;
-  tokenExpiresAt: Timestamp;
-  scopes: string[];
-  connectedAt: Timestamp;
-  lastSyncAt: Timestamp | null;
-}
-
 // Apple Health connection stored on user document (client-side only, no tokens needed)
 export interface HealthConnection {
   isAuthorized: boolean;
@@ -30,7 +18,6 @@ export interface UserDocument {
   updatedAt: Timestamp;
   lastActivityDate?: Timestamp;
   stats: UserStats;
-  stravaConnection?: StravaConnection;
   healthConnection?: HealthConnection;
 }
 
@@ -41,7 +28,7 @@ export interface UserStats {
   currentStreak: number;
 }
 
-export type ActivitySource = "manual" | "strava" | "apple_health";
+export type ActivitySource = "manual" | "apple_health";
 
 export interface ActivityDocument {
   source: ActivitySource;

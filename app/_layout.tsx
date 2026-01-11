@@ -16,7 +16,6 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
-import { StravaProvider } from "@/contexts/strava-context";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 
 import "../global.css";
@@ -78,11 +77,9 @@ export default function RootLayout() {
       <HeroUINativeProvider>
         <ThemeProvider>
           <AuthProvider>
-            <StravaProvider>
-              <BottomSheetModalProvider>
-                <RootLayoutNav />
-              </BottomSheetModalProvider>
-            </StravaProvider>
+            <BottomSheetModalProvider>
+              <RootLayoutNav />
+            </BottomSheetModalProvider>
           </AuthProvider>
         </ThemeProvider>
       </HeroUINativeProvider>

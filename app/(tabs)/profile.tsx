@@ -19,7 +19,6 @@ import {
   Award,
   ChevronRight,
   Heart,
-  Link2,
   LogOut,
   Moon,
   Settings,
@@ -30,30 +29,17 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BorderRadius, Spacing } from "@/constants";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
-import { deleteActivitiesBySource, getActivityCountBySource } from "@/lib/db/activities";
-import { recalculateUserStats } from "@/lib/db/users";
 import { auth } from "@/lib/firebase";
 import { useHealthConnection } from "@/lib/health";
-import { useStravaConnection } from "@/lib/strava";
 
-const STRAVA_COLOR = "#FC4C02";
 const HEALTH_COLOR = "#007AFF";
-
-type DataSource = "none" | "strava" | "apple_health";
 
 export default function ProfileScreen() {
   const { colors, shadows, isDark, toggleColorScheme } = useTheme();
   const insets = useSafeAreaInsets();
   const { uid } = useAuth();
-  const strava = useStravaConnection(uid);
   const health = useHealthConnection(uid);
   const [isSwitching, setIsSwitching] = useState(false);
-
-  const currentSource: DataSource = strava.isConnected
-    ? "strava"
-    : health.isConnected
-      ? "apple_health"
-      : "none";
 
   const handleSignOut = async () => {
     try {
@@ -65,109 +51,6 @@ export default function ProfileScreen() {
       console.error("[Profile] Sign out error:", error);
     }
   };
-
-  const handleSourceSwitch = useCallback(
-    async (oldSource: DataSource, newSource: DataSource, keepExisting: boolean) => {
-      if (!uid) return;
-
-      setIsSwitching(true);
-
-      try {
-        if (!keepExisting && oldSource !== "none") {
-          await deleteActivitiesBySource(uid, oldSource);
-          await recalculateUserStats(uid);
-        }
-
-        if (oldSource === "strava") {
-          await strava.disconnect();
-        } else if (oldSource === "apple_health") {
-          await health.disconnect();
-        }
-
-        if (newSource === "strava") {
-          await strava.connect();
-        } else if (newSource === "apple_health") {
-          await health.connect();
-        }
-      } catch (error) {
-        console.error("[Profile] Source switch error:", error);
-        Alert.alert("Error", "Failed to switch data source. Please try again.");
-      } finally {
-        setIsSwitching(false);
-      }
-    },
-    [uid, strava, health]
-  );
-
-  const showSwitchConfirmation = useCallback(
-    async (newSource: DataSource) => {
-      console.log("[Profile] showSwitchConfirmation called", { newSource, currentSource, uid });
-
-      if (!uid) {
-        console.log("[Profile] showSwitchConfirmation - no uid, returning");
-        return;
-      }
-      if (currentSource === newSource) {
-        console.log("[Profile] showSwitchConfirmation - same source, returning");
-        return;
-      }
-
-      if (currentSource === "none") {
-        console.log("[Profile] No current source, connecting directly to:", newSource);
-        if (newSource === "strava") {
-          await strava.connect();
-        } else if (newSource === "apple_health") {
-          console.log("[Profile] Calling health.connect()...");
-          await health.connect();
-          console.log("[Profile] health.connect() completed");
-        }
-        return;
-      }
-
-      const oldSourceLabel = currentSource === "strava" ? "Strava" : "Apple Health";
-      const newSourceLabel = newSource === "strava" ? "Strava" : "Apple Health";
-
-      const activityCount = await getActivityCountBySource(uid, currentSource);
-
-      if (activityCount === 0) {
-        await handleSourceSwitch(currentSource, newSource, true);
-        return;
-      }
-
-      Alert.alert(
-        `Switch to ${newSourceLabel}?`,
-        `You have ${activityCount} activities from ${oldSourceLabel}.\n\nWhat would you like to do?`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Keep existing",
-            onPress: () => handleSourceSwitch(currentSource, newSource, true),
-          },
-          {
-            text: "Start fresh",
-            style: "destructive",
-            onPress: () => handleSourceSwitch(currentSource, newSource, false),
-          },
-        ]
-      );
-    },
-    [uid, currentSource, strava, health, handleSourceSwitch]
-  );
-
-  const handleStravaPress = useCallback(() => {
-    if (strava.isConnected) {
-      Alert.alert("Disconnect Strava?", "Your Strava activities will remain.", [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Disconnect",
-          style: "destructive",
-          onPress: () => strava.disconnect(),
-        },
-      ]);
-    } else {
-      showSwitchConfirmation("strava");
-    }
-  }, [strava, showSwitchConfirmation]);
 
   const handleHealthPress = useCallback(() => {
     console.log("[Profile] handleHealthPress called, isConnected:", health.isConnected);
@@ -185,13 +68,13 @@ export default function ProfileScreen() {
         },
       ]);
     } else {
-      console.log("[Profile] Calling showSwitchConfirmation for apple_health");
-      showSwitchConfirmation("apple_health");
+      console.log("[Profile] Calling health.connect()...");
+      health.connect();
+      console.log("[Profile] health.connect() completed");
     }
-  }, [health, showSwitchConfirmation]);
+  }, [health]);
 
-  const isLoading =
-    strava.isLoading || strava.isSyncing || health.isLoading || health.isSyncing || isSwitching;
+  const isLoading = health.isLoading || health.isSyncing || isSwitching;
 
   const stats = [
     { label: "Total KM", value: "156.4" },
@@ -254,39 +137,6 @@ export default function ProfileScreen() {
             </View>
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Achievements</Text>
             <ChevronRight size={20} color={colors.textSecondary} />
-          </Pressable>
-
-          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
-
-          <Pressable style={styles.menuItem} onPress={handleStravaPress} disabled={isLoading}>
-            <View style={[styles.menuIcon, { backgroundColor: STRAVA_COLOR + "20" }]}>
-              <Link2 size={20} color={STRAVA_COLOR} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>
-                {strava.isConnected ? "Strava Connected" : "Connect Strava"}
-              </Text>
-              {strava.isConnected && strava.athleteUsername && (
-                <Text style={{ fontSize: 12, color: colors.textSecondary }}>
-                  @{strava.athleteUsername}
-                </Text>
-              )}
-              {strava.error && (
-                <Text style={{ fontSize: 12, color: colors.danger }}>{strava.error}</Text>
-              )}
-            </View>
-            {strava.isLoading || strava.isSyncing ? (
-              <ActivityIndicator size="small" color={STRAVA_COLOR} />
-            ) : (
-              <Text
-                style={{
-                  color: strava.isConnected ? colors.danger : colors.primary,
-                  fontWeight: "600",
-                }}
-              >
-                {strava.isConnected ? "Disconnect" : "Connect"}
-              </Text>
-            )}
           </Pressable>
 
           {Platform.OS === "ios" && health.isAvailable && (

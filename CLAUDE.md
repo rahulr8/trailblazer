@@ -9,7 +9,7 @@ BC Parks outdoor activity tracking app built with Expo, HeroUI Native, and Uniwi
 - **Components**: HeroUI Native
 - **Language**: TypeScript (strict mode)
 - **Backend**: Firebase (Auth, Firestore, Cloud Functions)
-- **Integrations**: Strava OAuth, Apple HealthKit
+- **Integrations**: Apple HealthKit
 
 ## Commands
 
@@ -31,7 +31,6 @@ contexts/               # React contexts (see contexts/CLAUDE.md)
 hooks/                  # Custom React hooks (see hooks/CLAUDE.md)
 lib/                    # Business logic
 ├── db/                 # Firestore operations (see lib/db/CLAUDE.md)
-├── strava/             # Strava client integration (see lib/strava/CLAUDE.md)
 ├── health/             # Apple Health integration (see lib/health/CLAUDE.md)
 └── constants/          # Activity constants (see lib/constants/CLAUDE.md)
 functions/              # Firebase Cloud Functions (see functions/CLAUDE.md)
@@ -46,7 +45,6 @@ Users sync activities from ONE source at a time:
 | Source | ID | Description |
 |--------|-----|-------------|
 | Manual | `manual` | User-entered activities |
-| Strava | `strava` | OAuth + webhooks sync |
 | Apple Health | `apple_health` | HealthKit workouts |
 
 Source configuration lives in `lib/constants/sources.ts` - single source of truth for colors, emojis, labels.
@@ -100,8 +98,7 @@ Order matters - outermost to innermost in `app/_layout.tsx`:
 2. `HeroUINativeProvider` (HeroUI theming)
 3. `ThemeProvider` (app theme + colors)
 4. `AuthProvider` (Firebase Auth state)
-5. `StravaProvider` (Strava OAuth flow)
-6. `BottomSheetModalProvider` (bottom sheet modals)
+5. `BottomSheetModalProvider` (bottom sheet modals)
 
 ## Uniwind Setup Notes
 
@@ -139,7 +136,7 @@ cd agents && npm install  # First time setup
 npm run feature "Add offline mode for saved trails"
 npm run fix "TypeScript errors in components folder"
 npm run review "../app/(tabs)"
-npm run integration "Debug Strava token refresh"
+npm run integration "Debug Apple Health permissions"
 ```
 
 See `agents/CLAUDE.md` for full documentation.

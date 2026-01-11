@@ -14,7 +14,6 @@ import { useTheme } from "@/contexts/theme-context";
 import { getUserStats } from "@/lib/db/users";
 import { getRecentActivities } from "@/lib/db/activities";
 import { Activity, UserStats } from "@/lib/db/types";
-import { useStravaConnection } from "@/lib/strava";
 import { useHealthConnection } from "@/lib/health";
 import { ConnectionStatusBox } from "@/components/ConnectionStatusBox";
 import { ActivitySourceCard } from "@/components/ActivitySourceCard";
@@ -26,7 +25,6 @@ export default function HomeScreen() {
   const [stats, setStats] = useState<UserStats | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
-  const strava = useStravaConnection(uid);
   const health = useHealthConnection(uid);
 
   const fetchData = async () => {
@@ -54,11 +52,6 @@ export default function HomeScreen() {
 
   const handleHealthSync = async () => {
     await health.sync();
-    await fetchData();
-  };
-
-  const handleStravaSync = async () => {
-    await strava.sync();
     await fetchData();
   };
 
@@ -143,12 +136,6 @@ export default function HomeScreen() {
             isSyncing={health.isSyncing}
             lastSyncAt={health.lastSyncAt}
           />
-          <ConnectionStatusBox
-            source="strava"
-            isConnected={strava.isConnected}
-            isSyncing={strava.isSyncing}
-            detail={strava.athleteUsername ? `@${strava.athleteUsername}` : undefined}
-          />
         </View>
 
         <ActivitySourceCard
@@ -157,14 +144,6 @@ export default function HomeScreen() {
           isConnected={health.isConnected}
           isSyncing={health.isSyncing}
           onSync={handleHealthSync}
-        />
-
-        <ActivitySourceCard
-          source="strava"
-          activities={activities}
-          isConnected={strava.isConnected}
-          isSyncing={strava.isSyncing}
-          onSync={handleStravaSync}
         />
 
         <Pressable

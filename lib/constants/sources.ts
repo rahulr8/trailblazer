@@ -14,12 +14,6 @@ export const SOURCE_CONFIG: Record<ActivitySource, SourceConfig> = {
     emoji: "❤️",
     label: "Apple Health",
   },
-  strava: {
-    color: "#FC4C02",
-    colorLight: "#FC4C0220",
-    emoji: "🏃",
-    label: "Strava",
-  },
   manual: {
     color: "#6B7280",
     colorLight: "#6B728020",
