@@ -1,6 +1,12 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Alert, Platform } from "react-native";
-import { doc, onSnapshot, updateDoc, serverTimestamp, deleteField } from "firebase/firestore";
+import {
+  doc,
+  onSnapshot,
+  updateDoc,
+  serverTimestamp,
+  deleteField,
+} from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { HealthConnection } from "@/lib/db/types";
 import { isHealthKitAvailableAsync, initHealthKit } from "./config";
@@ -94,9 +100,35 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
         console.log("[Health] Auto-sync complete:", result);
         setState((prev) => ({ ...prev, isSyncing: false }));
       })
-      .catch((error) => {
+      .catch(async (error) => {
         console.error("[Health] Auto-sync failed:", error);
         setState((prev) => ({ ...prev, isSyncing: false }));
+
+        // Check if this is an authorization error
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        const isAuthError =
+          errorMessage.includes("Authorization not determined") ||
+          errorMessage.includes("authorization denied") ||
+          errorMessage.includes("Code=5");
+
+        if (isAuthError) {
+          console.log("[Health] Authorization lost, disconnecting...");
+          // Clear the connection in Firestore so user can reconnect
+          try {
+            const userRef = doc(db, "users", uid);
+            await updateDoc(userRef, {
+              healthConnection: deleteField(),
+              updatedAt: serverTimestamp(),
+            });
+            console.log("[Health] Disconnected due to authorization loss");
+            Alert.alert(
+              "Apple Health Disconnected",
+              "HealthKit authorization was revoked. Please reconnect to continue syncing workouts."
+            );
+          } catch (disconnectError) {
+            console.error("[Health] Failed to disconnect after auth error:", disconnectError);
+          }
+        }
       });
   }, [uid, state.isConnected, state.isLoading]);
 
@@ -212,11 +244,35 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to sync";
       console.error("[Health] Sync error:", error);
-      setState((prev) => ({
-        ...prev,
-        error: errorMsg,
-      }));
-      Alert.alert("Sync Failed", errorMsg);
+
+      // Check if this is an authorization error
+      const isAuthError =
+        errorMsg.includes("Authorization not determined") ||
+        errorMsg.includes("authorization denied") ||
+        errorMsg.includes("Code=5");
+
+      if (isAuthError) {
+        console.log("[Health] Authorization lost during sync, disconnecting...");
+        try {
+          const userRef = doc(db, "users", uid);
+          await updateDoc(userRef, {
+            healthConnection: deleteField(),
+            updatedAt: serverTimestamp(),
+          });
+          Alert.alert(
+            "Apple Health Disconnected",
+            "HealthKit authorization was revoked. Please reconnect to continue syncing workouts."
+          );
+        } catch (disconnectError) {
+          console.error("[Health] Failed to disconnect after auth error:", disconnectError);
+        }
+      } else {
+        setState((prev) => ({
+          ...prev,
+          error: errorMsg,
+        }));
+        Alert.alert("Sync Failed", errorMsg);
+      }
       return 0;
     } finally {
       setState((prev) => ({ ...prev, isSyncing: false }));

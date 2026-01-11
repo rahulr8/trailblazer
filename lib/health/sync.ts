@@ -14,7 +14,7 @@ import { db } from "@/lib/firebase";
 import { collections } from "@/lib/db/utils";
 import { incrementUserStats, updateStreak } from "@/lib/db/users";
 import { calculateSteps, DEFAULT_SYNC_DAYS } from "@/lib/constants";
-import { mapWorkoutType } from "./config";
+import { mapWorkoutType, ensureHealthKitAuthorized } from "./config";
 
 interface SyncResult {
   syncedCount: number;
@@ -107,6 +107,11 @@ export async function syncHealthWorkouts(
   since?: Date
 ): Promise<SyncResult> {
   console.log("[Health] Starting sync for user:", uid);
+
+  // Ensure we have HealthKit authorization before attempting to fetch
+  // This will re-request if needed or throw if denied
+  await ensureHealthKitAuthorized();
+
   const syncStartDate = since || new Date(Date.now() - DEFAULT_SYNC_DAYS * 24 * 60 * 60 * 1000);
 
   const workouts = await getHealthKitWorkouts(syncStartDate);

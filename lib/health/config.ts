@@ -69,6 +69,14 @@ export async function isHealthKitAvailableAsync(): Promise<boolean> {
   }
 }
 
+// The permissions we need to request
+const HEALTHKIT_READ_PERMISSIONS = [
+  "HKWorkoutTypeIdentifier",
+  "HKQuantityTypeIdentifierDistanceWalkingRunning",
+  "HKQuantityTypeIdentifierDistanceCycling",
+  "HKQuantityTypeIdentifierDistanceSwimming",
+] as const;
+
 // Initialize HealthKit with permissions
 export async function initHealthKit(): Promise<void> {
   console.log("[Health] initHealthKit called");
@@ -89,12 +97,7 @@ export async function initHealthKit(): Promise<void> {
     console.log("[Health] Module loaded, calling requestAuthorization...");
 
     const authorized = await HealthKit.requestAuthorization({
-      toRead: [
-        "HKWorkoutTypeIdentifier",
-        "HKQuantityTypeIdentifierDistanceWalkingRunning",
-        "HKQuantityTypeIdentifierDistanceCycling",
-        "HKQuantityTypeIdentifierDistanceSwimming",
-      ],
+      toRead: [...HEALTHKIT_READ_PERMISSIONS],
       toShare: [],
     });
 
@@ -107,6 +110,45 @@ export async function initHealthKit(): Promise<void> {
     console.log("[Health] Authorization successful");
   } catch (error) {
     console.error("[Health] Authorization error:", error);
+    throw error;
+  }
+}
+
+// Ensure HealthKit is authorized before syncing
+// This re-requests authorization if needed (iOS shows dialog only if not determined)
+export async function ensureHealthKitAuthorized(): Promise<void> {
+  console.log("[Health] Ensuring authorization...");
+
+  if (Platform.OS !== "ios") {
+    throw new Error("Apple Health is only available on iOS");
+  }
+
+  const isAvailable = await isHealthKitAvailableAsync();
+  if (!isAvailable) {
+    throw new Error("HealthKit is not available on this device");
+  }
+
+  try {
+    const HealthKit = await import("@kingstinct/react-native-healthkit");
+
+    // requestAuthorization is idempotent - it will:
+    // - Show dialog if authorization is "not determined"
+    // - Return immediately if already authorized
+    // - Return false if previously denied (user must go to Settings)
+    const authorized = await HealthKit.requestAuthorization({
+      toRead: [...HEALTHKIT_READ_PERMISSIONS],
+      toShare: [],
+    });
+
+    console.log("[Health] Authorization check result:", authorized);
+
+    if (!authorized) {
+      throw new Error(
+        "HealthKit authorization denied. Please enable in Settings > Privacy & Security > Health > Trailblazer"
+      );
+    }
+  } catch (error) {
+    console.error("[Health] Authorization check error:", error);
     throw error;
   }
 }

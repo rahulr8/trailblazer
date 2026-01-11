@@ -117,13 +117,25 @@ source: "manual" | "apple_health";
 3. iOS shows permissions sheet
 4. On approval, `healthConnection` stored in Firestore
 5. Auto-sync effect triggers when `isConnected` becomes true
-6. Sync queries 30 days of workouts via `queryWorkoutSamples()`
-7. Workouts deduplicated by `externalId` (HealthKit's `uuid`)
-8. Distance retrieved via `workout.getStatistic()` for each distance type
-9. New activities stored in `users/{uid}/activities`
-10. User stats updated with totals
+6. **Before fetching**, `ensureHealthKitAuthorized()` verifies permissions are still valid
+7. Sync queries 30 days of workouts via `queryWorkoutSamples()`
+8. Workouts deduplicated by `externalId` (HealthKit's `uuid`)
+9. Distance retrieved via `workout.getStatistic()` for each distance type
+10. New activities stored in `users/{uid}/activities`
+11. User stats updated with totals
 
 **Important**: Only ONE sync runs at a time. The auto-sync effect uses a `hasAutoSynced` ref to prevent duplicate syncs on app open.
+
+## Authorization Recovery
+
+HealthKit authorization can be lost between app sessions (user revoked in Settings, app reinstall, etc.). The module handles this gracefully:
+
+1. **Before every sync**: `ensureHealthKitAuthorized()` is called to verify/re-request authorization
+2. **On "Authorization not determined" errors**: The user is automatically disconnected from Apple Health
+3. **User notification**: An alert informs them to reconnect via the profile page
+4. **Firestore cleanup**: `healthConnection` field is deleted so UI reflects disconnected state
+
+This prevents the sync-error loop that occurs when Firestore says "connected" but iOS says "not authorized".
 
 ## iOS-Only Feature
 
@@ -162,6 +174,24 @@ To debug issues:
 1. Check Metro console for `[Health]` logs
 2. Errors show Alert dialogs to user with error messages
 3. Error state is also stored in `health.error` for UI display
+
+## Exports
+
+```typescript
+// Hook for managing connection state
+export { useHealthConnection } from "./hooks";
+
+// Sync workouts to Firestore
+export { syncHealthWorkouts } from "./sync";
+
+// HealthKit utilities
+export {
+  isHealthKitAvailableAsync,   // Check if HealthKit is available
+  initHealthKit,               // Request initial authorization
+  ensureHealthKitAuthorized,   // Verify/re-request auth before operations
+  mapWorkoutType,              // Map HealthKit workout types to app types
+} from "./config";
+```
 
 ## Dynamic Imports
 
