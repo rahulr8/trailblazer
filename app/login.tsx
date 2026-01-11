@@ -2,7 +2,6 @@ import { useState } from "react";
 
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
-import { LinearGradient } from "expo-linear-gradient";
 import { Stack, router } from "expo-router";
 
 import { Button } from "heroui-native";
@@ -49,7 +48,7 @@ function getFirebaseErrorMessage(error: AuthError): string {
 }
 
 export default function LoginScreen() {
-  const { colors, gradients, shadows } = useTheme();
+  const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
@@ -100,6 +99,13 @@ export default function LoginScreen() {
     setMode((prev) => (prev === "login" ? "signup" : "login"));
   };
 
+  const title = mode === "login" ? "Welcome Back" : "Create Account";
+  const subtitle =
+    mode === "login" ? "Sign in to continue your adventure" : "Join the BC Parks community";
+  const submitText = mode === "login" ? "Sign In" : "Create Account";
+  const togglePrompt = mode === "login" ? "Don't have an account?" : "Already have an account?";
+  const toggleAction = mode === "login" ? "Sign Up" : "Sign In";
+
   return (
     <>
       <Stack.Screen
@@ -108,114 +114,94 @@ export default function LoginScreen() {
           presentation: "fullScreenModal",
         }}
       />
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <LinearGradient
-          colors={gradients.primary.colors as unknown as [string, string, ...string[]]}
-          start={gradients.primary.start}
-          end={gradients.primary.end}
-          style={styles.headerGradient}
-        >
-          <View style={[styles.headerContent, { paddingTop: insets.top + Spacing.xl }]}>
-            <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>Trailblazer</Text>
-              <Text style={styles.tagline}>Your outdoor adventure companion</Text>
-            </View>
-          </View>
-        </LinearGradient>
+      <View
+        style={[
+          styles.container,
+          { backgroundColor: colors.background, paddingTop: insets.top + Spacing.xl },
+        ]}
+      >
+        <View style={styles.brandingContainer}>
+          <Text style={[styles.logoText, { color: colors.primary }]}>Trailblazer</Text>
+          <Text style={[styles.tagline, { color: colors.textSecondary }]}>
+            Your outdoor adventure companion
+          </Text>
+        </View>
 
-        <View style={[styles.formContainer, shadows.lg]}>
-          <View style={[styles.formCard, { backgroundColor: colors.cardBackground }]}>
-            <Text style={[styles.formTitle, { color: colors.textPrimary }]}>
-              {mode === "login" ? "Welcome Back" : "Create Account"}
-            </Text>
-            <Text style={[styles.formSubtitle, { color: colors.textSecondary }]}>
-              {mode === "login"
-                ? "Sign in to continue your adventure"
-                : "Join the BC Parks community"}
-            </Text>
+        <View style={[styles.formCard, { backgroundColor: colors.cardBackground }, shadows.lg]}>
+          <Text style={[styles.formTitle, { color: colors.textPrimary }]}>{title}</Text>
+          <Text style={[styles.formSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
 
-            <View style={styles.inputGroup}>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
-                ]}
-              >
-                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                <TextInput
-                  placeholder="Email address"
-                  placeholderTextColor={colors.textSecondary}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  style={[styles.textInput, { color: colors.textPrimary }]}
-                />
-              </View>
-
-              <View
-                style={[
-                  styles.inputWrapper,
-                  { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
-                ]}
-              >
-                <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                <TextInput
-                  placeholder="Password"
-                  placeholderTextColor={colors.textSecondary}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  style={[styles.textInput, { color: colors.textPrimary }]}
-                />
-                <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                  {showPassword ? (
-                    <EyeOff size={20} color={colors.textSecondary} />
-                  ) : (
-                    <Eye size={20} color={colors.textSecondary} />
-                  )}
-                </Pressable>
-              </View>
+          <View style={styles.inputGroup}>
+            <View
+              style={[
+                styles.inputWrapper,
+                { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
+              ]}
+            >
+              <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <TextInput
+                placeholder="Email address"
+                placeholderTextColor={colors.textSecondary}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoCorrect={false}
+                style={[styles.textInput, { color: colors.textPrimary }]}
+              />
             </View>
 
-            {error && (
-              <View style={[styles.errorContainer, { backgroundColor: colors.danger + "15" }]}>
-                <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
-              </View>
-            )}
-
-            {mode === "login" && (
-              <Pressable style={styles.forgotPassword}>
-                <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
-                  Forgot password?
-                </Text>
+            <View
+              style={[
+                styles.inputWrapper,
+                { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
+              ]}
+            >
+              <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
+              <TextInput
+                placeholder="Password"
+                placeholderTextColor={colors.textSecondary}
+                value={password}
+                onChangeText={setPassword}
+                secureTextEntry={!showPassword}
+                style={[styles.textInput, { color: colors.textPrimary }]}
+              />
+              <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
+                {showPassword ? (
+                  <EyeOff size={20} color={colors.textSecondary} />
+                ) : (
+                  <Eye size={20} color={colors.textSecondary} />
+                )}
               </Pressable>
-            )}
-
-            <Button onPress={handleAuth} isDisabled={loading} style={styles.submitButton}>
-              {loading ? (
-                <ActivityIndicator size="small" color="#000" />
-              ) : mode === "login" ? (
-                "Sign In"
-              ) : (
-                "Create Account"
-              )}
-            </Button>
-
-            <SocialAuthButtons mode={mode} />
+            </View>
           </View>
 
-          <View style={styles.toggleContainer}>
-            <Text style={[styles.toggleText, { color: colors.textSecondary }]}>
-              {mode === "login" ? "Don't have an account?" : "Already have an account?"}
-            </Text>
-            <Pressable onPress={toggleMode}>
-              <Text style={[styles.toggleLink, { color: colors.primary }]}>
-                {mode === "login" ? "Sign Up" : "Sign In"}
+          {error && (
+            <View style={[styles.errorContainer, { backgroundColor: colors.danger + "15" }]}>
+              <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
+            </View>
+          )}
+
+          {mode === "login" && (
+            <Pressable style={styles.forgotPassword}>
+              <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
+                Forgot password?
               </Text>
             </Pressable>
-          </View>
+          )}
+
+          <Button onPress={handleAuth} isDisabled={loading} style={styles.submitButton}>
+            {loading ? <ActivityIndicator size="small" color="#000" /> : submitText}
+          </Button>
+
+          <SocialAuthButtons mode={mode} />
+        </View>
+
+        <View style={styles.toggleContainer}>
+          <Text style={[styles.toggleText, { color: colors.textSecondary }]}>{togglePrompt}</Text>
+          <Pressable onPress={toggleMode}>
+            <Text style={[styles.toggleLink, { color: colors.primary }]}>{toggleAction}</Text>
+          </Pressable>
         </View>
       </View>
     </>
@@ -225,34 +211,19 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  headerGradient: {
-    height: 280,
-  },
-  headerContent: {
-    flex: 1,
     paddingHorizontal: Spacing.xl,
-    justifyContent: "center",
   },
-  logoContainer: {
-    flex: 1,
-    justifyContent: "center",
+  brandingContainer: {
     alignItems: "center",
+    marginBottom: Spacing["2xl"],
   },
   logoText: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#FFFFFF",
   },
   tagline: {
     fontSize: 16,
-    color: "rgba(255, 255, 255, 0.8)",
     marginTop: Spacing.xs,
-  },
-  formContainer: {
-    flex: 1,
-    marginTop: -40,
-    paddingHorizontal: Spacing.xl,
   },
   formCard: {
     borderRadius: BorderRadius["2xl"],
