@@ -2,19 +2,21 @@
 
 ## Overview
 
-Add a digital wallet feature to the Trailblazer+ React Native app that displays membership cards in a stacked view similar to Apple Wallet. Cards are managed via a separate web app and stored in Firebase Firestore.
+Add a digital wallet feature to the Trailblazer React Native app that displays membership cards in a stacked view similar to Apple Wallet. Cards are managed via a separate web app and stored in Firebase Firestore.
 
 ## Requirements
 
 ### Core Functionality
+
 - Display membership cards in a stacked/cascading layout
 - Tap card to expand and show back side with barcode
-- Support multiple card types (NSMBA, BC Parks, Trailblazer+, etc.)
+- Support multiple card types (NSMBA, BC Parks, Trailblazer, etc.)
 - Cards sync from Firebase, managed by external web app
 - Works offline (cached locally)
 - Cross-platform (iOS and Android)
 
 ### Out of Scope
+
 - Screenshot prevention
 - Validator app for scanning cards
 - Cryptographic signing of cards
@@ -22,21 +24,23 @@ Add a digital wallet feature to the Trailblazer+ React Native app that displays 
 
 ## Technical Stack (Already Available)
 
-| Requirement | Library | Status |
-|-------------|---------|--------|
-| Card animations | React Native Reanimated v4 | ✅ Installed |
-| Gestures | React Native Gesture Handler | ✅ Installed |
-| Gradients | expo-linear-gradient | ✅ Installed |
-| Local cache | MMKV | ✅ Installed |
-| Database | Firebase Firestore | ✅ Configured |
-| Styling | Uniwind + HeroUI Native | ✅ Configured |
+| Requirement     | Library                      | Status        |
+| --------------- | ---------------------------- | ------------- |
+| Card animations | React Native Reanimated v4   | ✅ Installed  |
+| Gestures        | React Native Gesture Handler | ✅ Installed  |
+| Gradients       | expo-linear-gradient         | ✅ Installed  |
+| Local cache     | MMKV                         | ✅ Installed  |
+| Database        | Firebase Firestore           | ✅ Configured |
+| Styling         | Uniwind + HeroUI Native      | ✅ Configured |
 
 ### To Install
+
 - `react-native-barcode-svg` - For rendering barcodes from values
 
 ## Database Schema
 
 ### Card Templates Collection
+
 Path: `cardTemplates/{templateId}`
 
 Managed by web app. Defines the visual design for each card type.
@@ -44,13 +48,13 @@ Managed by web app. Defines the visual design for each card type.
 ```typescript
 interface CardTemplate {
   id: string;
-  name: string;                    // "NSMBA"
-  organizationName: string;        // "North Shore Mountain Bike Association"
-  logoUrl: string;                 // Firebase Storage URL
+  name: string; // "NSMBA"
+  organizationName: string; // "North Shore Mountain Bike Association"
+  logoUrl: string; // Firebase Storage URL
 
   front: {
     gradient: {
-      colors: string[];            // ["#1a1a1a", "#2d2d2d"]
+      colors: string[]; // ["#1a1a1a", "#2d2d2d"]
       direction: "horizontal" | "vertical" | "diagonal";
     };
     textColor: string;
@@ -58,8 +62,8 @@ interface CardTemplate {
   };
 
   back: {
-    backgroundColor: string;       // "#ffffff"
-    textColor: string;             // "#000000"
+    backgroundColor: string; // "#ffffff"
+    textColor: string; // "#000000"
     barcodeFormat: "CODE128" | "QR" | "CODE39";
   };
 
@@ -70,6 +74,7 @@ interface CardTemplate {
 ```
 
 ### User Wallet Cards Subcollection
+
 Path: `users/{uid}/walletCards/{cardId}`
 
 User's individual card instances with denormalized design data.
@@ -77,21 +82,21 @@ User's individual card instances with denormalized design data.
 ```typescript
 interface WalletCard {
   id: string;
-  templateId: string;              // Reference to cardTemplates
+  templateId: string; // Reference to cardTemplates
 
   // User-specific data
-  memberId: string;                // "123456" - display ID
+  memberId: string; // "123456" - display ID
   memberSince: Timestamp;
 
   // Barcode data
-  barcodeValue: string;            // "998811" - encoded in barcode
-  barcodeLabel?: string;           // "PARKS SCANNER" - text below barcode
+  barcodeValue: string; // "998811" - encoded in barcode
+  barcodeLabel?: string; // "PARKS SCANNER" - text below barcode
 
   // Lifecycle
   status: "active" | "expired" | "revoked";
   issuedAt: Timestamp;
-  expiresAt: Timestamp | null;     // null = never expires
-  lastSyncedAt: Timestamp;         // When design was synced from template
+  expiresAt: Timestamp | null; // null = never expires
+  lastSyncedAt: Timestamp; // When design was synced from template
 
   // Denormalized design (copied from template)
   design: {
@@ -118,6 +123,7 @@ interface WalletCard {
 ## UI Components to Build
 
 ### 1. WalletScreen
+
 Path: `app/(tabs)/wallet.tsx` or integrate into existing tab
 
 - Fetches user's wallet cards from Firestore
@@ -126,6 +132,7 @@ Path: `app/(tabs)/wallet.tsx` or integrate into existing tab
 - Handles empty state (no cards)
 
 ### 2. WalletCardStack
+
 Path: `components/wallet/WalletCardStack.tsx`
 
 - Renders cards in stacked/cascading layout
@@ -135,6 +142,7 @@ Path: `components/wallet/WalletCardStack.tsx`
 - Uses Reanimated shared values for smooth animations
 
 ### 3. WalletCard
+
 Path: `components/wallet/WalletCard.tsx`
 
 - Renders individual card with front and back faces
@@ -144,6 +152,7 @@ Path: `components/wallet/WalletCard.tsx`
 - Uses expo-linear-gradient for card backgrounds
 
 ### 4. BarcodeDisplay
+
 Path: `components/wallet/BarcodeDisplay.tsx`
 
 - Takes barcodeValue and barcodeFormat as props
@@ -153,6 +162,7 @@ Path: `components/wallet/BarcodeDisplay.tsx`
 ## Data Flow
 
 ### Initial Load
+
 ```
 App opens
   → Fetch walletCards subcollection from Firestore
@@ -161,6 +171,7 @@ App opens
 ```
 
 ### Offline Access
+
 ```
 App opens (no internet)
   → Load cached cards from MMKV
@@ -169,6 +180,7 @@ App opens (no internet)
 ```
 
 ### Card Updates (via web app)
+
 ```
 Web app updates card status/design
   → Firestore updates document
@@ -177,6 +189,7 @@ Web app updates card status/design
 ```
 
 ### Design Refresh (optional)
+
 ```
 On app open, for each card:
   if template.updatedAt > card.lastSyncedAt
@@ -211,16 +224,19 @@ app/
 ## Animation Specifications
 
 ### Stacked Card Layout
+
 - Cards stacked with ~40px vertical offset between each
 - Back cards scaled to ~0.95 of front card
 - Subtle shadow on each card for depth
 
 ### Card Selection
+
 - Tap to bring card to front
 - Other cards animate down/away
 - Selected card expands to show details
 
 ### Card Flip (to show barcode)
+
 - 3D rotation around Y-axis
 - Duration: ~400ms with spring physics
 - Back face renders when rotation > 90deg
@@ -250,13 +266,14 @@ app/
 ## Visual Reference
 
 ### Stacked View (Front)
+
 ```
 ┌─────────────────────────┐
 │ NSMBA                   │  ← Back card (dark)
 ├─────────────────────────┤
 │ BC PARKS                │  ← Middle card (green)
 ├─────────────────────────┤
-│ TRAILBLAZER+            │  ← Front card (orange gradient)
+│ Trailblazer            │  ← Front card (orange gradient)
 │                         │
 │ MEMBER SINCE            │
 │ 2024                    │
@@ -264,6 +281,7 @@ app/
 ```
 
 ### Expanded Card (Back with Barcode)
+
 ```
 ┌─────────────────────────┐
 │            +TRAILBLAZER │

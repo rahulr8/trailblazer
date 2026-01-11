@@ -1,6 +1,6 @@
 # App Directory - Expo Router
 
-Expo Router file-based routing for Trailblazer+.
+Expo Router file-based routing for Trailblazer.
 
 ## Route Structure
 
@@ -41,12 +41,14 @@ return <Stack>
 ```
 
 **Critical**: Expo Router maintains navigation state separately from screen definitions. After auth changes, use `router.replace()` to navigate:
+
 - After sign in: `router.replace("/(tabs)")`
 - After sign out: `router.replace("/login")`
 
 ## Navigation Patterns
 
 ### Opening Modals
+
 ```typescript
 import { router } from "expo-router";
 
@@ -59,28 +61,31 @@ router.back();
 ```
 
 ### Full-Screen Routes
+
 ```typescript
 // Chat opens as full-screen modal with slide animation
 router.push("/chat");
 ```
 
 ### Tab Navigation
+
 Tabs handle their own navigation. Users switch via bottom tab bar with haptic feedback.
 
 ## Screen Responsibilities
 
-| Screen | Purpose | Key Features |
-|--------|---------|--------------|
-| `login.tsx` | Authentication | Google/Apple sign-in |
-| `(tabs)/index.tsx` | Home dashboard | Stats, challenge progress, activity feed, connections |
-| `(tabs)/explore.tsx` | Adventure discovery | BC Parks grid, difficulty levels |
-| `(tabs)/rewards.tsx` | Rewards store | Partner offers, platinum upgrade CTA |
-| `(tabs)/profile.tsx` | User settings | Integrations, stats, sign out |
-| `chat.tsx` | AI assistant | Chat with Parker for trail recommendations |
+| Screen               | Purpose             | Key Features                                          |
+| -------------------- | ------------------- | ----------------------------------------------------- |
+| `login.tsx`          | Authentication      | Google/Apple sign-in                                  |
+| `(tabs)/index.tsx`   | Home dashboard      | Stats, challenge progress, activity feed, connections |
+| `(tabs)/explore.tsx` | Adventure discovery | BC Parks grid, difficulty levels                      |
+| `(tabs)/rewards.tsx` | Rewards store       | Partner offers, platinum upgrade CTA                  |
+| `(tabs)/profile.tsx` | User settings       | Integrations, stats, sign out                         |
+| `chat.tsx`           | AI assistant        | Chat with Parker for trail recommendations            |
 
 ## Modal Presentation
 
 All modals use `transparentModal` with `fade` animation:
+
 - Background screen remains visible (dimmed)
 - Modal content slides/fades in
 - Tap outside or swipe to dismiss
@@ -101,15 +106,18 @@ GestureHandlerRootView
 ## Adding New Screens
 
 ### New Tab Screen
+
 1. Create `app/(tabs)/new-screen.tsx`
 2. Add `<Tabs.Screen>` entry in `app/(tabs)/_layout.tsx`
 3. Choose icon from `lucide-react-native`
 
 ### New Modal
+
 1. Create `app/(modals)/new-modal.tsx`
 2. Add `<Stack.Screen>` entry in `app/(modals)/_layout.tsx`
 3. Navigate with `router.push("/(modals)/new-modal")`
 
 ### New Full-Screen Route
+
 1. Create `app/new-route.tsx`
 2. Add `<Stack.Screen>` entry in `app/_layout.tsx` with presentation options

@@ -1,6 +1,6 @@
 # Apple Health Module (`lib/health/`)
 
-Client-side Apple HealthKit integration for syncing workouts to Trailblazer+.
+Client-side Apple HealthKit integration for syncing workouts to Trailblazer.
 
 ## Structure
 
@@ -33,8 +33,8 @@ The library uses an Expo config plugin. In `app.json`:
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "Trailblazer+ reads your workouts...",
-          "NSHealthUpdateUsageDescription": "Trailblazer+ can save activities..."
+          "NSHealthShareUsageDescription": "Trailblazer reads your workouts...",
+          "NSHealthUpdateUsageDescription": "Trailblazer can save activities..."
         }
       ]
     ]
@@ -44,11 +44,11 @@ The library uses an Expo config plugin. In `app.json`:
 
 ## Key Characteristics
 
-| Aspect | Apple Health |
-|--------|--------------|
-| Auth | On-device HealthKit permission |
-| Sync trigger | Manual pull or app open |
-| Token storage | None needed |
+| Aspect        | Apple Health                    |
+| ------------- | ------------------------------- |
+| Auth          | On-device HealthKit permission  |
+| Sync trigger  | Manual pull or app open         |
+| Token storage | None needed                     |
 | Data location | On-device → Direct to Firestore |
 
 **Apple Health sync is client-side only** - no Cloud Functions needed.
@@ -57,15 +57,15 @@ The library uses an Expo config plugin. In `app.json`:
 
 ```typescript
 const {
-  isConnected,    // boolean - has HealthKit authorization
-  isAvailable,    // boolean - is HealthKit available (iOS only)
-  isLoading,      // boolean - loading state
-  isSyncing,      // boolean - syncing workouts
-  lastSyncAt,     // Date | null
-  error,          // string | null
-  connect,        // () => Promise<void> - request HealthKit auth
-  disconnect,     // () => Promise<void> - clear local flag
-  sync,           // () => Promise<number> - sync workouts, return count
+  isConnected, // boolean - has HealthKit authorization
+  isAvailable, // boolean - is HealthKit available (iOS only)
+  isLoading, // boolean - loading state
+  isSyncing, // boolean - syncing workouts
+  lastSyncAt, // Date | null
+  error, // string | null
+  connect, // () => Promise<void> - request HealthKit auth
+  disconnect, // () => Promise<void> - clear local flag
+  sync, // () => Promise<number> - sync workouts, return count
 } = useHealthConnection(uid);
 ```
 
@@ -73,21 +73,22 @@ const {
 
 HealthKit activity types are mapped to app types:
 
-| HealthKit | App Type |
-|-----------|----------|
-| `running` | run |
-| `hiking` | hike |
-| `cycling` | bike |
-| `walking` | walk |
-| `swimming` | swim |
-| `paddleSports`, `rowing` | paddle |
-| `snowSports`, `crossCountrySkiing`, `downhillSkiing` | snow |
-| `functionalStrengthTraining`, `crossTraining` | workout |
-| (others) | other |
+| HealthKit                                            | App Type |
+| ---------------------------------------------------- | -------- |
+| `running`                                            | run      |
+| `hiking`                                             | hike     |
+| `cycling`                                            | bike     |
+| `walking`                                            | walk     |
+| `swimming`                                           | swim     |
+| `paddleSports`, `rowing`                             | paddle   |
+| `snowSports`, `crossCountrySkiing`, `downhillSkiing` | snow     |
+| `functionalStrengthTraining`, `crossTraining`        | workout  |
+| (others)                                             | other    |
 
 ## Data Sources
 
 Users can use:
+
 - `manual` - Manual activity logging
 - `apple_health` - Apple Health connected (iOS only)
 
@@ -97,16 +98,16 @@ Users can use:
 
 ```typescript
 {
-  isAuthorized: boolean;     // User granted HealthKit permission
-  connectedAt: Timestamp;    // When connected
-  lastSyncAt: Timestamp | null;  // Last successful sync
+  isAuthorized: boolean; // User granted HealthKit permission
+  connectedAt: Timestamp; // When connected
+  lastSyncAt: Timestamp | null; // Last successful sync
 }
 ```
 
 ### ActivityDocument.source
 
 ```typescript
-source: "manual" | "apple_health"
+source: "manual" | "apple_health";
 ```
 
 ## Sync Flow
@@ -133,7 +134,7 @@ HealthKit is iOS-only. The Apple Health option only appears on iOS devices where
 This module uses shared constants from `lib/constants/`:
 
 ```typescript
-import { calculateSteps, DEFAULT_SYNC_DAYS } from "@/lib/constants";
+import { DEFAULT_SYNC_DAYS, calculateSteps } from "@/lib/constants";
 ```
 
 - `DEFAULT_SYNC_DAYS` - 30 day default sync period
@@ -157,6 +158,7 @@ All operations are logged with `[Health]` prefix:
 ```
 
 To debug issues:
+
 1. Check Metro console for `[Health]` logs
 2. Errors show Alert dialogs to user with error messages
 3. Error state is also stored in `health.error` for UI display

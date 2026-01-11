@@ -1,6 +1,6 @@
 # Hooks Directory
 
-Custom React hooks for Trailblazer+.
+Custom React hooks for Trailblazer.
 
 ## Available Hooks
 
@@ -15,6 +15,7 @@ const colorScheme = useColorScheme(); // "light" | "dark" | null
 ```
 
 **Platform Variants**:
+
 - `use-color-scheme.ts` - Default (re-exports from react-native)
 - `use-color-scheme.web.ts` - Web-specific implementation
 
@@ -25,6 +26,7 @@ const colorScheme = useColorScheme(); // "light" | "dark" | null
 These hooks live in `lib/` with their related code, not in `hooks/`:
 
 ### useHealthConnection (`lib/health/hooks.ts`)
+
 ```typescript
 const {
   isConnected,
@@ -32,9 +34,9 @@ const {
   isSyncing,
   lastSyncAt,
   error,
-  connect,      // Request HealthKit permissions
-  disconnect,   // Revoke connection
-  sync,         // Sync workouts from Apple Health
+  connect, // Request HealthKit permissions
+  disconnect, // Revoke connection
+  sync, // Sync workouts from Apple Health
 } = useHealthConnection();
 ```
 
@@ -47,7 +49,7 @@ const {
 ## Creating New Hooks
 
 ```typescript
-import { useState, useEffect, useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useMyHook(param: string) {
   const [state, setState] = useState<MyType | null>(null);
@@ -61,9 +63,14 @@ export function useMyHook(param: string) {
     };
   }, [param]);
 
-  const doAction = useCallback(async () => {
-    // Action logic
-  }, [/* dependencies */]);
+  const doAction = useCallback(
+    async () => {
+      // Action logic
+    },
+    [
+      /* dependencies */
+    ]
+  );
 
   return { state, isLoading, error, doAction };
 }
@@ -71,10 +78,10 @@ export function useMyHook(param: string) {
 
 ## Hook Location Guidelines
 
-| Location | When to Use |
-|----------|-------------|
-| `hooks/` | Generic UI hooks, platform utilities |
+| Location                 | When to Use                              |
+| ------------------------ | ---------------------------------------- |
+| `hooks/`                 | Generic UI hooks, platform utilities     |
 | `lib/{feature}/hooks.ts` | Feature-specific hooks with related code |
-| `components/` | Component-specific hooks (rare) |
+| `components/`            | Component-specific hooks (rare)          |
 
 **Colocate hooks with related code** - `useHealthConnection` lives in `lib/health/` because it uses HealthKit config, types, and sync functions.

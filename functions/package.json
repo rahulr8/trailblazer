@@ -1,7 +1,7 @@
 {
   "name": "trailblazer-functions",
   "version": "1.0.0",
-  "description": "Firebase Cloud Functions for Trailblazer+",
+  "description": "Firebase Cloud Functions for Trailblazer",
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",

@@ -1,6 +1,6 @@
 # Database Module (`lib/db/`)
 
-Firestore database operations for Trailblazer+.
+Firestore database operations for Trailblazer.
 
 ## Structure
 
@@ -29,12 +29,14 @@ conversations/{sessionId}
 ## Key Types
 
 ### UserDocument
+
 - `email`, `displayName`, `photoURL`
 - `membershipTier`: `"free"` | `"platinum"`
 - `stats`: `{ totalKm, totalMinutes, totalSteps, currentStreak }`
 - `healthConnection?`: Apple Health authorization status
 
 ### ActivityDocument
+
 - `source`: `"manual"` | `"apple_health"` - tracks where activity came from
 - `externalId`: External activity ID (null for manual)
 - `type`: `"run"` | `"hike"` | `"bike"` | `"walk"` | etc.
@@ -45,6 +47,7 @@ conversations/{sessionId}
 - Optional fields: `elapsedTime`, `elevationGain`, `name`, `sportType`
 
 ### HealthConnection (on UserDocument)
+
 - `isAuthorized`: Boolean indicating HealthKit permission granted
 - `connectedAt`: When connected
 - `lastSyncAt`: Last successful sync timestamp
@@ -54,16 +57,17 @@ conversations/{sessionId}
 Use `collections` object from `utils.ts` to prevent typos:
 
 ```typescript
-import { collections } from '@/lib/db';
+import { collections } from "@/lib/db";
 
-collections.users                    // "users"
-collections.activities(uid)          // "users/{uid}/activities"
-collections.savedAdventures(uid)     // "users/{uid}/savedAdventures"
+collections.users; // "users"
+collections.activities(uid); // "users/{uid}/activities"
+collections.savedAdventures(uid); // "users/{uid}/savedAdventures"
 ```
 
 ## Activity Logging
 
 When logging activities, the `source` field is automatically set:
+
 - Manual activities via `logActivity()`: `source: "manual"`, `externalId: null`
 - Apple Health activities (via client sync): `source: "apple_health"`, `externalId: "<sourceId>_<startTime>"`
 
@@ -87,6 +91,7 @@ await recalculateUserStats(uid);
 ## Firestore Indexes
 
 Required composite index for activity queries by source:
+
 - `users/{uid}/activities`, `source` + `externalId` fields
 
 Deploy with: `firebase deploy --only firestore:indexes`

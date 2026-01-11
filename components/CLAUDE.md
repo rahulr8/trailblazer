@@ -1,6 +1,6 @@
 # Components (`components/`)
 
-Reusable UI components for Trailblazer+.
+Reusable UI components for Trailblazer.
 
 ## Activity Components
 
@@ -15,6 +15,7 @@ import { ActivityListItem } from "@/components/ActivityListItem";
 ```
 
 **Props:**
+
 - `activity: Activity` - Activity object from database
 
 Automatically applies correct colors based on `activity.source` using `SOURCE_CONFIG`.
@@ -36,6 +37,7 @@ import { ActivitySourceCard } from "@/components/ActivitySourceCard";
 ```
 
 **Props:**
+
 - `source: ActivitySource` - Data source ("apple_health" | "manual")
 - `activities: Activity[]` - All activities (will be filtered by source)
 - `isConnected: boolean` - Whether source is connected
@@ -43,6 +45,7 @@ import { ActivitySourceCard } from "@/components/ActivitySourceCard";
 - `onSync: () => void` - Callback for sync button
 
 **Renders:**
+
 - Header with emoji and source label
 - Sync button (when connected)
 - Activity list (when connected and has activities)
@@ -65,6 +68,7 @@ import { ConnectionStatusBox } from "@/components/ConnectionStatusBox";
 ```
 
 **Props:**
+
 - `source: ActivitySource` - Data source
 - `isConnected: boolean` - Whether source is connected
 - `isSyncing: boolean` - Whether sync is in progress

@@ -1,4 +1,4 @@
-# Trailblazer+ React Native
+# Trailblazer React Native
 
 BC Parks outdoor activity tracking app built with Expo, HeroUI Native, and Uniwind.
 
@@ -42,10 +42,10 @@ agents/                 # AI development agents (see agents/CLAUDE.md)
 
 Users sync activities from ONE source at a time:
 
-| Source | ID | Description |
-|--------|-----|-------------|
-| Manual | `manual` | User-entered activities |
-| Apple Health | `apple_health` | HealthKit workouts |
+| Source       | ID             | Description             |
+| ------------ | -------------- | ----------------------- |
+| Manual       | `manual`       | User-entered activities |
+| Apple Health | `apple_health` | HealthKit workouts      |
 
 Source configuration lives in `lib/constants/sources.ts` - single source of truth for colors, emojis, labels.
 
@@ -85,6 +85,7 @@ Source configuration lives in `lib/constants/sources.ts` - single source of trut
 Expo Router maintains navigation state separately from conditional Stack rendering. Changing which screens are defined in `_layout.tsx` based on auth state does NOT automatically navigate the user.
 
 **Always use explicit navigation after auth changes:**
+
 - After sign in: `router.replace("/(tabs)")`
 - After sign out: `router.replace("/login")`
 

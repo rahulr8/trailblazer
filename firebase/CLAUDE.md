@@ -1,6 +1,6 @@
 # Firebase Config (`firebase/`)
 
-Firebase configuration files for Trailblazer+.
+Firebase configuration files for Trailblazer.
 
 ## Structure
 
@@ -32,6 +32,7 @@ firebase deploy --only functions
 ## Firestore Security Rules
 
 The rules in `firestore.rules` enforce:
+
 - Users can only read/write their own data (`/users/{userId}/**`)
 - Authenticated access for conversations
 - No client access to webhook queue (Cloud Functions only)
@@ -43,5 +44,6 @@ The rules in `firestore.rules` enforce:
 ## Adding New Indexes
 
 If you get a Firestore error about missing indexes:
+
 1. The error message includes a link to create the index in Console
 2. Or add manually to `firestore.indexes.json` and deploy

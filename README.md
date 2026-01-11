@@ -1,4 +1,4 @@
-# Trailblazer+
+# Trailblazer
 
 BC Parks outdoor activity tracking app built with Expo and Firebase.
 
@@ -98,6 +98,7 @@ npm run firebase:deploy # Build and deploy Cloud Functions
 ## Documentation
 
 ### Code Reference (CLAUDE.md files)
+
 - `/CLAUDE.md` - Project overview and code standards
 - `/lib/health/CLAUDE.md` - Apple Health integration
 - `/lib/db/CLAUDE.md` - Database operations

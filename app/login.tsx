@@ -3,23 +3,22 @@ import { useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 
 import { LinearGradient } from "expo-linear-gradient";
-import { router, Stack } from "expo-router";
-
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  AuthError,
-} from "firebase/auth";
+import { Stack, router } from "expo-router";
 
 import { Button } from "heroui-native";
 
+import {
+  AuthError,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
-import { auth } from "@/lib/firebase";
 import { createUser } from "@/lib/db/users";
+import { auth } from "@/lib/firebase";
 
 type AuthMode = "login" | "signup";
 
@@ -117,7 +116,7 @@ export default function LoginScreen() {
         >
           <View style={[styles.headerContent, { paddingTop: insets.top + Spacing.xl }]}>
             <View style={styles.logoContainer}>
-              <Text style={styles.logoText}>Trailblazer+</Text>
+              <Text style={styles.logoText}>Trailblazer</Text>
               <Text style={styles.tagline}>Your outdoor adventure companion</Text>
             </View>
           </View>
@@ -202,7 +201,6 @@ export default function LoginScreen() {
                 "Create Account"
               )}
             </Button>
-
           </View>
 
           <View style={styles.toggleContainer}>

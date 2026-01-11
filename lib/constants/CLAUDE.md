@@ -1,6 +1,6 @@
 # Constants Module (`lib/constants/`)
 
-Shared constants and configuration values used across the Trailblazer+ app.
+Shared constants and configuration values used across the Trailblazer app.
 
 ## Structure
 
@@ -14,19 +14,24 @@ lib/constants/
 ## Activity Constants (`activity.ts`)
 
 ```typescript
-import { STEPS_PER_KM, STEP_COUNTING_ACTIVITIES, calculateSteps, DEFAULT_SYNC_DAYS } from "@/lib/constants";
+import {
+  DEFAULT_SYNC_DAYS,
+  STEPS_PER_KM,
+  STEP_COUNTING_ACTIVITIES,
+  calculateSteps,
+} from "@/lib/constants";
 ```
 
-| Constant | Value | Description |
-|----------|-------|-------------|
-| `STEPS_PER_KM` | `1300` | Empirical average steps per kilometer |
+| Constant                   | Value                     | Description                                  |
+| -------------------------- | ------------------------- | -------------------------------------------- |
+| `STEPS_PER_KM`             | `1300`                    | Empirical average steps per kilometer        |
 | `STEP_COUNTING_ACTIVITIES` | `["walk", "hike", "run"]` | Activity types that count toward step totals |
-| `DEFAULT_SYNC_DAYS` | `30` | Default sync period for health integrations |
+| `DEFAULT_SYNC_DAYS`        | `30`                      | Default sync period for health integrations  |
 
 ### calculateSteps Function
 
 ```typescript
-function calculateSteps(activityType: string, distanceKm: number): number
+function calculateSteps(activityType: string, distanceKm: number): number;
 ```
 
 Returns estimated step count for an activity. Only returns non-zero for step-counting activities (walk, hike, run).
@@ -44,10 +49,10 @@ const healthConfig = SOURCE_CONFIG["apple_health"];
 
 ### SOURCE_CONFIG
 
-| Source | Color | Emoji | Label |
-|--------|-------|-------|-------|
-| `apple_health` | `#007AFF` | ❤️ | Apple Health |
-| `manual` | `#6B7280` | ✏️ | Manual |
+| Source         | Color     | Emoji | Label        |
+| -------------- | --------- | ----- | ------------ |
+| `apple_health` | `#007AFF` | ❤️    | Apple Health |
+| `manual`       | `#6B7280` | ✏️    | Manual       |
 
 ### Adding New Sources
 
@@ -70,6 +75,7 @@ import { STEPS_PER_KM } from "@/lib/constants/activity";
 ## Single Source of Truth
 
 These constants replace duplicated values that previously existed in:
+
 - `lib/db/activities.ts`
 - `lib/db/users.ts`
 - `lib/health/sync.ts`

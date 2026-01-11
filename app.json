@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Trailblazer+",
+    "name": "Trailblazer",
     "slug": "trailblazerplus",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -45,8 +45,8 @@
       [
         "@kingstinct/react-native-healthkit",
         {
-          "NSHealthShareUsageDescription": "Trailblazer+ reads your workouts to track your outdoor activities.",
-          "NSHealthUpdateUsageDescription": "Trailblazer+ can save your logged activities to Apple Health."
+          "NSHealthShareUsageDescription": "Trailblazer reads your workouts to track your outdoor activities.",
+          "NSHealthUpdateUsageDescription": "Trailblazer can save your logged activities to Apple Health."
         }
       ]
     ],

@@ -1,6 +1,6 @@
 # Firebase Cloud Functions (`functions/`)
 
-Backend for Trailblazer+ handling server-side operations.
+Backend for Trailblazer handling server-side operations.
 
 ## Structure
 

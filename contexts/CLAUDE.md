@@ -1,6 +1,6 @@
 # Contexts Directory
 
-React Context providers for global state management in Trailblazer+.
+React Context providers for global state management in Trailblazer.
 
 ## Available Contexts
 
@@ -10,9 +10,9 @@ Firebase Authentication state management.
 
 ```typescript
 interface AuthContextValue {
-  user: User | null;      // Firebase User object
-  uid: string | null;     // Shorthand for user.uid
-  isLoading: boolean;     // True while checking auth state
+  user: User | null; // Firebase User object
+  uid: string | null; // Shorthand for user.uid
+  isLoading: boolean; // True while checking auth state
 }
 
 // Usage
@@ -20,6 +20,7 @@ const { user, uid, isLoading } = useAuth();
 ```
 
 **Behavior**:
+
 - Listens to `onAuthStateChanged` from Firebase
 - Persists auth state via MMKV (see `lib/firebase.ts`)
 - `isLoading` is true until initial auth check completes
@@ -34,8 +35,8 @@ interface ThemeContextValue {
   setColorScheme: (scheme: ColorScheme) => void;
   toggleColorScheme: () => void;
   isDark: boolean;
-  colors: ColorTokens;    // Theme-aware color palette
-  shadows: ShadowTokens;  // Theme-aware shadows
+  colors: ColorTokens; // Theme-aware color palette
+  shadows: ShadowTokens; // Theme-aware shadows
   gradients: GradientTokens; // Theme-aware gradients
 }
 
@@ -44,6 +45,7 @@ const { isDark, colors, toggleColorScheme } = useTheme();
 ```
 
 **Behavior**:
+
 - Persists preference to AsyncStorage
 - Falls back to system preference on first launch
 - Provides pre-computed `colors`, `shadows`, `gradients` for current theme
@@ -67,6 +69,7 @@ Order is critical - defined in `app/_layout.tsx`:
 ```
 
 **Why this order?**
+
 1. `GestureHandlerRootView` - Required for gesture handling (React Native Gesture Handler)
 2. `HeroUINativeProvider` - HeroUI theming (needs gesture handler)
 3. `ThemeProvider` - App theme (provides colors to subsequent providers)
@@ -106,12 +109,13 @@ export function useMy(): MyContextValue {
 
 ## Context vs Hook Pattern
 
-| Use Context When | Use Hook When |
-|------------------|---------------|
+| Use Context When                    | Use Hook When                     |
+| ----------------------------------- | --------------------------------- |
 | State shared across many components | State local to one component tree |
-| Auth, theme, global settings | Data fetching, API calls |
-| Provider hierarchy matters | No provider needed |
+| Auth, theme, global settings        | Data fetching, API calls          |
+| Provider hierarchy matters          | No provider needed                |
 
 **Examples**:
+
 - `AuthContext` - auth state used everywhere
 - `useHealthConnection` - hook that interacts with HealthKit, not context
