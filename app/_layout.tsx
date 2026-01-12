@@ -1,6 +1,7 @@
+import { useEffect, useRef } from "react";
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
-import { Stack } from "expo-router";
+import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import {
@@ -27,6 +28,30 @@ export const unstable_settings = {
 function RootLayoutNav() {
   const { isDark, colors } = useTheme();
   const { user, isLoading } = useAuth();
+  const hasNavigated = useRef(false);
+
+  useEffect(() => {
+    if (isLoading) return;
+
+    if (!hasNavigated.current) {
+      hasNavigated.current = true;
+      if (user) {
+        router.replace("/(tabs)");
+      } else {
+        router.replace("/login");
+      }
+    }
+  }, [isLoading, user]);
+
+  useEffect(() => {
+    if (isLoading || !hasNavigated.current) return;
+
+    if (user) {
+      router.replace("/(tabs)");
+    } else {
+      router.replace("/login");
+    }
+  }, [user]);
 
   if (isLoading) {
     return (
@@ -36,20 +61,10 @@ function RootLayoutNav() {
     );
   }
 
-  if (!user) {
-    return (
-      <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="login" />
-        </Stack>
-        <StatusBar style="auto" />
-      </NavigationThemeProvider>
-    );
-  }
-
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="login" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="(modals)"
