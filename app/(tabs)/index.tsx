@@ -1,266 +1,59 @@
-import { useCallback, useEffect, useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { RefreshControl, ScrollView, Text, View } from "react-native";
 
-import { router } from "expo-router";
-
-import { Button, useToast } from "heroui-native";
-
-import { Plus } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { BorderRadius, Spacing } from "@/constants";
-import { useAuth } from "@/contexts/auth-context";
+import { TopBar } from "@/components/navigation/TopBar";
 import { useTheme } from "@/contexts/theme-context";
-import { getUserStats } from "@/lib/db/users";
-import { getRecentActivities } from "@/lib/db/activities";
-import { Activity, UserStats } from "@/lib/db/types";
-import { useHealthConnection } from "@/lib/health";
-import { ConnectionStatusBox } from "@/components/ConnectionStatusBox";
-import { ActivitySourceCard } from "@/components/ActivitySourceCard";
+import { MOCK_AFFIRMATIONS, MOCK_USER } from "@/lib/mock";
 
 export default function HomeScreen() {
-  const { colors, shadows } = useTheme();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { uid } = useAuth();
-  const { toast } = useToast();
-  const [stats, setStats] = useState<UserStats | null>(null);
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const health = useHealthConnection(uid);
+  const [affirmationIndex, setAffirmationIndex] = useState(
+    () => Math.floor(Math.random() * MOCK_AFFIRMATIONS.length)
+  );
+  const [refreshing, setRefreshing] = useState(false);
 
-  const fetchData = async () => {
-    if (!uid) return;
-    try {
-      const [userStats, recentActivities] = await Promise.all([
-        getUserStats(uid),
-        getRecentActivities(uid, 5),
-      ]);
-      setStats(userStats);
-      setActivities(recentActivities);
-    } catch (error) {
-      console.error("Error fetching home data:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (!uid) {
-      setLoading(false);
-      return;
-    }
-
-    fetchData().finally(() => setLoading(false));
-  }, [uid]);
-
-  const handleHealthSync = async () => {
-    await health.sync();
-    await fetchData();
-  };
-
-  const handleAddActivity = useCallback(() => {
-    toast.show({
-      label: "Coming Soon",
-      description: "Activity logging will be available in a future update!",
-      variant: "default",
-      placement: "top",
-    });
-  }, [toast]);
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    setAffirmationIndex((prev) => (prev + 1) % MOCK_AFFIRMATIONS.length);
+    setTimeout(() => setRefreshing(false), 500);
+  }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <View className="flex-1" style={{ backgroundColor: colors.background }}>
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.content,
-          {
-            paddingTop: insets.top + Spacing.lg,
-            paddingBottom: Platform.OS === "ios" ? 100 : insets.bottom + Spacing.lg,
-          },
-        ]}
+        className="flex-1"
+        contentContainerStyle={{
+          paddingTop: insets.top,
+          paddingBottom: 100,
+        }}
         showsVerticalScrollIndicator={false}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
       >
-        <Text style={[styles.greeting, { color: colors.textSecondary }]}>Good morning</Text>
-        <Text style={[styles.title, { color: colors.textPrimary }]}>Welcome back!</Text>
-
-        <Pressable
-          style={[styles.addActivityButton, { backgroundColor: colors.accent + "15" }]}
-          onPress={handleAddActivity}
-        >
-          <Plus size={20} color={colors.accent} />
-          <Text style={[styles.addActivityText, { color: colors.accent }]}>Add Activity</Text>
-        </Pressable>
-
-        <View
-          style={[
-            styles.card,
-            { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
-            shadows.md,
-          ]}
-        >
-          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>60-Day Challenge</Text>
-          <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
-            Track your outdoor activities
-          </Text>
-
-          <View style={[styles.progressTrack, { backgroundColor: colors.progressTrack }]}>
-            <View style={[styles.progressFill, { backgroundColor: colors.accent, width: "45%" }]} />
-          </View>
-
-          <Text style={[styles.progressLabel, { color: colors.textSecondary }]}>
-            Day 27 of 60 • 45% complete
-          </Text>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          <Button onPress={() => router.push("/(modals)/log-activity")}>
-            <Plus size={20} color="#000" style={{ marginRight: 8 }} />
-            Log Activity
-          </Button>
-        </View>
-
-        <View
-          style={[
-            styles.card,
-            { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
-            shadows.md,
-          ]}
-        >
-          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Your Stats</Text>
-          <View style={styles.statsRow}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.primary }]}>
-                {stats?.totalKm.toFixed(1) ?? "0"}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>km total</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.accent }]}>
-                {stats?.totalSteps.toLocaleString() ?? "0"}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>steps</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.highlight }]}>
-                {stats?.currentStreak ?? "0"}
-              </Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>day streak</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.connectionRow}>
-          <ConnectionStatusBox
-            source="apple_health"
-            isConnected={health.isConnected}
-            isSyncing={health.isSyncing}
-            lastSyncAt={health.lastSyncAt}
-          />
-        </View>
-
-        <ActivitySourceCard
-          source="apple_health"
-          activities={activities}
-          isConnected={health.isConnected}
-          isSyncing={health.isSyncing}
-          onSync={handleHealthSync}
+        <TopBar
+          affirmation={MOCK_AFFIRMATIONS[affirmationIndex]}
+          avatarUrl={MOCK_USER.photoURL}
         />
 
-        <Pressable
-          style={[
-            styles.card,
-            { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
-            shadows.md,
-          ]}
-          onPress={() => router.push("/chat")}
-        >
-          <Text style={[styles.cardTitle, { color: colors.textPrimary }]}>Ask Parker</Text>
-          <Text style={[styles.cardSubtitle, { color: colors.textSecondary }]}>
-            Get trail recommendations from our AI assistant
+        <View className="px-4 gap-4 pt-4">
+          <Text
+            className="text-3xl font-bold"
+            style={{ color: colors.textPrimary }}
+          >
+            Home
           </Text>
-        </Pressable>
+          <Text
+            className="text-base"
+            style={{ color: colors.textSecondary }}
+          >
+            Your outdoor activity dashboard
+          </Text>
+        </View>
       </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  scrollView: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: Spacing.lg,
-    gap: Spacing.lg,
-  },
-  greeting: {
-    fontSize: 15,
-    fontWeight: "500",
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: "700",
-    marginTop: -4,
-  },
-  card: {
-    padding: Spacing.xl,
-    borderRadius: BorderRadius["2xl"],
-    borderWidth: 1,
-    gap: Spacing.sm,
-  },
-  cardTitle: {
-    fontSize: 17,
-    fontWeight: "600",
-  },
-  cardSubtitle: {
-    fontSize: 14,
-  },
-  progressTrack: {
-    height: 8,
-    borderRadius: BorderRadius.full,
-    marginTop: Spacing.sm,
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: BorderRadius.full,
-  },
-  progressLabel: {
-    fontSize: 13,
-    marginTop: Spacing.xs,
-  },
-  buttonContainer: {
-    marginVertical: Spacing.sm,
-  },
-  statsRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: Spacing.md,
-  },
-  statItem: {
-    alignItems: "center",
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: "700",
-  },
-  statLabel: {
-    fontSize: 12,
-    marginTop: 2,
-  },
-  connectionRow: {
-    flexDirection: "row",
-    gap: Spacing.md,
-  },
-  addActivityButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: Spacing.md,
-    borderRadius: BorderRadius.xl,
-    gap: Spacing.sm,
-  },
-  addActivityText: {
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
