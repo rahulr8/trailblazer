@@ -13,7 +13,7 @@ This roadmap delivers a complete UI rebuild of the Trailblazer+ React Native app
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Mock Data Layer** - TypeScript interfaces and hardcoded data powering all screens
-- [ ] **Phase 2: Navigation & Layout** - 3-tab shell, Parker FAB, TopBar, and routing structure
+- [x] **Phase 2: Navigation & Layout** - 3-tab shell, Parker FAB, TopBar, and routing structure
 - [ ] **Phase 3: Home Screen** - Hero swiper, flip card stats, leaderboard preview with animations
 - [ ] **Phase 4: Your Stash + Your Squad** - Rewards carousel/grid with toaster, leaderboard widget
 - [ ] **Phase 5: Profile Screen** - Identity, lifetime stats, settings, data sync, and account actions
@@ -50,7 +50,7 @@ Plans:
 
 Plans:
 - [x] 02-01-PLAN.md -- Tab bar restructure, Parker FAB, and Profile modal route (Wave 1)
-- [ ] 02-02-PLAN.md -- TopBar component and Profile routing (Wave 2)
+- [x] 02-02-PLAN.md -- TopBar component and Profile routing (Wave 2)
 - [x] 02-03-PLAN.md -- Stub FABs and action buttons (Wave 2)
 
 ### Phase 3: Home Screen
@@ -128,7 +128,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Mock Data Layer | 2/2 | Complete | 2026-01-27 |
-| 2. Navigation & Layout | 2/3 | In progress | - |
+| 2. Navigation & Layout | 3/3 | Complete | 2026-01-27 |
 | 3. Home Screen | 0/3 | Not started | - |
 | 4. Your Stash + Your Squad | 0/3 | Not started | - |
 | 5. Profile Screen | 0/2 | Not started | - |
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27 -- 02-03 complete*
+*Last updated: 2026-01-27 -- Phase 2 complete*

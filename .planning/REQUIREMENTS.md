@@ -7,18 +7,18 @@
 
 ### Mock Data Layer
 
-- [ ] **MOCK-01**: All UI-specific TypeScript interfaces defined in `lib/mock/types.ts`
-- [ ] **MOCK-02**: All hardcoded mock data centralized in `lib/mock/data.ts` with realistic values
-- [ ] **MOCK-03**: No Firebase imports in any new screen file — screens import from `@/lib/mock` only
+- [x] **MOCK-01**: All UI-specific TypeScript interfaces defined in `lib/mock/types.ts`
+- [x] **MOCK-02**: All hardcoded mock data centralized in `lib/mock/data.ts` with realistic values
+- [x] **MOCK-03**: No Firebase imports in any new screen file — screens import from `@/lib/mock` only
 
 ### Navigation & Layout
 
-- [ ] **NAV-01**: 3-tab bottom navigation: Home, Your Stash, Your Squad
-- [ ] **NAV-02**: Parker FAB (bear icon, bottom-right of dock) opens Parker Chat on tap
-- [ ] **NAV-03**: Shared TopBar component on all tab screens: daily affirmation text, date (MMM DD), profile avatar
-- [ ] **NAV-04**: Avatar tap in TopBar navigates to Profile (standalone route, not a tab)
-- [ ] **NAV-05**: "+" FAB visible on Home screen (stub — shows "Coming Soon" toast on tap)
-- [ ] **NAV-06**: Add Friend button visible on Squad screen header (stub — shows "Coming Soon" toast on tap)
+- [x] **NAV-01**: 3-tab bottom navigation: Home, Your Stash, Your Squad
+- [x] **NAV-02**: Parker FAB (bear icon, bottom-right of dock) opens Parker Chat on tap
+- [x] **NAV-03**: Shared TopBar component on all tab screens: daily affirmation text, date (MMM DD), profile avatar
+- [x] **NAV-04**: Avatar tap in TopBar navigates to Profile (standalone route, not a tab)
+- [x] **NAV-05**: "+" FAB visible on Home screen (stub — shows "Coming Soon" toast on tap)
+- [x] **NAV-06**: Add Friend button visible on Squad screen header (stub — shows "Coming Soon" toast on tap)
 
 ### Home Screen
 
@@ -60,7 +60,7 @@
 ### Overlays
 
 - [ ] **OVLY-01**: Reward Toaster — bottom sheet slides up, shows reward title, description, QR placeholder or barcode placeholder or coupon code text
-- [ ] **OVLY-02**: Parker Chat — existing full-screen chat interface matches design navigation (bear FAB → chat)
+- [x] **OVLY-02**: Parker Chat — existing full-screen chat interface matches design navigation (bear FAB → chat)
 
 ### Animations
 
@@ -126,13 +126,13 @@
 | MOCK-01 | Phase 1: Mock Data Layer | Complete |
 | MOCK-02 | Phase 1: Mock Data Layer | Complete |
 | MOCK-03 | Phase 1: Mock Data Layer | Complete |
-| NAV-01 | Phase 2: Navigation & Layout | Pending |
-| NAV-02 | Phase 2: Navigation & Layout | Pending |
-| NAV-03 | Phase 2: Navigation & Layout | Pending |
-| NAV-04 | Phase 2: Navigation & Layout | Pending |
-| NAV-05 | Phase 2: Navigation & Layout | Pending |
-| NAV-06 | Phase 2: Navigation & Layout | Pending |
-| OVLY-02 | Phase 2: Navigation & Layout | Pending |
+| NAV-01 | Phase 2: Navigation & Layout | Complete |
+| NAV-02 | Phase 2: Navigation & Layout | Complete |
+| NAV-03 | Phase 2: Navigation & Layout | Complete |
+| NAV-04 | Phase 2: Navigation & Layout | Complete |
+| NAV-05 | Phase 2: Navigation & Layout | Complete |
+| NAV-06 | Phase 2: Navigation & Layout | Complete |
+| OVLY-02 | Phase 2: Navigation & Layout | Complete |
 | HOME-01 | Phase 3: Home Screen | Pending |
 | HOME-02 | Phase 3: Home Screen | Pending |
 | HOME-03 | Phase 3: Home Screen | Pending |
@@ -166,4 +166,4 @@
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-27 after roadmap creation -- fixed count to 35, added phase names to traceability, grouped by phase*
+*Last updated: 2026-01-27 -- Phase 2 requirements marked Complete*
