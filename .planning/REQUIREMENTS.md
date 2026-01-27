@@ -123,47 +123,47 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MOCK-01 | Phase 1 | Pending |
-| MOCK-02 | Phase 1 | Pending |
-| MOCK-03 | Phase 1 | Pending |
-| NAV-01 | Phase 2 | Pending |
-| NAV-02 | Phase 2 | Pending |
-| NAV-03 | Phase 2 | Pending |
-| NAV-04 | Phase 2 | Pending |
-| NAV-05 | Phase 2 | Pending |
-| NAV-06 | Phase 2 | Pending |
-| HOME-01 | Phase 3 | Pending |
-| HOME-02 | Phase 3 | Pending |
-| HOME-03 | Phase 3 | Pending |
-| HOME-04 | Phase 3 | Pending |
-| STSH-01 | Phase 4 | Pending |
-| STSH-02 | Phase 4 | Pending |
-| STSH-03 | Phase 4 | Pending |
-| SQUD-01 | Phase 4 | Pending |
-| SQUD-02 | Phase 4 | Pending |
-| SQUD-03 | Phase 4 | Pending |
-| PROF-01 | Phase 5 | Pending |
-| PROF-02 | Phase 5 | Pending |
-| PROF-03 | Phase 5 | Pending |
-| PROF-04 | Phase 5 | Pending |
-| PROF-05 | Phase 5 | Pending |
-| PROF-06 | Phase 5 | Pending |
-| PROF-07 | Phase 5 | Pending |
-| ONBD-01 | Phase 6 | Pending |
-| ONBD-02 | Phase 6 | Pending |
-| ONBD-03 | Phase 6 | Pending |
-| ONBD-04 | Phase 6 | Pending |
-| ONBD-05 | Phase 6 | Pending |
-| OVLY-01 | Phase 4 | Pending |
-| OVLY-02 | Phase 2 | Pending |
-| ANIM-01 | Phase 3 | Pending |
-| ANIM-02 | Phase 3 | Pending |
+| MOCK-01 | Phase 1: Mock Data Layer | Complete |
+| MOCK-02 | Phase 1: Mock Data Layer | Complete |
+| MOCK-03 | Phase 1: Mock Data Layer | Complete |
+| NAV-01 | Phase 2: Navigation & Layout | Pending |
+| NAV-02 | Phase 2: Navigation & Layout | Pending |
+| NAV-03 | Phase 2: Navigation & Layout | Pending |
+| NAV-04 | Phase 2: Navigation & Layout | Pending |
+| NAV-05 | Phase 2: Navigation & Layout | Pending |
+| NAV-06 | Phase 2: Navigation & Layout | Pending |
+| OVLY-02 | Phase 2: Navigation & Layout | Pending |
+| HOME-01 | Phase 3: Home Screen | Pending |
+| HOME-02 | Phase 3: Home Screen | Pending |
+| HOME-03 | Phase 3: Home Screen | Pending |
+| HOME-04 | Phase 3: Home Screen | Pending |
+| ANIM-01 | Phase 3: Home Screen | Pending |
+| ANIM-02 | Phase 3: Home Screen | Pending |
+| STSH-01 | Phase 4: Your Stash + Your Squad | Pending |
+| STSH-02 | Phase 4: Your Stash + Your Squad | Pending |
+| STSH-03 | Phase 4: Your Stash + Your Squad | Pending |
+| SQUD-01 | Phase 4: Your Stash + Your Squad | Pending |
+| SQUD-02 | Phase 4: Your Stash + Your Squad | Pending |
+| SQUD-03 | Phase 4: Your Stash + Your Squad | Pending |
+| OVLY-01 | Phase 4: Your Stash + Your Squad | Pending |
+| PROF-01 | Phase 5: Profile Screen | Pending |
+| PROF-02 | Phase 5: Profile Screen | Pending |
+| PROF-03 | Phase 5: Profile Screen | Pending |
+| PROF-04 | Phase 5: Profile Screen | Pending |
+| PROF-05 | Phase 5: Profile Screen | Pending |
+| PROF-06 | Phase 5: Profile Screen | Pending |
+| PROF-07 | Phase 5: Profile Screen | Pending |
+| ONBD-01 | Phase 6: Onboarding Flow | Pending |
+| ONBD-02 | Phase 6: Onboarding Flow | Pending |
+| ONBD-03 | Phase 6: Onboarding Flow | Pending |
+| ONBD-04 | Phase 6: Onboarding Flow | Pending |
+| ONBD-05 | Phase 6: Onboarding Flow | Pending |
 
 **Coverage:**
-- v1 requirements: 30 total
-- Mapped to phases: 30
-- Unmapped: 0 ✓
+- v1 requirements: 35 total
+- Mapped to phases: 35
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-27 after initial definition*
+*Last updated: 2026-01-27 after roadmap creation -- fixed count to 35, added phase names to traceability, grouped by phase*
