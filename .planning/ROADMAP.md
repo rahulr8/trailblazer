@@ -46,12 +46,12 @@ Plans:
   3. TopBar appears on all three tab screens showing daily affirmation text, the current date formatted as "MMM DD", and a profile avatar
   4. Tapping the avatar in the TopBar navigates to the Profile screen (standalone route, not a tab)
   5. "+" FAB is visible on the Home screen and shows a "Coming Soon" toast on tap; Add Friend button is visible on the Squad screen header and shows a "Coming Soon" toast on tap
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 02-01: Tab bar restructure and Parker FAB
-- [ ] 02-02: TopBar component and Profile routing
-- [ ] 02-03: Stub FABs and action buttons
+- [ ] 02-01-PLAN.md -- Tab bar restructure, Parker FAB, and Profile modal route (Wave 1)
+- [ ] 02-02-PLAN.md -- TopBar component and Profile routing (Wave 2)
+- [ ] 02-03-PLAN.md -- Stub FABs and action buttons (Wave 2)
 
 ### Phase 3: Home Screen
 **Goal**: Users see a fully populated Home screen with animated hero swiper, flip card stats, and leaderboard preview
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 1 complete*
+*Last updated: 2026-01-27 -- Phase 2 planned*
