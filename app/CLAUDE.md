@@ -55,6 +55,8 @@ Uses Material Top Tabs (`@react-navigation/material-top-tabs`) positioned at bot
 
 ParkerFAB (bear paw icon) overlays all tab screens in bottom-right corner, navigates to `/chat`.
 
+Each tab screen renders a shared `TopBar` component (date + affirmation + avatar) as the first child inside its ScrollView. The TopBar scrolls with content (not sticky). Pull-to-refresh rotates the affirmation text. Each tab manages its own affirmation state independently. All screens use mock data from `@/lib/mock`.
+
 ### Opening Modals
 
 ```typescript
@@ -83,9 +85,9 @@ router.push("/chat");
 | Screen                  | Purpose               | Key Features                                          |
 | ----------------------- | --------------------- | ----------------------------------------------------- |
 | `login.tsx`             | Authentication        | Google/Apple sign-in                                  |
-| `(tabs)/index.tsx`      | Home dashboard        | Stats, challenge progress, activity feed, connections |
-| `(tabs)/stash.tsx`      | Your Stash            | Rewards and perks (placeholder)                       |
-| `(tabs)/squad.tsx`      | Your Squad            | Community and leaderboard (placeholder)               |
+| `(tabs)/index.tsx`      | Home dashboard        | TopBar, pull-to-refresh affirmation, placeholder      |
+| `(tabs)/stash.tsx`      | Your Stash            | TopBar, pull-to-refresh affirmation, placeholder      |
+| `(tabs)/squad.tsx`      | Your Squad            | TopBar, pull-to-refresh affirmation, placeholder      |
 | `(modals)/profile.tsx`  | User settings         | Integrations, stats, sign out, dismiss button         |
 | `chat.tsx`              | AI assistant          | Chat with Parker for trail recommendations            |
 

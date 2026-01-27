@@ -103,6 +103,34 @@ No component code changes needed.
 
 ## Navigation Components
 
+### TopBar
+
+Shared header component rendered at the top of all tab screens (inside ScrollView, scrolls with content).
+
+```typescript
+import { TopBar } from "@/components/navigation/TopBar";
+
+<TopBar affirmation="Every step counts!" avatarUrl="https://..." />
+```
+
+**Props:**
+
+- `affirmation: string` - Daily motivational text displayed in center
+- `avatarUrl: string` - Profile avatar image URL
+
+**Layout:**
+
+- Left: Current date formatted as "MMM DD" (e.g., "Jan 27")
+- Center: Affirmation text (flex-1, centered, up to 2 lines)
+- Right: Tappable profile avatar (HeroUI Avatar, size "md")
+
+**Behavior:**
+
+- Avatar tap navigates to `/(modals)/profile` via `router.push`
+- Scrolls with content (not sticky) -- rendered inside ScrollView
+- Pull-to-refresh affirmation rotation managed by parent screen
+- Uses `useTheme()` for text colors
+
 ### ParkerFAB
 
 Floating action button for Parker AI chat, positioned in bottom-right corner.
@@ -130,5 +158,6 @@ import { ParkerFAB } from "@/components/navigation/ParkerFAB";
 - `external-link.tsx` - Link that opens in in-app browser
 - `haptic-tab.tsx` - Tab bar item with haptic feedback (used by old Bottom Tabs, not Material Top Tabs)
 - `hello-wave.tsx` - Animated wave emoji
+- `navigation/TopBar.tsx` - Shared top bar with date, affirmation, and avatar
 - `navigation/ParkerFAB.tsx` - Parker AI chat FAB
 - `ui/` - UI primitives
