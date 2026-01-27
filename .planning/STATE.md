@@ -10,28 +10,28 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 1 of 6 (Mock Data Layer)
-Plan: 1 of 2 in current phase
-Status: In progress
-Last activity: 2026-01-27 -- Completed 01-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-01-27 -- Completed 01-02-PLAN.md
 
-Progress: [█░░░░░░░░░░░░░░░░░░░] 5%
+Progress: [██░░░░░░░░░░░░░░░░░░] 10%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 1min
-- Total execution time: 0.02 hours
+- Total plans completed: 2
+- Average duration: 1.5min
+- Total execution time: 0.05 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-mock-data-layer | 1/2 | 1min | 1min |
+| 01-mock-data-layer | 2/2 | 3min | 1.5min |
 
 **Recent Trend:**
-- Last 5 plans: 1min
-- Trend: Starting phase
+- Last 5 plans: 1min, 2min
+- Trend: Phase complete
 
 *Updated after each plan completion*
 
@@ -47,6 +47,9 @@ Recent decisions affecting current work:
 - Android requires `{ perspective: 1000 }` as FIRST transform in array for 3D effects
 - All dates stored as ISO 8601 strings (not Firebase Timestamp) for UI layer (01-01)
 - String literal unions for discriminated fields (membershipTier, rewardType, type) (01-01)
+- Used pravatar.cc for consistent avatar URLs across mock data (01-02)
+- Used Unsplash for realistic outdoor brand reward images (01-02)
+- Provided raw numeric primitives in mock data - screens handle formatting (01-02)
 
 ### Pending Todos
 
@@ -59,6 +62,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-27T17:49:22Z
-Stopped at: Completed 01-01-PLAN.md
+Last session: 2026-01-27T17:54:10Z
+Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
 Resume file: None
