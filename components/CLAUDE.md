@@ -101,9 +101,34 @@ When adding a new data source:
 
 No component code changes needed.
 
+## Navigation Components
+
+### ParkerFAB
+
+Floating action button for Parker AI chat, positioned in bottom-right corner.
+
+```typescript
+import { ParkerFAB } from "@/components/navigation/ParkerFAB";
+
+// Rendered as sibling to tab navigator in app/(tabs)/_layout.tsx
+<View style={{ flex: 1 }}>
+  <MaterialTopTabs ... />
+  <ParkerFAB />
+</View>
+```
+
+**Behavior:**
+
+- Absolutely positioned bottom-right with safe area insets
+- Spring entrance animation (scale 0 to 1, damping: 15)
+- PawPrint icon from lucide-react-native
+- Navigates to `/chat` on press
+- 56x56 rounded button with accent background color
+
 ## Existing Components
 
 - `external-link.tsx` - Link that opens in in-app browser
-- `haptic-tab.tsx` - Tab bar item with haptic feedback
+- `haptic-tab.tsx` - Tab bar item with haptic feedback (used by old Bottom Tabs, not Material Top Tabs)
 - `hello-wave.tsx` - Animated wave emoji
+- `navigation/ParkerFAB.tsx` - Parker AI chat FAB
 - `ui/` - UI primitives
