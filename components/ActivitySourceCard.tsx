@@ -68,7 +68,7 @@ export function ActivitySourceCard({
           No activities synced yet
         </Text>
       ) : (
-        <Pressable onPress={() => router.push("/(tabs)/profile")}>
+        <Pressable onPress={() => router.push("/(modals)/profile")}>
           <Text style={[styles.subtitle, { color: sourceConfig.color }]}>
             Tap to connect {sourceConfig.label}
           </Text>
