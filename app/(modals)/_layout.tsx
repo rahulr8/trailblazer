@@ -18,6 +18,14 @@ export default function ModalsLayout() {
       <Stack.Screen name="badge-detail" />
       <Stack.Screen name="reset-challenge" />
       <Stack.Screen name="giveaway" />
+      <Stack.Screen
+        name="profile"
+        options={{
+          presentation: "modal",
+          animation: "slide_from_bottom",
+          contentStyle: undefined,
+        }}
+      />
     </Stack>
   );
 }

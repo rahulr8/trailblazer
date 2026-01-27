@@ -23,6 +23,7 @@ import {
   Moon,
   Settings,
   User,
+  X,
 } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -43,9 +44,7 @@ export default function ProfileScreen() {
 
   const handleSignOut = async () => {
     try {
-      console.log("[Profile] Signing out...");
       await signOut(auth);
-      console.log("[Profile] Sign out successful");
       router.replace("/login");
     } catch (error) {
       console.error("[Profile] Sign out error:", error);
@@ -53,8 +52,6 @@ export default function ProfileScreen() {
   };
 
   const handleHealthPress = useCallback(() => {
-    console.log("[Profile] handleHealthPress called, isConnected:", health.isConnected);
-
     if (health.isConnected) {
       Alert.alert("Disconnect Apple Health?", "Your Apple Health activities will remain.", [
         { text: "Cancel", style: "cancel" },
@@ -62,15 +59,12 @@ export default function ProfileScreen() {
           text: "Disconnect",
           style: "destructive",
           onPress: () => {
-            console.log("[Profile] User confirmed disconnect");
             health.disconnect();
           },
         },
       ]);
     } else {
-      console.log("[Profile] Calling health.connect()...");
       health.connect();
-      console.log("[Profile] health.connect() completed");
     }
   }, [health]);
 
@@ -85,18 +79,28 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.header, { paddingTop: insets.top + Spacing.sm }]}>
+        <Pressable
+          onPress={() => router.back()}
+          style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
+          accessibilityLabel="Close profile"
+          accessibilityRole="button"
+        >
+          <X size={20} color={colors.textPrimary} />
+        </Pressable>
+      </View>
+
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={[
           styles.content,
           {
-            paddingTop: insets.top + Spacing.lg,
-            paddingBottom: Platform.OS === "ios" ? 100 : insets.bottom + Spacing.lg,
+            paddingBottom: Platform.OS === "ios" ? 40 : insets.bottom + Spacing.lg,
           },
         ]}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
+        <View style={styles.avatarSection}>
           <View style={[styles.avatar, { backgroundColor: colors.primary + "20" }]}>
             <User size={40} color={colors.primary} />
           </View>
@@ -226,6 +230,19 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  header: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.sm,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.full,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   scrollView: {
     flex: 1,
   },
@@ -233,7 +250,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: Spacing.lg,
     gap: Spacing.xl,
   },
-  header: {
+  avatarSection: {
     alignItems: "center",
     gap: Spacing.sm,
   },

@@ -1,76 +1,94 @@
 import { Platform, StyleSheet, View } from "react-native";
 
-import { BlurView } from "expo-blur";
-import { Tabs } from "expo-router";
+import { withLayoutContext } from "expo-router";
 
-import { Compass, Gift, Home, User } from "lucide-react-native";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-import { HapticTab } from "@/components/haptic-tab";
+import { Gift, Home, Users } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+import { ParkerFAB } from "@/components/navigation/ParkerFAB";
 import { useTheme } from "@/contexts/theme-context";
 
+const { Navigator } = createMaterialTopTabNavigator();
+const MaterialTopTabs = withLayoutContext(Navigator);
+
 export default function TabLayout() {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarActiveTintColor: colors.tabIconActive,
-        tabBarInactiveTintColor: colors.tabIconInactive,
-        tabBarButton: HapticTab,
-        tabBarStyle: {
-          backgroundColor: Platform.OS === "ios" ? "transparent" : colors.tabBarBackground,
-          borderTopColor: colors.tabBarBorder,
-          borderTopWidth: StyleSheet.hairlineWidth,
-          height: Platform.OS === "ios" ? 88 : 64,
-          paddingTop: 8,
-          paddingBottom: Platform.OS === "ios" ? 28 : 8,
-          position: Platform.OS === "ios" ? "absolute" : "relative",
-        },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: "600",
-        },
-        tabBarBackground: () =>
-          Platform.OS === "ios" ? (
-            <BlurView
-              intensity={isDark ? 80 : 60}
-              tint={isDark ? "dark" : "light"}
-              style={StyleSheet.absoluteFill}
-            />
-          ) : (
-            <View style={[StyleSheet.absoluteFill, { backgroundColor: colors.tabBarBackground }]} />
-          ),
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Home",
-          tabBarIcon: ({ color, size }) => <Home size={size} color={color} />,
+    <View style={styles.root}>
+      <MaterialTopTabs
+        tabBarPosition="bottom"
+        screenOptions={{
+          swipeEnabled: true,
+          lazy: true,
+          lazyPreloadDistance: 0,
+          tabBarActiveTintColor: colors.tabIconActive,
+          tabBarInactiveTintColor: colors.tabIconInactive,
+          tabBarShowIcon: true,
+          tabBarLabelStyle: styles.tabBarLabel,
+          tabBarItemStyle: styles.tabBarItem,
+          tabBarIndicatorStyle: styles.tabBarIndicator,
+          tabBarStyle: [
+            styles.tabBar,
+            {
+              paddingBottom: insets.bottom,
+              backgroundColor: colors.tabBarBackground,
+              borderTopColor: colors.tabBarBorder,
+            },
+          ],
         }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: "Explore",
-          tabBarIcon: ({ color, size }) => <Compass size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="rewards"
-        options={{
-          title: "Rewards",
-          tabBarIcon: ({ color, size }) => <Gift size={size} color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: "Profile",
-          tabBarIcon: ({ color, size }) => <User size={size} color={color} />,
-        }}
-      />
-    </Tabs>
+      >
+        <MaterialTopTabs.Screen
+          name="index"
+          options={{
+            title: "Home",
+            tabBarIcon: ({ color }: { color: string }) => <Home size={22} color={color} />,
+          }}
+        />
+        <MaterialTopTabs.Screen
+          name="stash"
+          options={{
+            title: "Your Stash",
+            tabBarIcon: ({ color }: { color: string }) => <Gift size={22} color={color} />,
+          }}
+        />
+        <MaterialTopTabs.Screen
+          name="squad"
+          options={{
+            title: "Your Squad",
+            tabBarIcon: ({ color }: { color: string }) => <Users size={22} color={color} />,
+          }}
+        />
+      </MaterialTopTabs>
+      <ParkerFAB />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  root: {
+    flex: 1,
+  },
+  tabBar: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    elevation: 0,
+    height: Platform.OS === "ios" ? 88 : 64,
+  },
+  tabBarLabel: {
+    fontSize: 11,
+    fontWeight: "600",
+    textTransform: "none",
+  },
+  tabBarItem: {
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingTop: 6,
+  },
+  tabBarIndicator: {
+    display: "none",
+  },
+});
