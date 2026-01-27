@@ -49,7 +49,7 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 02-01-PLAN.md -- Tab bar restructure, Parker FAB, and Profile modal route (Wave 1)
+- [x] 02-01-PLAN.md -- Tab bar restructure, Parker FAB, and Profile modal route (Wave 1)
 - [ ] 02-02-PLAN.md -- TopBar component and Profile routing (Wave 2)
 - [ ] 02-03-PLAN.md -- Stub FABs and action buttons (Wave 2)
 
@@ -128,7 +128,7 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | Phase | Plans Complete | Status | Completed |
 |-------|---------------|--------|-----------|
 | 1. Mock Data Layer | 2/2 | Complete | 2026-01-27 |
-| 2. Navigation & Layout | 0/3 | Not started | - |
+| 2. Navigation & Layout | 1/3 | In progress | - |
 | 3. Home Screen | 0/3 | Not started | - |
 | 4. Your Stash + Your Squad | 0/3 | Not started | - |
 | 5. Profile Screen | 0/2 | Not started | - |
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 2 planned*
+*Last updated: 2026-01-27 -- 02-01 complete*

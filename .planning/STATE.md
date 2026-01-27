@@ -5,33 +5,34 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** Every screen matches wireframe designs, feels native, and mock data cleanly separates from future backend.
-**Current focus:** Phase 1 - Mock Data Layer
+**Current focus:** Phase 2 - Navigation & Layout
 
 ## Current Position
 
-Phase: 1 of 6 (Mock Data Layer)
-Plan: 2 of 2 in current phase
-Status: Phase complete
-Last activity: 2026-01-27 -- Completed 01-02-PLAN.md
+Phase: 2 of 6 (Navigation & Layout)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-27 -- Completed 02-01-PLAN.md
 
-Progress: [██░░░░░░░░░░░░░░░░░░] 10%
+Progress: [████░░░░░░░░░░░░░░░░] 20%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
-- Average duration: 1.5min
-- Total execution time: 0.05 hours
+- Total plans completed: 3
+- Average duration: 2.3min
+- Total execution time: 0.12 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-mock-data-layer | 2/2 | 3min | 1.5min |
+| 02-navigation-layout | 1/3 | 4min | 4min |
 
 **Recent Trend:**
-- Last 5 plans: 1min, 2min
-- Trend: Phase complete
+- Last 5 plans: 1min, 2min, 4min
+- Trend: Steady
 
 *Updated after each plan completion*
 
@@ -50,6 +51,9 @@ Recent decisions affecting current work:
 - Used pravatar.cc for consistent avatar URLs across mock data (01-02)
 - Used Unsplash for realistic outdoor brand reward images (01-02)
 - Provided raw numeric primitives in mock data - screens handle formatting (01-02)
+- Used Material Top Tabs with tabBarPosition=bottom for swipe+slide instead of custom layout (02-01)
+- Dropped BlurView tab bar background -- not supported by Material Top Tabs, using solid backgroundColor (02-01)
+- Profile modal uses presentation=modal with slide_from_bottom, overriding transparentModal default (02-01)
 
 ### Pending Todos
 
@@ -59,9 +63,10 @@ None yet.
 
 - HeroUI Native 1.0.0-beta.9 is in beta -- monitor for API changes or bugs during development
 - Digital wallet 3D stack animation (v2 scope) has no official pattern; will need prototyping if added
+- haptic-tab.tsx is no longer used (Bottom Tabs specific) but kept in codebase -- consider removing if not needed
 
 ## Session Continuity
 
-Last session: 2026-01-27T17:54:10Z
-Stopped at: Completed 01-02-PLAN.md (Phase 1 complete)
+Last session: 2026-01-27T18:36:00Z
+Stopped at: Completed 02-01-PLAN.md
 Resume file: None
