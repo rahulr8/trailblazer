@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { router } from "expo-router";
 
-import { Button } from "heroui-native";
+import { Button, useToast } from "heroui-native";
 
 import { Plus } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -22,6 +22,7 @@ export default function HomeScreen() {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const { uid } = useAuth();
+  const { toast } = useToast();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -55,6 +56,15 @@ export default function HomeScreen() {
     await fetchData();
   };
 
+  const handleAddActivity = useCallback(() => {
+    toast.show({
+      label: "Coming Soon",
+      description: "Activity logging will be available in a future update!",
+      variant: "default",
+      placement: "top",
+    });
+  }, [toast]);
+
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
@@ -70,6 +80,14 @@ export default function HomeScreen() {
       >
         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Good morning</Text>
         <Text style={[styles.title, { color: colors.textPrimary }]}>Welcome back!</Text>
+
+        <Pressable
+          style={[styles.addActivityButton, { backgroundColor: colors.accent + "15" }]}
+          onPress={handleAddActivity}
+        >
+          <Plus size={20} color={colors.accent} />
+          <Text style={[styles.addActivityText, { color: colors.accent }]}>Add Activity</Text>
+        </Pressable>
 
         <View
           style={[
@@ -232,5 +250,17 @@ const styles = StyleSheet.create({
   connectionRow: {
     flexDirection: "row",
     gap: Spacing.md,
+  },
+  addActivityButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.xl,
+    gap: Spacing.sm,
+  },
+  addActivityText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
