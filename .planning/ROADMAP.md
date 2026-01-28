@@ -63,12 +63,12 @@ Plans:
   3. Nature Score flip card shows leaf icon, calculated score, and "Room to Improve" on front; tapping flips to reveal breakdown logic text on back
   4. Leaderboard preview shows Friends/Global toggle, top 5 ranked entries with avatar and name, and "View All" button that navigates to the Your Squad tab
   5. All flip card animations render correctly on both iOS and Android (perspective as first transform on Android)
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 03-01: FlipCard reusable component
-- [ ] 03-02: Hero swiper and stats grid
-- [ ] 03-03: Leaderboard preview widget
+- [ ] 03-01-PLAN.md -- FlipCard reusable component and StatsFlipCard wrappers (Wave 1)
+- [ ] 03-02-PLAN.md -- HeroSwiper and LeaderboardPreview components (Wave 1)
+- [ ] 03-03-PLAN.md -- Home screen assembly and documentation (Wave 2)
 
 ### Phase 4: Your Stash + Your Squad
 **Goal**: Users can browse rewards and view community leaderboard across two complete tab screens
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 2 complete*
+*Last updated: 2026-01-27 -- Phase 3 planned*
