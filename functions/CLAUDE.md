@@ -19,10 +19,10 @@ functions/
 ## Commands
 
 ```bash
-npm run build         # Compile TypeScript
-npm run typecheck     # Type check without emit
-npm run serve         # Local emulator
-npm run deploy        # Deploy to Firebase
+bun run build         # Compile TypeScript
+bun run typecheck     # Type check without emit
+bun run serve         # Local emulator
+bun run deploy        # Deploy to Firebase
 ```
 
 ## Environment Variables
@@ -39,7 +39,7 @@ ENCRYPTION_KEY=your_64_character_hex_string
 
 ```bash
 # Build and deploy functions
-npm run build && firebase deploy --only functions
+bun run build && firebase deploy --only functions
 
 # Deploy Firestore indexes
 firebase deploy --only firestore:indexes

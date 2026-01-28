@@ -14,9 +14,9 @@ BC Parks outdoor activity tracking app built with Expo, HeroUI Native, and Uniwi
 ## Commands
 
 ```bash
-npx expo start          # Start dev server
-npx tsc --noEmit        # Type check (run before committing)
-npx expo export         # Build for production
+bunx expo start          # Start dev server
+bunx tsc --noEmit        # Type check (run before committing)
+bunx expo export         # Build for production
 ```
 
 ## Project Structure

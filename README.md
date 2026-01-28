@@ -14,8 +14,8 @@ BC Parks outdoor activity tracking app built with Expo and Firebase.
 ### Prerequisites
 
 - Node.js 18+
-- Expo CLI (`npm install -g expo-cli`)
-- Firebase CLI (`npm install -g firebase-tools`)
+- [Bun](https://bun.sh) (`curl -fsSL https://bun.sh/install | bash`)
+- Firebase CLI (`bun install -g firebase-tools`)
 - iOS Simulator or Android Emulator (or physical device)
 
 ### Installation
@@ -23,8 +23,8 @@ BC Parks outdoor activity tracking app built with Expo and Firebase.
 1. Install dependencies:
 
    ```bash
-   npm install
-   cd functions && npm install && cd ..
+   bun install
+   cd functions && bun install && cd ..
    ```
 
 2. Set up environment variables:
@@ -43,20 +43,20 @@ BC Parks outdoor activity tracking app built with Expo and Firebase.
 4. Deploy Cloud Functions:
 
    ```bash
-   npm run firebase:deploy
+   bun run firebase:deploy
    ```
 
 ### Running the App
 
 ```bash
 # Start Expo dev server
-npx expo start
+bunx expo start
 
 # Run on iOS
-npx expo run:ios
+bunx expo run:ios
 
 # Run on Android
-npx expo run:android
+bunx expo run:android
 ```
 
 ## Project Structure
@@ -89,10 +89,10 @@ functions/              # Firebase Cloud Functions
 ## Scripts
 
 ```bash
-npm start               # Start Expo dev server
-npm run typecheck       # TypeScript type checking
-npm run format          # Format code with Prettier
-npm run firebase:deploy # Build and deploy Cloud Functions
+bun start               # Start Expo dev server
+bun run typecheck       # TypeScript type checking
+bun run format          # Format code with Prettier
+bun run firebase:deploy # Build and deploy Cloud Functions
 ```
 
 ## Documentation
