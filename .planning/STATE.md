@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 3 of 6 (Home Screen)
-Plan: 1 of 3 in current phase
+Plan: 2 of 3 in current phase
 Status: In progress
-Last activity: 2026-01-27 -- Completed 03-01-PLAN.md
+Last activity: 2026-01-27 -- Completed 03-02-PLAN.md
 
-Progress: [████████░░░░░░░░░░░░] 40%
+Progress: [█████████░░░░░░░░░░░] 46%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 2.7min
-- Total execution time: 0.26 hours
+- Total execution time: 0.30 hours
 
 **By Phase:**
 
@@ -29,10 +29,10 @@ Progress: [████████░░░░░░░░░░░░] 40%
 |-------|-------|-------|----------|
 | 01-mock-data-layer | 2/2 | 3min | 1.5min |
 | 02-navigation-layout | 3/3 | 11min | 3.7min |
-| 03-home-screen | 1/3 | 4min | 4.0min |
+| 03-home-screen | 2/3 | 6.7min | 3.3min |
 
 **Recent Trend:**
-- Last 5 plans: 2min, 4min, 2min, 5min, 4min
+- Last 5 plans: 4min, 2min, 5min, 4min, 2.7min
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -61,6 +61,9 @@ Recent decisions affecting current work:
 - Home screen simplified to placeholder for Phase 2 -- Firebase/Health imports removed, will rebuild in Phase 3 (02-02)
 - No tap affordance visual hint on flip cards - discovery-based interaction is common mobile pattern (03-01)
 - Nature Score calculation uses simple mock formula (totalMinutes * 0.05) - real algorithm deferred (03-01)
+- Used snapToInterval + decelerationRate='fast' instead of pagingEnabled for cross-platform snap behavior (03-02)
+- LinearGradient colors requires type assertion as readonly [ColorValue, ColorValue, ...ColorValue[]] (03-02)
+- Leaderboard time formatted as hours only for compact preview (03-02)
 
 ### Pending Todos
 
@@ -74,6 +77,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-28T00:55:08Z
-Stopped at: Completed 03-01-PLAN.md (FlipCard components)
+Last session: 2026-01-27T19:02:42Z
+Stopped at: Completed 03-02-PLAN.md (HeroSwiper + LeaderboardPreview components)
 Resume file: None
