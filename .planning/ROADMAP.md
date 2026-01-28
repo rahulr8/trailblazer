@@ -14,7 +14,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 - [x] **Phase 1: Mock Data Layer** - TypeScript interfaces and hardcoded data powering all screens
 - [x] **Phase 2: Navigation & Layout** - 3-tab shell, Parker FAB, TopBar, and routing structure
-- [ ] **Phase 3: Home Screen** - Hero swiper, flip card stats, leaderboard preview with animations
+- [x] **Phase 3: Home Screen** - Hero swiper, flip card stats, leaderboard preview with animations
 - [ ] **Phase 4: Your Stash + Your Squad** - Rewards carousel/grid with toaster, leaderboard widget
 - [ ] **Phase 5: Profile Screen** - Identity, lifetime stats, settings, data sync, and account actions
 - [ ] **Phase 6: Onboarding Flow** - Welcome pager, login, permission screens, and launch routing
@@ -66,9 +66,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 03-01-PLAN.md -- FlipCard reusable component and StatsFlipCard wrappers (Wave 1)
-- [ ] 03-02-PLAN.md -- HeroSwiper and LeaderboardPreview components (Wave 1)
-- [ ] 03-03-PLAN.md -- Home screen assembly and documentation (Wave 2)
+- [x] 03-01-PLAN.md -- FlipCard reusable component and StatsFlipCard wrappers (Wave 1)
+- [x] 03-02-PLAN.md -- HeroSwiper and LeaderboardPreview components (Wave 1)
+- [x] 03-03-PLAN.md -- Home screen assembly and documentation (Wave 2)
 
 ### Phase 4: Your Stash + Your Squad
 **Goal**: Users can browse rewards and view community leaderboard across two complete tab screens
@@ -129,11 +129,11 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 |-------|---------------|--------|-----------|
 | 1. Mock Data Layer | 2/2 | Complete | 2026-01-27 |
 | 2. Navigation & Layout | 3/3 | Complete | 2026-01-27 |
-| 3. Home Screen | 0/3 | Not started | - |
+| 3. Home Screen | 3/3 | Complete | 2026-01-27 |
 | 4. Your Stash + Your Squad | 0/3 | Not started | - |
 | 5. Profile Screen | 0/2 | Not started | - |
 | 6. Onboarding Flow | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 3 planned*
+*Last updated: 2026-01-27 -- Phase 3 complete*

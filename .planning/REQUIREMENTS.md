@@ -22,10 +22,10 @@
 
 ### Home Screen
 
-- [ ] **HOME-01**: Hero card swiper with 2 cards (motivation text with refresh + minutes active counter), page indicator dots
-- [ ] **HOME-02**: Streak flip card — front: fire icon + current streak + "Days Active"; back: personal best streak
-- [ ] **HOME-03**: Nature Score flip card — front: leaf icon + calculated score + "Room to Improve"; back: breakdown logic text
-- [ ] **HOME-04**: Leaderboard preview with Friends/Global toggle, top 5 ranked entries, "View All" navigates to Your Squad tab
+- [x] **HOME-01**: Hero card swiper with 2 cards (motivation text with refresh + minutes active counter), page indicator dots
+- [x] **HOME-02**: Streak flip card — front: fire icon + current streak + "Days Active"; back: personal best streak
+- [x] **HOME-03**: Nature Score flip card — front: leaf icon + calculated score + "Room to Improve"; back: breakdown logic text
+- [x] **HOME-04**: Leaderboard preview with Friends/Global toggle, top 5 ranked entries, "View All" navigates to Your Squad tab
 
 ### Your Stash Screen
 
@@ -64,8 +64,8 @@
 
 ### Animations
 
-- [ ] **ANIM-01**: 3D flip card animation on Streak and Nature Score cards (smooth rotateY with perspective, 300-400ms)
-- [ ] **ANIM-02**: Hero card swiper horizontal gesture with page indicator dots that track scroll position
+- [x] **ANIM-01**: 3D flip card animation on Streak and Nature Score cards (smooth rotateY with perspective, 300-400ms)
+- [x] **ANIM-02**: Hero card swiper horizontal gesture with page indicator dots that track scroll position
 
 ## v2 Requirements
 
@@ -133,12 +133,12 @@
 | NAV-05 | Phase 2: Navigation & Layout | Complete |
 | NAV-06 | Phase 2: Navigation & Layout | Complete |
 | OVLY-02 | Phase 2: Navigation & Layout | Complete |
-| HOME-01 | Phase 3: Home Screen | Pending |
-| HOME-02 | Phase 3: Home Screen | Pending |
-| HOME-03 | Phase 3: Home Screen | Pending |
-| HOME-04 | Phase 3: Home Screen | Pending |
-| ANIM-01 | Phase 3: Home Screen | Pending |
-| ANIM-02 | Phase 3: Home Screen | Pending |
+| HOME-01 | Phase 3: Home Screen | Complete |
+| HOME-02 | Phase 3: Home Screen | Complete |
+| HOME-03 | Phase 3: Home Screen | Complete |
+| HOME-04 | Phase 3: Home Screen | Complete |
+| ANIM-01 | Phase 3: Home Screen | Complete |
+| ANIM-02 | Phase 3: Home Screen | Complete |
 | STSH-01 | Phase 4: Your Stash + Your Squad | Pending |
 | STSH-02 | Phase 4: Your Stash + Your Squad | Pending |
 | STSH-03 | Phase 4: Your Stash + Your Squad | Pending |
@@ -166,4 +166,4 @@
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 2 requirements marked Complete*
+*Last updated: 2026-01-27 -- Phase 3 requirements marked Complete*
