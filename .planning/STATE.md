@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-01-27)
 
 **Core value:** Every screen matches wireframe designs, feels native, and mock data cleanly separates from future backend.
-**Current focus:** Phase 2 - Navigation & Layout (complete, verified)
+**Current focus:** Phase 3 - Home Screen (in progress)
 
 ## Current Position
 
-Phase: 2 of 6 (Navigation & Layout)
-Plan: 3 of 3 in current phase
-Status: Phase complete (verified)
-Last activity: 2026-01-27 -- Phase 2 execution complete
+Phase: 3 of 6 (Home Screen)
+Plan: 1 of 3 in current phase
+Status: In progress
+Last activity: 2026-01-27 -- Completed 03-01-PLAN.md
 
-Progress: [██████░░░░░░░░░░░░░░] 33%
+Progress: [████████░░░░░░░░░░░░] 40%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
-- Average duration: 2.6min
-- Total execution time: 0.22 hours
+- Total plans completed: 6
+- Average duration: 2.7min
+- Total execution time: 0.26 hours
 
 **By Phase:**
 
@@ -29,9 +29,10 @@ Progress: [██████░░░░░░░░░░░░░░] 33%
 |-------|-------|-------|----------|
 | 01-mock-data-layer | 2/2 | 3min | 1.5min |
 | 02-navigation-layout | 3/3 | 11min | 3.7min |
+| 03-home-screen | 1/3 | 4min | 4.0min |
 
 **Recent Trend:**
-- Last 5 plans: 1min, 2min, 4min, 2min, 5min
+- Last 5 plans: 2min, 4min, 2min, 5min, 4min
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -58,6 +59,8 @@ Recent decisions affecting current work:
 - HeroUI Avatar requires alt prop for accessibility (02-02)
 - Each tab manages independent affirmation state, not shared global (02-02)
 - Home screen simplified to placeholder for Phase 2 -- Firebase/Health imports removed, will rebuild in Phase 3 (02-02)
+- No tap affordance visual hint on flip cards - discovery-based interaction is common mobile pattern (03-01)
+- Nature Score calculation uses simple mock formula (totalMinutes * 0.05) - real algorithm deferred (03-01)
 
 ### Pending Todos
 
@@ -71,6 +74,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-27T19:00:00Z
-Stopped at: Phase 2 execution complete (all 3 plans + verification)
+Last session: 2026-01-28T00:55:08Z
+Stopped at: Completed 03-01-PLAN.md (FlipCard components)
 Resume file: None
