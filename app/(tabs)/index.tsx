@@ -6,6 +6,9 @@ import { Plus } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TopBar } from "@/components/navigation/TopBar";
+import { HeroSwiper } from "@/components/home/HeroSwiper";
+import { StreakFlipCard, NatureScoreFlipCard } from "@/components/home/StatsFlipCard";
+import { LeaderboardPreview } from "@/components/home/LeaderboardPreview";
 import { useTheme } from "@/contexts/theme-context";
 import { MOCK_AFFIRMATIONS, MOCK_USER } from "@/lib/mock";
 
@@ -62,19 +65,24 @@ export default function HomeScreen() {
           </Text>
         </Pressable>
 
-        <View className="px-4 gap-4 pt-4">
-          <Text
-            className="text-3xl font-bold"
-            style={{ color: colors.textPrimary }}
-          >
-            Home
-          </Text>
-          <Text
-            className="text-base"
-            style={{ color: colors.textSecondary }}
-          >
-            Your outdoor activity dashboard
-          </Text>
+        <View className="mt-4">
+          <HeroSwiper
+            onRefreshMotivation={onRefresh}
+            motivationText={MOCK_AFFIRMATIONS[affirmationIndex]}
+          />
+        </View>
+
+        <View className="flex-row gap-3 px-4 mt-4">
+          <View className="flex-1">
+            <StreakFlipCard />
+          </View>
+          <View className="flex-1">
+            <NatureScoreFlipCard />
+          </View>
+        </View>
+
+        <View className="px-4 mt-6">
+          <LeaderboardPreview />
         </View>
       </ScrollView>
     </View>
