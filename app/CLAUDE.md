@@ -10,7 +10,7 @@ app/
 ├── login.tsx            # Login screen (shown when no user)
 ├── chat.tsx             # Full-screen AI chat with Parker
 ├── (tabs)/              # Bottom tab navigation (authenticated)
-│   ├── _layout.tsx      # Material Top Tabs at bottom + ParkerFAB overlay
+│   ├── _layout.tsx      # Material Top Tabs at bottom + CustomTabBar
 │   ├── index.tsx        # Home - stats, challenge, activities
 │   ├── stash.tsx        # Your Stash - rewards and perks (placeholder)
 │   └── squad.tsx        # Your Squad - community and leaderboard (placeholder)
@@ -49,11 +49,11 @@ return <Stack>
 
 ### Tab Navigation
 
-Uses Material Top Tabs (`@react-navigation/material-top-tabs`) positioned at bottom via `tabBarPosition="bottom"`. Supports swipe gestures between tabs with horizontal slide animation.
+Uses Material Top Tabs (`@react-navigation/material-top-tabs`) positioned at bottom via `tabBarPosition="bottom"` with a custom `CustomTabBar` component. Supports swipe gestures between tabs.
 
-3 tabs: Home, Your Stash, Your Squad.
+3 tabs: Home, Your Stash, Your Squad — icons grouped on the left side of the bar.
 
-ParkerFAB (bear paw icon) overlays all tab screens in bottom-right corner, navigates to `/chat`.
+Parker chat button (paw icon, accent-colored circle) is integrated into the right side of the custom tab bar, navigates to `/chat`.
 
 Each tab screen renders a shared `TopBar` component (date + affirmation + avatar) as the first child inside its ScrollView. The TopBar scrolls with content (not sticky). Pull-to-refresh rotates the affirmation text. Each tab manages its own affirmation state independently. All screens use mock data from `@/lib/mock`.
 

@@ -131,27 +131,32 @@ import { TopBar } from "@/components/navigation/TopBar";
 - Pull-to-refresh affirmation rotation managed by parent screen
 - Uses `useTheme()` for text colors
 
-### ParkerFAB
+### CustomTabBar
 
-Floating action button for Parker AI chat, positioned in bottom-right corner.
+Custom bottom tab bar with icons grouped on the left and Parker chat button on the right.
 
 ```typescript
-import { ParkerFAB } from "@/components/navigation/ParkerFAB";
+import { CustomTabBar } from "@/components/navigation/CustomTabBar";
 
-// Rendered as sibling to tab navigator in app/(tabs)/_layout.tsx
-<View style={{ flex: 1 }}>
-  <MaterialTopTabs ... />
-  <ParkerFAB />
-</View>
+// Used as tabBar prop in app/(tabs)/_layout.tsx
+<MaterialTopTabs tabBar={(props) => <CustomTabBar {...props} />} ... />
 ```
+
+**Layout:**
+
+- Left: 3 tab icons (Home, Gift, Users) grouped closely with 4px gap, each in a 44x44 rounded-square button
+- Right: Parker paw icon in a 48px accent-colored circle
 
 **Behavior:**
 
-- Absolutely positioned bottom-right with safe area insets
-- Spring entrance animation (scale 0 to 1, damping: 15)
-- PawPrint icon from lucide-react-native
-- Navigates to `/chat` on press
-- 56x56 rounded button with accent background color
+- Active tab gets `tabIconActiveBg` background highlight
+- Active/inactive icon colors from theme
+- Parker button navigates to `/chat`
+- Handles safe area insets for bottom padding
+
+### ParkerFAB (deprecated)
+
+Previously a floating action button overlaying the tab bar. Replaced by the Parker button integrated into `CustomTabBar`. File still exists at `navigation/ParkerFAB.tsx` but is no longer used.
 
 ## Existing Components
 
@@ -159,5 +164,6 @@ import { ParkerFAB } from "@/components/navigation/ParkerFAB";
 - `haptic-tab.tsx` - Tab bar item with haptic feedback (used by old Bottom Tabs, not Material Top Tabs)
 - `hello-wave.tsx` - Animated wave emoji
 - `navigation/TopBar.tsx` - Shared top bar with date, affirmation, and avatar
-- `navigation/ParkerFAB.tsx` - Parker AI chat FAB
+- `navigation/CustomTabBar.tsx` - Custom bottom tab bar with grouped icons + Parker button
+- `navigation/ParkerFAB.tsx` - Parker AI chat FAB (deprecated, replaced by CustomTabBar)
 - `ui/` - UI primitives

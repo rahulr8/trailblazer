@@ -13,7 +13,7 @@ import {
 
 import { Stack, router } from "expo-router";
 
-import { ArrowLeft, Bot, Send, User } from "lucide-react-native";
+import { Bot, Send, User, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BorderRadius, Spacing } from "@/constants";
@@ -104,24 +104,22 @@ export default function ChatScreen() {
 
   return (
     <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: "Parker AI",
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.textPrimary,
-          headerLeft: () => (
-            <Pressable onPress={() => router.back()} style={styles.headerButton}>
-              <ArrowLeft size={24} color={colors.textPrimary} />
-            </Pressable>
-          ),
-        }}
-      />
+      <Stack.Screen options={{ headerShown: false }} />
       <KeyboardAvoidingView
         style={[styles.container, { backgroundColor: colors.background }]}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+        keyboardVerticalOffset={0}
       >
+        <View style={[styles.header, { paddingTop: insets.top }]}>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Parker</Text>
+          <Pressable
+            onPress={() => router.back()}
+            style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
+            accessibilityLabel="Close chat"
+          >
+            <X size={20} color={colors.textPrimary} />
+          </Pressable>
+        </View>
         <FlatList
           ref={flatListRef}
           data={messages}
@@ -170,9 +168,23 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerButton: {
-    padding: Spacing.sm,
-    marginLeft: -Spacing.sm,
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: Spacing.lg,
+    paddingBottom: Spacing.md,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: BorderRadius.full,
+    alignItems: "center",
+    justifyContent: "center",
   },
   messageList: {
     padding: Spacing.lg,
