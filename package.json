@@ -5,16 +5,19 @@
   "version": "54.0.35",
   "scripts": {
     "prebuild": "expo prebuild",
-    "start": "expo start",
-    "dev": "expo start --clear",
-    "android": "expo run:android --device",
-    "ios": "expo run:ios --device",
+    "start": "expo start --port 8082",
+    "android": "expo run:android --device --port 8082",
+    "ios": "expo run:ios --device --port 8082",
+    "dev": "expo start --clear --port 8082",
+    "lfg:ios": "npm run prebuild --clean && npm run ios",
+    "lfg:android": "npm run prebuild --clean && npm run android",
+    "build:ios": "eas build --platform ios --profile production",
+    "submit:ios": "eas submit --platform ios --latest",
+    "update:ios": "eas update --channel production",
     "typecheck": "tsc --noEmit",
+    "lint": "expo lint",
     "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "firebase:build": "cd functions && npm run build",
-    "firebase:deploy": "cd functions && npm run build && cd .. && firebase deploy --only functions",
-    "firebase:deploy:all": "cd functions && npm run build && cd .. && firebase deploy"
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@expo/metro-runtime": "~6.1.2",
