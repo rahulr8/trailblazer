@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 
 ## Current Position
 
-Phase: 4 of 6 (Your Stash Your Squad)
-Plan: 1 of 3 in current phase
-Status: In progress
-Last activity: 2026-01-31 -- Completed 04-01-PLAN.md
+Phase: 4 of 6 (Your Stash & Your Squad)
+Plan: 3 of 3 in current phase
+Status: Phase complete
+Last activity: 2026-01-31 -- Completed 04-03-PLAN.md
 
-Progress: [███████████░░░░░░░░░] 52%
+Progress: [███████████░░░░░░░░░] 55%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 9
-- Average duration: 2.5min
-- Total execution time: 0.38 hours
+- Total plans completed: 11
+- Average duration: 2.6min
+- Total execution time: 0.47 hours
 
 **By Phase:**
 
@@ -30,11 +30,11 @@ Progress: [███████████░░░░░░░░░] 52%
 | 01-mock-data-layer | 2/2 | 3min | 1.5min |
 | 02-navigation-layout | 3/3 | 11min | 3.7min |
 | 03-home-screen | 3/3 | 8.8min | 2.9min |
-| 04-your-stash-your-squad | 1/3 | 2min | 2min |
+| 04-your-stash-your-squad | 3/3 | 8min | 2.7min |
 
 **Recent Trend:**
-- Last 5 plans: 4min, 2.7min, 2.1min, 2min
-- Trend: Accelerating
+- Last 5 plans: 2.7min, 2.1min, 2min, 3min, 3min
+- Trend: Steady
 
 *Updated after each plan completion*
 
@@ -71,6 +71,9 @@ Recent decisions affecting current work:
 - Used cardBackground and cardBorder from theme colors (not card/border) (04-01)
 - Increased pull-to-refresh delay from 500ms to 800ms to match CONTEXT.md mock delay pattern (04-01)
 - Carousel and grid flow as one continuous scroll with no section breaks (04-01)
+- Time formatted as hours+minutes (Xh Ym) on full Squad leaderboard for more detail than Home preview (04-03)
+- SegmentedControl is generic and reusable (not leaderboard-specific) (04-03)
+- Show More expansion resets when switching between Friends/Global tabs (04-03)
 
 ### Pending Todos
 
@@ -84,6 +87,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-31T02:05:09Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-01-31T02:06:43Z
+Stopped at: Completed 04-03-PLAN.md (Phase 4 complete)
 Resume file: None
