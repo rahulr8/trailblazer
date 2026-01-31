@@ -5,6 +5,7 @@ import { useToast } from "heroui-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TopBar } from "@/components/navigation/TopBar";
+import { LeaderboardWidget } from "@/components/squad/LeaderboardWidget";
 import { useTheme } from "@/contexts/theme-context";
 import { MOCK_AFFIRMATIONS, MOCK_USER } from "@/lib/mock";
 
@@ -71,6 +72,10 @@ export default function SquadScreen() {
           >
             Everything's better together.
           </Text>
+        </View>
+
+        <View className="px-4 mt-4">
+          <LeaderboardWidget />
         </View>
       </ScrollView>
     </View>
