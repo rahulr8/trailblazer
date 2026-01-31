@@ -17,6 +17,7 @@
     },
     "production": {
       "channel": "production",
+      "environment": "production",
       "ios": {
         "resourceClass": "default",
         "buildConfiguration": "Release"
