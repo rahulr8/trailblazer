@@ -13,6 +13,7 @@ interface RewardCarouselProps {
 export function RewardCarousel({ rewards, onRewardPress }: RewardCarouselProps) {
   const { width } = useWindowDimensions();
   const { colors } = useTheme();
+  const GAP = 12;
   const CARD_WIDTH = width - 32;
 
   const [activeIndex, setActiveIndex] = useState(0);
@@ -35,13 +36,13 @@ export function RewardCarousel({ rewards, onRewardPress }: RewardCarouselProps) 
         data={rewards}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH}
+        snapToInterval={CARD_WIDTH + GAP}
         decelerationRate="fast"
         pagingEnabled={false}
         contentContainerStyle={{ paddingHorizontal: 16 }}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View style={{ width: CARD_WIDTH, paddingRight: 0 }}>
+          <View style={{ width: CARD_WIDTH, marginRight: GAP }}>
             <RewardCard reward={item} onPress={onRewardPress} variant="carousel" />
           </View>
         )}
