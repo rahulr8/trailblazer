@@ -15,6 +15,7 @@ import { MOCK_HERO_CARDS } from "@/lib/mock";
 import { useTheme } from "@/contexts/theme-context";
 import type { MockHeroCard } from "@/lib/mock/types";
 
+const GAP = 12;
 const CARD_WIDTH = Dimensions.get("window").width - 32;
 
 interface HeroSwiperProps {
@@ -44,8 +45,8 @@ export function HeroSwiper({
 
   const getItemLayout = useCallback(
     (_data: ArrayLike<MockHeroCard> | null | undefined, index: number) => ({
-      length: CARD_WIDTH,
-      offset: CARD_WIDTH * index,
+      length: CARD_WIDTH + GAP,
+      offset: (CARD_WIDTH + GAP) * index,
       index,
     }),
     []
@@ -58,6 +59,7 @@ export function HeroSwiper({
           <View
             style={{
               width: CARD_WIDTH,
+              marginRight: GAP,
               borderRadius: 16,
               overflow: "hidden",
               ...shadows.md,
@@ -106,6 +108,7 @@ export function HeroSwiper({
           <View
             style={{
               width: CARD_WIDTH,
+              marginRight: GAP,
               borderRadius: 16,
               overflow: "hidden",
               backgroundColor: colors.cardBackground,
@@ -159,7 +162,7 @@ export function HeroSwiper({
         keyExtractor={(item) => item.id}
         horizontal
         showsHorizontalScrollIndicator={false}
-        snapToInterval={CARD_WIDTH}
+        snapToInterval={CARD_WIDTH + GAP}
         decelerationRate="fast"
         contentContainerStyle={{ paddingHorizontal: 16 }}
         getItemLayout={getItemLayout}
