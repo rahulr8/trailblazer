@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Mock Data Layer** - TypeScript interfaces and hardcoded data powering all screens
 - [x] **Phase 2: Navigation & Layout** - 3-tab shell, Parker FAB, TopBar, and routing structure
 - [x] **Phase 3: Home Screen** - Hero swiper, flip card stats, leaderboard preview with animations
-- [ ] **Phase 4: Your Stash + Your Squad** - Rewards carousel/grid with toaster, leaderboard widget
+- [x] **Phase 4: Your Stash + Your Squad** - Rewards carousel/grid with toaster, leaderboard widget
 - [ ] **Phase 5: Profile Screen** - Identity, lifetime stats, settings, data sync, and account actions
 - [ ] **Phase 6: Onboarding Flow** - Welcome pager, login, permission screens, and launch routing
 
@@ -83,9 +83,9 @@ Plans:
 **Plans**: 3 plans
 
 Plans:
-- [ ] 04-01-PLAN.md -- Your Stash screen with featured carousel and 2-column rewards grid (Wave 1)
-- [ ] 04-02-PLAN.md -- Reward Toaster bottom sheet wired to card presses (Wave 2)
-- [ ] 04-03-PLAN.md -- Your Squad screen with full leaderboard widget and docs (Wave 1)
+- [x] 04-01-PLAN.md -- Your Stash screen with featured carousel and 2-column rewards grid (Wave 1)
+- [x] 04-02-PLAN.md -- Reward Toaster bottom sheet wired to card presses (Wave 2)
+- [x] 04-03-PLAN.md -- Your Squad screen with full leaderboard widget and docs (Wave 1)
 
 ### Phase 5: Profile Screen
 **Goal**: Users can view their identity, lifetime stats, and access all account settings from a single Profile route
@@ -130,10 +130,10 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 1. Mock Data Layer | 2/2 | Complete | 2026-01-27 |
 | 2. Navigation & Layout | 3/3 | Complete | 2026-01-27 |
 | 3. Home Screen | 3/3 | Complete | 2026-01-27 |
-| 4. Your Stash + Your Squad | 0/3 | Not started | - |
+| 4. Your Stash + Your Squad | 3/3 | Complete | 2026-01-30 |
 | 5. Profile Screen | 0/2 | Not started | - |
 | 6. Onboarding Flow | 0/2 | Not started | - |
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-30 -- Phase 4 planned*
+*Last updated: 2026-01-30 -- Phase 4 complete*

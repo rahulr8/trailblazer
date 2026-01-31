@@ -29,15 +29,15 @@
 
 ### Your Stash Screen
 
-- [ ] **STSH-01**: Featured rewards horizontal carousel (max 6 cards, page indicator dots)
-- [ ] **STSH-02**: 2-column rewards grid with vendor name + reward info per tile
-- [ ] **STSH-03**: Tapping any reward opens Reward Toaster bottom sheet (does not navigate away)
+- [x] **STSH-01**: Featured rewards horizontal carousel (max 6 cards, page indicator dots)
+- [x] **STSH-02**: 2-column rewards grid with vendor name + reward info per tile
+- [x] **STSH-03**: Tapping any reward opens Reward Toaster bottom sheet (does not navigate away)
 
 ### Your Squad Screen
 
-- [ ] **SQUD-01**: Leaderboard widget with Friends/Global toggle switch
-- [ ] **SQUD-02**: Ranked rows showing avatar, name, total time — current user row highlighted
-- [ ] **SQUD-03**: Screen header shows "Your Squad" title, "Everything's better together." subtitle
+- [x] **SQUD-01**: Leaderboard widget with Friends/Global toggle switch
+- [x] **SQUD-02**: Ranked rows showing avatar, name, total time — current user row highlighted
+- [x] **SQUD-03**: Screen header shows "Your Squad" title, "Everything's better together." subtitle
 
 ### Profile Screen
 
@@ -59,7 +59,7 @@
 
 ### Overlays
 
-- [ ] **OVLY-01**: Reward Toaster — bottom sheet slides up, shows reward title, description, QR placeholder or barcode placeholder or coupon code text
+- [x] **OVLY-01**: Reward Toaster — bottom sheet slides up, shows reward title, description, QR placeholder or barcode placeholder or coupon code text
 - [x] **OVLY-02**: Parker Chat — existing full-screen chat interface matches design navigation (bear FAB → chat)
 
 ### Animations
@@ -139,13 +139,13 @@
 | HOME-04 | Phase 3: Home Screen | Complete |
 | ANIM-01 | Phase 3: Home Screen | Complete |
 | ANIM-02 | Phase 3: Home Screen | Complete |
-| STSH-01 | Phase 4: Your Stash + Your Squad | Pending |
-| STSH-02 | Phase 4: Your Stash + Your Squad | Pending |
-| STSH-03 | Phase 4: Your Stash + Your Squad | Pending |
-| SQUD-01 | Phase 4: Your Stash + Your Squad | Pending |
-| SQUD-02 | Phase 4: Your Stash + Your Squad | Pending |
-| SQUD-03 | Phase 4: Your Stash + Your Squad | Pending |
-| OVLY-01 | Phase 4: Your Stash + Your Squad | Pending |
+| STSH-01 | Phase 4: Your Stash + Your Squad | Complete |
+| STSH-02 | Phase 4: Your Stash + Your Squad | Complete |
+| STSH-03 | Phase 4: Your Stash + Your Squad | Complete |
+| SQUD-01 | Phase 4: Your Stash + Your Squad | Complete |
+| SQUD-02 | Phase 4: Your Stash + Your Squad | Complete |
+| SQUD-03 | Phase 4: Your Stash + Your Squad | Complete |
+| OVLY-01 | Phase 4: Your Stash + Your Squad | Complete |
 | PROF-01 | Phase 5: Profile Screen | Pending |
 | PROF-02 | Phase 5: Profile Screen | Pending |
 | PROF-03 | Phase 5: Profile Screen | Pending |
@@ -166,4 +166,4 @@
 
 ---
 *Requirements defined: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 3 requirements marked Complete*
+*Last updated: 2026-01-30 -- Phase 4 requirements marked Complete*
