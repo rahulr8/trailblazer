@@ -9,6 +9,7 @@ Your Stash screen components for reward display in Trailblazer.
 | RewardCard      | RewardCard.tsx     | Single reward card with press animation (carousel/grid) |
 | RewardCarousel  | RewardCarousel.tsx | Horizontal swipeable featured rewards with page dots     |
 | RewardsGrid     | RewardsGrid.tsx    | Vertical 2-column grid of all rewards                   |
+| RewardToaster   | RewardToaster.tsx  | Bottom sheet modal for reward detail and redemption     |
 
 ## RewardCard
 
@@ -122,6 +123,79 @@ Grid uses `scrollEnabled={false}` to defer scrolling to parent ScrollView. This 
 
 Each card renders as `variant="grid"`.
 
+## RewardToaster
+
+Bottom sheet modal that displays reward details and redemption placeholder.
+
+```typescript
+import { RewardToaster } from "@/components/stash/RewardToaster";
+
+const bottomSheetRef = useRef<BottomSheetModal>(null);
+const [selectedReward, setSelectedReward] = useState<MockReward | null>(null);
+
+// Open on card tap
+const handleRewardPress = (reward: MockReward) => {
+  setSelectedReward(reward);
+  bottomSheetRef.current?.present();
+};
+
+// Close handler
+const handleDismiss = () => {
+  setSelectedReward(null);
+};
+
+<RewardToaster
+  ref={bottomSheetRef}
+  reward={selectedReward}
+  onDismiss={handleDismiss}
+/>
+```
+
+**Props:**
+
+- `reward: MockReward | null` - Currently selected reward to display (null when closed)
+- `onDismiss: () => void` - Callback when sheet dismisses (swipe down or backdrop tap)
+
+**Ref pattern:**
+
+Uses `forwardRef` to expose `BottomSheetModal` ref to parent. Parent calls `bottomSheetRef.current?.present()` to open.
+
+**Layout:**
+
+- `snapPoints={['50%']}` - Half screen height
+- `enablePanDownToClose={true}` - Swipe down to dismiss
+- `backdropComponent` - Backdrop tap to dismiss
+- Top section: Vendor name (uppercase, small, secondary), title (bold, xl), description (base, secondary)
+- Middle section: Type-appropriate placeholder based on `reward.rewardType`:
+  - `"qr"`: 160x160 gray rounded rectangle with "QR Code" label + rewardValue below
+  - `"barcode"`: 200x80 gray rounded rectangle with barcode placeholder "||||||||||||" + rewardValue below
+  - `"code"`: Accent-bordered rounded rectangle with rewardValue in large monospace font
+- Bottom section: Full-width "Redeem" button (HeroUI Button with primary background)
+
+**Redeem button:**
+
+Shows Coming Soon toast via `useToast()`:
+
+```typescript
+toast.show({
+  label: "Coming Soon",
+  description: "Redemption will be available soon!",
+  variant: "default",
+  placement: "top",
+});
+```
+
+**Integration pattern:**
+
+RewardToaster renders as sibling to ScrollView in parent screen (not nested inside). This ensures bottom sheet overlays properly without scroll interference.
+
+**Dismiss behavior:**
+
+- Swipe down gesture
+- Backdrop tap
+- Both trigger `onDismiss` callback
+- No navigation side effects (stays on Your Stash screen)
+
 ## Mock Data Sources
 
 All components import from `@/lib/mock`:
@@ -193,11 +267,63 @@ All components use `useTheme()` hook for dynamic colors:
 
 Carousel variant uses hardcoded white text on dark gradient overlay for consistent contrast across all reward images.
 
+## BottomSheetModal Pattern
+
+RewardToaster demonstrates the app's BottomSheetModal integration pattern using `@gorhom/bottom-sheet`:
+
+```typescript
+import { forwardRef, useCallback } from "react";
+import {
+  BottomSheetModal,
+  BottomSheetBackdrop,
+  BottomSheetView,
+} from "@gorhom/bottom-sheet";
+import type { BottomSheetDefaultBackdropProps } from "@gorhom/bottom-sheet/lib/typescript/components/bottomSheetBackdrop/types";
+
+export const Component = forwardRef<BottomSheetModal, Props>(({ onDismiss }, ref) => {
+  const renderBackdrop = useCallback(
+    (props: BottomSheetDefaultBackdropProps) => (
+      <BottomSheetBackdrop
+        {...props}
+        appearsOnIndex={0}
+        disappearsOnIndex={-1}
+      />
+    ),
+    []
+  );
+
+  return (
+    <BottomSheetModal
+      ref={ref}
+      snapPoints={["50%"]}
+      enablePanDownToClose={true}
+      backdropComponent={renderBackdrop}
+      onDismiss={onDismiss}
+      backgroundStyle={{ backgroundColor: colors.cardBackground }}
+      handleIndicatorStyle={{ backgroundColor: colors.cardBorder }}
+    >
+      <BottomSheetView>
+        {/* content */}
+      </BottomSheetView>
+    </BottomSheetModal>
+  );
+});
+```
+
+**Key requirements:**
+
+- `forwardRef` pattern for parent control
+- `renderBackdrop` memoized with `useCallback`
+- `BottomSheetView` wrapper for content
+- Theme-colored background and handle indicator
+
+This pattern can be reused for other bottom sheet modals (badge detail, upgrade flow, etc.).
+
 ## Future Extensions
 
 **Planned for later phases:**
 
-- RewardToaster: BottomSheetModal for reward redemption (Plan 04-02)
 - Wallet integration: Redeemed rewards move to digital wallet
 - Filtering: Filter grid by category or partner
 - Search: Find specific vendors or offers
+- Real redemption: Replace Coming Soon toast with actual QR/barcode generation
