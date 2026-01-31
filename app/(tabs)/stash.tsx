@@ -1,11 +1,13 @@
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TopBar } from "@/components/navigation/TopBar";
 import { RewardCarousel } from "@/components/stash/RewardCarousel";
 import { RewardsGrid } from "@/components/stash/RewardsGrid";
+import { RewardToaster } from "@/components/stash/RewardToaster";
 import { useTheme } from "@/contexts/theme-context";
 import { MOCK_AFFIRMATIONS, MOCK_REWARDS, MOCK_USER, type MockReward } from "@/lib/mock";
 
@@ -16,6 +18,8 @@ export default function StashScreen() {
     () => Math.floor(Math.random() * MOCK_AFFIRMATIONS.length)
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [selectedReward, setSelectedReward] = useState<MockReward | null>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -24,8 +28,12 @@ export default function StashScreen() {
   }, []);
 
   const onRewardPress = useCallback((reward: MockReward) => {
-    // Plan 02 will add bottom sheet detail view
-    console.log("Reward pressed:", reward.id);
+    setSelectedReward(reward);
+    bottomSheetRef.current?.present();
+  }, []);
+
+  const handleDismiss = useCallback(() => {
+    setSelectedReward(null);
   }, []);
 
   return (
@@ -75,6 +83,12 @@ export default function StashScreen() {
           />
         </View>
       </ScrollView>
+
+      <RewardToaster
+        ref={bottomSheetRef}
+        reward={selectedReward}
+        onDismiss={handleDismiss}
+      />
     </View>
   );
 }
