@@ -80,12 +80,12 @@ Plans:
   3. Your Squad screen displays "Your Squad" title and "Everything's better together." subtitle in the header
   4. Leaderboard widget on Your Squad shows Friends/Global toggle, ranked rows with avatar, name, and total time, with the current user's row visually highlighted
   5. Dismissing the Reward Toaster returns to Your Stash with no navigation side effects
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 04-01: Your Stash screen (carousel + grid)
-- [ ] 04-02: Reward Toaster bottom sheet
-- [ ] 04-03: Your Squad screen (leaderboard widget)
+- [ ] 04-01-PLAN.md -- Your Stash screen with featured carousel and 2-column rewards grid (Wave 1)
+- [ ] 04-02-PLAN.md -- Reward Toaster bottom sheet wired to card presses (Wave 2)
+- [ ] 04-03-PLAN.md -- Your Squad screen with full leaderboard widget and docs (Wave 1)
 
 ### Phase 5: Profile Screen
 **Goal**: Users can view their identity, lifetime stats, and access all account settings from a single Profile route
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-27 -- Phase 3 complete*
+*Last updated: 2026-01-30 -- Phase 4 planned*
