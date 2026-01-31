@@ -12,16 +12,16 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 Phase: 4 of 6 (Your Stash & Your Squad)
 Plan: 3 of 3 in current phase
 Status: Phase complete
-Last activity: 2026-01-31 -- Completed 04-03-PLAN.md
+Last activity: 2026-01-31 -- Completed 04-02-PLAN.md
 
-Progress: [███████████░░░░░░░░░] 55%
+Progress: [████████████░░░░░░░░] 60%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
-- Average duration: 2.6min
-- Total execution time: 0.47 hours
+- Total plans completed: 12
+- Average duration: 2.5min
+- Total execution time: 0.5 hours
 
 **By Phase:**
 
@@ -30,10 +30,10 @@ Progress: [███████████░░░░░░░░░] 55%
 | 01-mock-data-layer | 2/2 | 3min | 1.5min |
 | 02-navigation-layout | 3/3 | 11min | 3.7min |
 | 03-home-screen | 3/3 | 8.8min | 2.9min |
-| 04-your-stash-your-squad | 3/3 | 8min | 2.7min |
+| 04-your-stash-your-squad | 3/3 | 10min | 3.3min |
 
 **Recent Trend:**
-- Last 5 plans: 2.7min, 2.1min, 2min, 3min, 3min
+- Last 5 plans: 2min, 2.7min, 2.1min, 2min, 3min
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -74,6 +74,10 @@ Recent decisions affecting current work:
 - Time formatted as hours+minutes (Xh Ym) on full Squad leaderboard for more detail than Home preview (04-03)
 - SegmentedControl is generic and reusable (not leaderboard-specific) (04-03)
 - Show More expansion resets when switching between Friends/Global tabs (04-03)
+- Used forwardRef pattern to expose BottomSheetModal ref to parent screen (04-02)
+- Rendered RewardToaster as sibling to ScrollView (not nested) to prevent scroll conflicts (04-02)
+- Used useToast destructured as { toast } for toast.show() API (04-02)
+- Memoized renderBackdrop with useCallback for stable reference (04-02)
 
 ### Pending Todos
 
@@ -87,6 +91,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-01-31T02:06:43Z
-Stopped at: Completed 04-03-PLAN.md (Phase 4 complete)
+Last session: 2026-01-31T02:12:56Z
+Stopped at: Completed 04-02-PLAN.md (Phase 4 complete)
 Resume file: None
