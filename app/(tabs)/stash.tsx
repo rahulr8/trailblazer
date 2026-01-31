@@ -4,8 +4,10 @@ import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { TopBar } from "@/components/navigation/TopBar";
+import { RewardCarousel } from "@/components/stash/RewardCarousel";
+import { RewardsGrid } from "@/components/stash/RewardsGrid";
 import { useTheme } from "@/contexts/theme-context";
-import { MOCK_AFFIRMATIONS, MOCK_USER } from "@/lib/mock";
+import { MOCK_AFFIRMATIONS, MOCK_REWARDS, MOCK_USER, type MockReward } from "@/lib/mock";
 
 export default function StashScreen() {
   const { colors } = useTheme();
@@ -18,7 +20,12 @@ export default function StashScreen() {
   const onRefresh = useCallback(() => {
     setRefreshing(true);
     setAffirmationIndex((prev) => (prev + 1) % MOCK_AFFIRMATIONS.length);
-    setTimeout(() => setRefreshing(false), 500);
+    setTimeout(() => setRefreshing(false), 800);
+  }, []);
+
+  const onRewardPress = useCallback((reward: MockReward) => {
+    // Plan 02 will add bottom sheet detail view
+    console.log("Reward pressed:", reward.id);
   }, []);
 
   return (
@@ -52,6 +59,20 @@ export default function StashScreen() {
           >
             Rewards and offers from our partners
           </Text>
+        </View>
+
+        <View className="mt-4">
+          <RewardCarousel
+            rewards={MOCK_REWARDS.filter((r) => r.featured)}
+            onRewardPress={onRewardPress}
+          />
+        </View>
+
+        <View className="mt-4">
+          <RewardsGrid
+            rewards={MOCK_REWARDS.filter((r) => !r.featured)}
+            onRewardPress={onRewardPress}
+          />
         </View>
       </ScrollView>
     </View>
