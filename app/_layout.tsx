@@ -69,14 +69,17 @@ function RootLayoutNav() {
     setHasCompletedPermissions(true);
   };
 
-  // Reset onboarding/permissions when user signs out
+  // Reset onboarding/permissions when user signs out (not on initial load)
+  const prevUser = useRef(user);
   useEffect(() => {
-    if (!isLoading && !user) {
+    if (prevUser.current && !user) {
+      // User went from logged-in to logged-out = sign out
       setHasSeenOnboarding(false);
       setHasCompletedPermissions(false);
       AsyncStorage.multiRemove([ONBOARDING_KEY, PERMISSIONS_KEY]).catch(() => {});
     }
-  }, [user, isLoading]);
+    prevUser.current = user;
+  }, [user]);
 
   if (isLoading || !flagsLoaded) {
     return (
