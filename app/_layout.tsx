@@ -98,10 +98,10 @@ function RootLayoutNav() {
 
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="onboarding" />
-        <Stack.Screen name="login" />
-        <Stack.Screen name="permissions" />
+      <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
+        <Stack.Screen name="onboarding" options={{ animation: "none" }} />
+        <Stack.Screen name="login" options={{ animation: "fade" }} />
+        <Stack.Screen name="permissions" options={{ animation: "fade" }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="(modals)"

@@ -67,15 +67,17 @@ export default function OnboardingScreen() {
 
   const renderPage = useCallback(
     ({ item }: { item: WelcomePage }) => (
-      <View style={[styles.page, { width: SCREEN_WIDTH }]}>
-        <View style={styles.content}>
+      <View style={[styles.page, { width: SCREEN_WIDTH, paddingTop: insets.top + Spacing["5xl"] }]}>
+        <View style={styles.logoArea}>
           <RotatingLogo size={80} />
+        </View>
+        <View style={styles.textArea}>
           <Text style={[styles.title, { color: colors.textPrimary }]}>{item.title}</Text>
           <Text style={[styles.body, { color: colors.textSecondary }]}>{item.body}</Text>
         </View>
       </View>
     ),
-    [colors]
+    [colors, insets.top]
   );
 
   return (
@@ -127,25 +129,24 @@ const styles = StyleSheet.create({
   },
   page: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
     paddingHorizontal: Spacing["2xl"],
   },
-  content: {
-    alignItems: "center",
-    gap: Spacing.xl,
+  logoArea: {
+    alignItems: "flex-start",
+    marginBottom: Spacing["3xl"],
+  },
+  textArea: {
+    gap: Spacing.lg,
     maxWidth: 340,
   },
   title: {
     fontSize: 28,
     fontWeight: "700",
-    textAlign: "center",
     lineHeight: 36,
   },
   body: {
     fontSize: 16,
     lineHeight: 24,
-    textAlign: "center",
   },
   footer: {
     position: "absolute",

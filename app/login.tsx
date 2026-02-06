@@ -88,7 +88,6 @@ export default function LoginScreen() {
         await signInWithEmailAndPassword(auth, email.trim(), password);
       }
       setShowLoginModal(false);
-      router.replace("/(tabs)");
     } catch (err) {
       if (err && typeof err === "object" && "code" in err) {
         setError(getFirebaseErrorMessage(err as AuthError));
