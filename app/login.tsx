@@ -1,20 +1,29 @@
 import { useState } from "react";
 
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  ActivityIndicator,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 
-import { Stack, router } from "expo-router";
-
-import { Button } from "heroui-native";
+import { router } from "expo-router";
 
 import {
-  AuthError,
+  type AuthError,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react-native";
+import { Eye, EyeOff, Lock, Mail, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { SocialAuthButtons } from "@/components/SocialAuthButtons";
+import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
 import { createUser } from "@/lib/db/users";
@@ -48,8 +57,9 @@ function getFirebaseErrorMessage(error: AuthError): string {
 }
 
 export default function LoginScreen() {
-  const { colors, shadows } = useTheme();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const [showLoginModal, setShowLoginModal] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -68,23 +78,18 @@ export default function LoginScreen() {
 
     try {
       if (mode === "signup") {
-        console.log("[Auth] Creating Firebase user...");
         const { user } = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        console.log("[Auth] Firebase user created:", user.uid);
         await createUser(user.uid, {
           email: user.email || email.trim(),
           displayName: null,
           photoURL: null,
         });
-        console.log("[Auth] Firestore user document created");
       } else {
-        console.log("[Auth] Signing in...");
         await signInWithEmailAndPassword(auth, email.trim(), password);
-        console.log("[Auth] Sign in successful");
       }
+      setShowLoginModal(false);
       router.replace("/(tabs)");
     } catch (err) {
-      console.error("[Auth] Error:", err);
       if (err && typeof err === "object" && "code" in err) {
         setError(getFirebaseErrorMessage(err as AuthError));
       } else {
@@ -95,146 +100,261 @@ export default function LoginScreen() {
     }
   };
 
-  const toggleMode = () => {
-    setMode((prev) => (prev === "login" ? "signup" : "login"));
+  const openLoginModal = () => {
+    setMode("login");
+    setEmail("");
+    setPassword("");
+    setError(null);
+    setShowLoginModal(true);
   };
 
-  const title = mode === "login" ? "Welcome Back" : "Create Account";
-  const subtitle =
-    mode === "login" ? "Sign in to continue your adventure" : "Join the BC Parks community";
-  const submitText = mode === "login" ? "Sign In" : "Create Account";
-  const togglePrompt = mode === "login" ? "Don't have an account?" : "Already have an account?";
-  const toggleAction = mode === "login" ? "Sign Up" : "Sign In";
+  const handleAppleSignUp = () => {
+    console.log("[Auth] Apple sign-in pressed - not yet implemented");
+  };
 
   return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: false,
-          presentation: "fullScreenModal",
-        }}
-      />
-      <View
-        style={[
-          styles.container,
-          { backgroundColor: colors.background, paddingTop: insets.top + Spacing.xl },
-        ]}
-      >
-        <View style={styles.brandingContainer}>
-          <Text style={[styles.logoText, { color: colors.primary }]}>Trailblazer</Text>
-          <Text style={[styles.tagline, { color: colors.textSecondary }]}>
-            Your outdoor adventure companion
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.mainContent}>
+        <RotatingLogo size={70} />
+
+        <View style={styles.textContent}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Join Trailblazer+</Text>
+          <Text style={[styles.body, { color: colors.textSecondary }]}>
+            Create an account to track progress, enter the challenge, and access member benefits.
           </Text>
         </View>
 
-        <View style={[styles.formCard, { backgroundColor: colors.cardBackground }, shadows.lg]}>
-          <Text style={[styles.formTitle, { color: colors.textPrimary }]}>{title}</Text>
-          <Text style={[styles.formSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
+        <View style={styles.buttons}>
+          <Pressable
+            style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
+            onPress={openLoginModal}
+          >
+            <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>Login</Text>
+          </Pressable>
 
-          <View style={styles.inputGroup}>
-            <View
-              style={[
-                styles.inputWrapper,
-                { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
-              ]}
-            >
-              <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
-              <TextInput
-                placeholder="Email address"
-                placeholderTextColor={colors.textSecondary}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                style={[styles.textInput, { color: colors.textPrimary }]}
-              />
-            </View>
-
-            <View
-              style={[
-                styles.inputWrapper,
-                { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
-              ]}
-            >
-              <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
-              <TextInput
-                placeholder="Password"
-                placeholderTextColor={colors.textSecondary}
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry={!showPassword}
-                style={[styles.textInput, { color: colors.textPrimary }]}
-              />
-              <Pressable onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                {showPassword ? (
-                  <EyeOff size={20} color={colors.textSecondary} />
-                ) : (
-                  <Eye size={20} color={colors.textSecondary} />
-                )}
-              </Pressable>
-            </View>
-          </View>
-
-          {error && (
-            <View style={[styles.errorContainer, { backgroundColor: colors.danger + "15" }]}>
-              <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
-            </View>
-          )}
-
-          {mode === "login" && (
-            <Pressable style={styles.forgotPassword}>
-              <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>
-                Forgot password?
-              </Text>
-            </Pressable>
-          )}
-
-          <Button onPress={handleAuth} isDisabled={loading} style={styles.submitButton}>
-            {loading ? <ActivityIndicator size="small" color="#000" /> : submitText}
-          </Button>
-
-          <SocialAuthButtons mode={mode} />
-        </View>
-
-        <View style={styles.toggleContainer}>
-          <Text style={[styles.toggleText, { color: colors.textSecondary }]}>{togglePrompt}</Text>
-          <Pressable onPress={toggleMode}>
-            <Text style={[styles.toggleLink, { color: colors.primary }]}>{toggleAction}</Text>
+          <Pressable
+            style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
+            onPress={handleAppleSignUp}
+          >
+            <Text style={[styles.appleIcon, { color: colors.textPrimary }]}></Text>
+            <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>
+              Sign up with Apple
+            </Text>
           </Pressable>
         </View>
       </View>
-    </>
+
+      <Text
+        style={[
+          styles.terms,
+          { color: colors.textTertiary, paddingBottom: insets.bottom + Spacing.xl },
+        ]}
+      >
+        Terms & Conditions Apply
+      </Text>
+
+      <Modal
+        visible={showLoginModal}
+        animationType="slide"
+        presentationStyle="pageSheet"
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <KeyboardAvoidingView
+          style={[styles.modalContainer, { backgroundColor: colors.background }]}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <View style={[styles.modalHeader, { paddingTop: Spacing.lg }]}>
+            <Pressable
+              style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
+              onPress={() => setShowLoginModal(false)}
+            >
+              <X size={20} color={colors.textSecondary} />
+            </Pressable>
+          </View>
+
+          <ScrollView
+            contentContainerStyle={styles.modalContent}
+            keyboardShouldPersistTaps="handled"
+          >
+            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+              {mode === "login" ? "Welcome Back" : "Create Account"}
+            </Text>
+            <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
+              {mode === "login"
+                ? "Sign in to continue your adventure"
+                : "Join the BC Parks community"}
+            </Text>
+
+            <View style={styles.inputGroup}>
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
+                ]}
+              >
+                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                <TextInput
+                  placeholder="Email address"
+                  placeholderTextColor={colors.textSecondary}
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  style={[styles.textInput, { color: colors.textPrimary }]}
+                />
+              </View>
+
+              <View
+                style={[
+                  styles.inputWrapper,
+                  { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
+                ]}
+              >
+                <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                <TextInput
+                  placeholder="Password"
+                  placeholderTextColor={colors.textSecondary}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  style={[styles.textInput, { color: colors.textPrimary }]}
+                />
+                <Pressable
+                  onPress={() => setShowPassword(!showPassword)}
+                  style={styles.eyeButton}
+                >
+                  {showPassword ? (
+                    <EyeOff size={20} color={colors.textSecondary} />
+                  ) : (
+                    <Eye size={20} color={colors.textSecondary} />
+                  )}
+                </Pressable>
+              </View>
+            </View>
+
+            {error && (
+              <View style={[styles.errorContainer, { backgroundColor: colors.danger + "15" }]}>
+                <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
+              </View>
+            )}
+
+            <Pressable
+              style={[styles.submitButton, { backgroundColor: colors.textPrimary }]}
+              onPress={handleAuth}
+              disabled={loading}
+            >
+              {loading ? (
+                <ActivityIndicator size="small" color={colors.background} />
+              ) : (
+                <Text style={[styles.submitButtonText, { color: colors.background }]}>
+                  {mode === "login" ? "Sign In" : "Create Account"}
+                </Text>
+              )}
+            </Pressable>
+
+            <View style={styles.toggleContainer}>
+              <Text style={[styles.toggleText, { color: colors.textSecondary }]}>
+                {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+              </Text>
+              <Pressable
+                onPress={() => {
+                  setMode(mode === "login" ? "signup" : "login");
+                  setError(null);
+                }}
+              >
+                <Text style={[styles.toggleLink, { color: colors.primary }]}>
+                  {mode === "login" ? "Sign Up" : "Sign In"}
+                </Text>
+              </Pressable>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </Modal>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingHorizontal: Spacing.xl,
-  },
-  brandingContainer: {
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: Spacing["2xl"],
+    paddingHorizontal: Spacing["2xl"],
   },
-  logoText: {
-    fontSize: 32,
+  mainContent: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    gap: Spacing["2xl"],
+    maxWidth: 340,
+  },
+  textContent: {
+    alignItems: "center",
+    gap: Spacing.md,
+  },
+  title: {
+    fontSize: 28,
     fontWeight: "700",
+    textAlign: "center",
+    lineHeight: 36,
   },
-  tagline: {
+  body: {
     fontSize: 16,
-    marginTop: Spacing.xs,
+    lineHeight: 24,
+    textAlign: "center",
   },
-  formCard: {
-    borderRadius: BorderRadius["2xl"],
-    padding: Spacing["2xl"],
+  buttons: {
+    width: "100%",
+    gap: Spacing.md,
   },
-  formTitle: {
+  outlineButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    height: 52,
+    borderRadius: BorderRadius.lg,
+    borderWidth: 1,
+    gap: Spacing.sm,
+  },
+  outlineButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  appleIcon: {
+    fontSize: 20,
+    marginTop: -2,
+  },
+  terms: {
+    fontSize: 13,
+    textAlign: "center",
+  },
+  modalContainer: {
+    flex: 1,
+  },
+  modalHeader: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: Spacing.lg,
+  },
+  closeButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  modalContent: {
+    paddingHorizontal: Spacing["2xl"],
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing["5xl"],
+  },
+  modalTitle: {
     fontSize: 24,
     fontWeight: "700",
     textAlign: "center",
   },
-  formSubtitle: {
+  modalSubtitle: {
     fontSize: 15,
     textAlign: "center",
     marginTop: Spacing.xs,
@@ -242,15 +362,6 @@ const styles = StyleSheet.create({
   },
   inputGroup: {
     gap: Spacing.md,
-  },
-  errorContainer: {
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    marginTop: Spacing.md,
-  },
-  errorText: {
-    fontSize: 14,
-    textAlign: "center",
   },
   inputWrapper: {
     flexDirection: "row",
@@ -272,16 +383,25 @@ const styles = StyleSheet.create({
     padding: Spacing.sm,
     marginLeft: Spacing.sm,
   },
-  forgotPassword: {
-    alignSelf: "flex-end",
-    marginTop: Spacing.sm,
+  errorContainer: {
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginTop: Spacing.md,
   },
-  forgotPasswordText: {
+  errorText: {
     fontSize: 14,
-    fontWeight: "500",
+    textAlign: "center",
   },
   submitButton: {
+    height: 52,
+    borderRadius: BorderRadius.lg,
+    alignItems: "center",
+    justifyContent: "center",
     marginTop: Spacing.xl,
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
   toggleContainer: {
     flexDirection: "row",

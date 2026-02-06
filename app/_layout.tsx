@@ -1,4 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
 import { ActivityIndicator, StyleSheet, View } from "react-native";
 
 import { router, Stack } from "expo-router";
@@ -12,6 +13,7 @@ import {
 
 import { HeroUINativeProvider } from "heroui-native";
 
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
@@ -25,35 +27,68 @@ export const unstable_settings = {
   anchor: "(tabs)",
 };
 
+const ONBOARDING_KEY = "@trailblazer_onboarding_seen";
+const PERMISSIONS_KEY = "@trailblazer_permissions_complete";
+
 function RootLayoutNav() {
   const { isDark, colors } = useTheme();
   const { user, isLoading } = useAuth();
   const hasNavigated = useRef(false);
+  const [flagsLoaded, setFlagsLoaded] = useState(false);
+  const hasSeenOnboarding = useRef(false);
+  const hasCompletedPermissions = useRef(false);
 
   useEffect(() => {
-    if (isLoading) return;
+    async function loadFlags() {
+      try {
+        const [onboarding, permissions] = await Promise.all([
+          AsyncStorage.getItem(ONBOARDING_KEY),
+          AsyncStorage.getItem(PERMISSIONS_KEY),
+        ]);
+        hasSeenOnboarding.current = onboarding === "true";
+        hasCompletedPermissions.current = permissions === "true";
+      } catch {
+        // Defaults are false
+      } finally {
+        setFlagsLoaded(true);
+      }
+    }
+    loadFlags();
+  }, []);
+
+  useEffect(() => {
+    if (isLoading || !flagsLoaded) return;
 
     if (!hasNavigated.current) {
       hasNavigated.current = true;
-      if (user) {
+
+      if (!hasSeenOnboarding.current) {
+        AsyncStorage.setItem(ONBOARDING_KEY, "true").catch(() => {});
+        hasSeenOnboarding.current = true;
+        router.replace("/onboarding");
+      } else if (user && !hasCompletedPermissions.current) {
+        router.replace("/permissions");
+      } else if (user) {
         router.replace("/(tabs)");
       } else {
         router.replace("/login");
       }
     }
-  }, [isLoading, user]);
+  }, [isLoading, user, flagsLoaded]);
 
   useEffect(() => {
-    if (isLoading || !hasNavigated.current) return;
+    if (isLoading || !hasNavigated.current || !flagsLoaded) return;
 
-    if (user) {
+    if (user && !hasCompletedPermissions.current) {
+      router.replace("/permissions");
+    } else if (user) {
       router.replace("/(tabs)");
     } else {
       router.replace("/login");
     }
   }, [user]);
 
-  if (isLoading) {
+  if (isLoading || !flagsLoaded) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
         <ActivityIndicator size="large" color={colors.primary} />
@@ -64,7 +99,9 @@ function RootLayoutNav() {
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="onboarding" />
         <Stack.Screen name="login" />
+        <Stack.Screen name="permissions" />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="(modals)"
