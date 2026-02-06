@@ -120,7 +120,7 @@ export default function ProfileScreen() {
         contentContainerStyle={[
           styles.content,
           {
-            paddingBottom: Platform.OS === "ios" ? 40 : insets.bottom + Spacing.lg,
+            paddingBottom: insets.bottom + 120,
           },
         ]}
         showsVerticalScrollIndicator={false}
@@ -690,9 +690,9 @@ const styles = StyleSheet.create({
     gap: Spacing.md,
   },
   actionButton: {
-    flex: 1,
-    minWidth: "45%",
-    paddingVertical: Spacing.lg,
+    width: "47%",
+    flexGrow: 1,
+    paddingVertical: Spacing.xl,
     borderRadius: BorderRadius.xl,
     borderWidth: 1,
     alignItems: "center",
