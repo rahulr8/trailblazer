@@ -21,6 +21,10 @@ import "react-native-reanimated";
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 
+import LoginScreen from "@/components/auth/LoginScreen";
+import OnboardingScreen from "@/components/auth/OnboardingScreen";
+import PermissionsScreen from "@/components/auth/PermissionsScreen";
+
 import "../global.css";
 
 export const unstable_settings = {
@@ -33,10 +37,9 @@ const PERMISSIONS_KEY = "@trailblazer_permissions_complete";
 function RootLayoutNav() {
   const { isDark, colors } = useTheme();
   const { user, isLoading } = useAuth();
-  const hasNavigated = useRef(false);
   const [flagsLoaded, setFlagsLoaded] = useState(false);
-  const hasSeenOnboarding = useRef(false);
-  const hasCompletedPermissions = useRef(false);
+  const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+  const [hasCompletedPermissions, setHasCompletedPermissions] = useState(false);
 
   useEffect(() => {
     async function loadFlags() {
@@ -45,8 +48,8 @@ function RootLayoutNav() {
           AsyncStorage.getItem(ONBOARDING_KEY),
           AsyncStorage.getItem(PERMISSIONS_KEY),
         ]);
-        hasSeenOnboarding.current = onboarding === "true";
-        hasCompletedPermissions.current = permissions === "true";
+        setHasSeenOnboarding(onboarding === "true");
+        setHasCompletedPermissions(permissions === "true");
       } catch {
         // Defaults are false
       } finally {
@@ -56,37 +59,15 @@ function RootLayoutNav() {
     loadFlags();
   }, []);
 
-  useEffect(() => {
-    if (isLoading || !flagsLoaded) return;
+  const handleOnboardingComplete = () => {
+    AsyncStorage.setItem(ONBOARDING_KEY, "true").catch(() => {});
+    setHasSeenOnboarding(true);
+  };
 
-    if (!hasNavigated.current) {
-      hasNavigated.current = true;
-
-      if (!hasSeenOnboarding.current) {
-        AsyncStorage.setItem(ONBOARDING_KEY, "true").catch(() => {});
-        hasSeenOnboarding.current = true;
-        router.replace("/onboarding");
-      } else if (user && !hasCompletedPermissions.current) {
-        router.replace("/permissions");
-      } else if (user) {
-        router.replace("/(tabs)");
-      } else {
-        router.replace("/login");
-      }
-    }
-  }, [isLoading, user, flagsLoaded]);
-
-  useEffect(() => {
-    if (isLoading || !hasNavigated.current || !flagsLoaded) return;
-
-    if (user && !hasCompletedPermissions.current) {
-      router.replace("/permissions");
-    } else if (user) {
-      router.replace("/(tabs)");
-    } else {
-      router.replace("/login");
-    }
-  }, [user]);
+  const handlePermissionsComplete = () => {
+    AsyncStorage.setItem(PERMISSIONS_KEY, "true").catch(() => {});
+    setHasCompletedPermissions(true);
+  };
 
   if (isLoading || !flagsLoaded) {
     return (
@@ -96,12 +77,37 @@ function RootLayoutNav() {
     );
   }
 
+  // Auth screens rendered OUTSIDE the Stack navigator to bypass Card clipping bug
+  if (!hasSeenOnboarding) {
+    return (
+      <>
+        <OnboardingScreen onComplete={handleOnboardingComplete} />
+        <StatusBar style="auto" />
+      </>
+    );
+  }
+
+  if (!user) {
+    return (
+      <>
+        <LoginScreen />
+        <StatusBar style="auto" />
+      </>
+    );
+  }
+
+  if (!hasCompletedPermissions) {
+    return (
+      <>
+        <PermissionsScreen onComplete={handlePermissionsComplete} />
+        <StatusBar style="auto" />
+      </>
+    );
+  }
+
   return (
     <NavigationThemeProvider value={isDark ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false, animation: "fade" }}>
-        <Stack.Screen name="onboarding" options={{ animation: "none" }} />
-        <Stack.Screen name="login" options={{ animation: "fade" }} />
-        <Stack.Screen name="permissions" options={{ animation: "fade" }} />
         <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="(modals)"

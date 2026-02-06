@@ -128,7 +128,7 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
         enablePanDownToClose={true}
         backdropComponent={renderBackdrop}
         onDismiss={onDismiss}
-        backgroundStyle={{ backgroundColor: colors.cardBackground }}
+        backgroundStyle={{ backgroundColor: colors.surfaceRaised }}
         handleIndicatorStyle={{ backgroundColor: colors.cardBorder }}
       >
         <BottomSheetView style={{ paddingHorizontal: 20, paddingVertical: 16 }}>

@@ -31,6 +31,7 @@ export const Colors = {
     // Cards & surfaces
     cardBackground: "#FFFFFF",
     cardBorder: "rgba(0, 0, 0, 0.06)",
+    surfaceRaised: "#FFFFFF",
 
     // Progress
     progressTrack: "rgba(0, 0, 0, 0.1)",
@@ -75,6 +76,7 @@ export const Colors = {
     // Cards & surfaces
     cardBackground: "rgba(255, 255, 255, 0.08)",
     cardBorder: "rgba(255, 255, 255, 0.1)",
+    surfaceRaised: "#1C1C1E",
 
     // Progress
     progressTrack: "rgba(255, 255, 255, 0.1)",

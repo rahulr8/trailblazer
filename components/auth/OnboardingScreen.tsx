@@ -10,8 +10,6 @@ import {
   type ViewToken,
 } from "react-native";
 
-import { router } from "expo-router";
-
 import { ArrowRight } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -40,7 +38,7 @@ const PAGES: WelcomePage[] = [
   },
 ];
 
-export default function OnboardingScreen() {
+export default function OnboardingScreen({ onComplete }: { onComplete?: () => void } = {}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList<WelcomePage>>(null);
@@ -61,7 +59,7 @@ export default function OnboardingScreen() {
     if (currentIndex < PAGES.length - 1) {
       flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
     } else {
-      router.replace("/login");
+      onComplete?.();
     }
   };
 

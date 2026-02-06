@@ -13,8 +13,6 @@ import {
   View,
 } from "react-native";
 
-import { router } from "expo-router";
-
 import {
   type AuthError,
   createUserWithEmailAndPassword,
@@ -112,45 +110,44 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.mainContent}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.background,
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+        },
+      ]}
+    >
+      <View style={styles.centerContent}>
         <RotatingLogo size={70} />
 
-        <View style={styles.textContent}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Join Trailblazer+</Text>
-          <Text style={[styles.body, { color: colors.textSecondary }]}>
-            Create an account to track progress, enter the challenge, and access member benefits.
+        <Text style={[styles.title, { color: colors.textPrimary }]}>Join Trailblazer+</Text>
+
+        <Text style={[styles.body, { color: colors.textSecondary }]}>
+          Create an account to track progress, enter the challenge, and access member benefits.
+        </Text>
+
+        <Pressable
+          style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
+          onPress={openLoginModal}
+        >
+          <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>Login</Text>
+        </Pressable>
+
+        <Pressable
+          style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
+          onPress={handleAppleSignUp}
+        >
+          <Text style={[styles.appleIcon, { color: colors.textPrimary }]}></Text>
+          <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>
+            Sign up with Apple
           </Text>
-        </View>
-
-        <View style={styles.buttons}>
-          <Pressable
-            style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
-            onPress={openLoginModal}
-          >
-            <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>Login</Text>
-          </Pressable>
-
-          <Pressable
-            style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
-            onPress={handleAppleSignUp}
-          >
-            <Text style={[styles.appleIcon, { color: colors.textPrimary }]}></Text>
-            <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>
-              Sign up with Apple
-            </Text>
-          </Pressable>
-        </View>
+        </Pressable>
       </View>
 
-      <Text
-        style={[
-          styles.terms,
-          { color: colors.textTertiary, paddingBottom: insets.bottom + Spacing.xl },
-        ]}
-      >
-        Terms & Conditions Apply
-      </Text>
+      <Text style={[styles.terms, { color: colors.textTertiary }]}>Terms & Conditions Apply</Text>
 
       <Modal
         visible={showLoginModal}
@@ -277,40 +274,35 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: Spacing["2xl"],
+    justifyContent: "space-between",
   },
-  mainContent: {
+  centerContent: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    gap: Spacing["2xl"],
-    maxWidth: 340,
-  },
-  textContent: {
-    alignItems: "center",
-    gap: Spacing.md,
+    gap: Spacing.xl,
+    paddingHorizontal: Spacing["2xl"],
   },
   title: {
     fontSize: 28,
     fontWeight: "700",
     textAlign: "center",
     lineHeight: 36,
+    marginTop: Spacing.md,
   },
   body: {
     fontSize: 16,
     lineHeight: 24,
     textAlign: "center",
-  },
-  buttons: {
-    width: "100%",
-    gap: Spacing.md,
+    paddingHorizontal: Spacing["2xl"],
+    marginBottom: Spacing.sm,
   },
   outlineButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
+    alignSelf: "stretch",
     height: 52,
     borderRadius: BorderRadius.lg,
     borderWidth: 1,
@@ -327,6 +319,7 @@ const styles = StyleSheet.create({
   terms: {
     fontSize: 13,
     textAlign: "center",
+    paddingBottom: Spacing.xl,
   },
   modalContainer: {
     flex: 1,

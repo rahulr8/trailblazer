@@ -10,8 +10,6 @@ import {
   type ViewToken,
 } from "react-native";
 
-import { router } from "expo-router";
-
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -72,7 +70,7 @@ async function requestNotificationPermission(): Promise<void> {
   }
 }
 
-export default function PermissionsScreen() {
+export default function PermissionsScreen({ onComplete }: { onComplete?: () => void } = {}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const flatListRef = useRef<FlatList<PermissionPage>>(null);
@@ -91,7 +89,7 @@ export default function PermissionsScreen() {
 
   const finishPermissions = async () => {
     await AsyncStorage.setItem(PERMISSIONS_COMPLETE_KEY, "true");
-    router.replace("/(tabs)");
+    onComplete?.();
   };
 
   const advanceOrFinish = async () => {
