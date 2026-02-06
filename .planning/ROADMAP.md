@@ -97,11 +97,11 @@ Plans:
   3. Data Sync section shows toggles for Apple Health and Google Fit (UI-only, no real sync triggered)
   4. Account management button, Privacy Policy link, and Terms of Use link each open the device web browser to a placeholder URL
   5. Sign out button triggers existing auth signOut and navigates to login screen
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 05-01: Profile hero and lifetime stats
-- [ ] 05-02: Settings, sync toggles, and account actions
+- [ ] 05-01-PLAN.md -- Profile hero, coach personality, lifetime stats, and achievements (Wave 1)
+- [ ] 05-02-PLAN.md -- App theme, data sync toggles, account links, and action buttons (Wave 2)
 
 ### Phase 6: Onboarding Flow
 **Goal**: New users experience a guided welcome flow before reaching the main app; returning users skip directly to login or main screen
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-01-30 -- Phase 4 complete*
+*Last updated: 2026-02-06 -- Phase 5 planned*
