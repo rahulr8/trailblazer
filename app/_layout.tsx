@@ -22,6 +22,7 @@ import { AuthProvider, useAuth } from "@/contexts/auth-context";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 
 import LoginScreen from "@/components/auth/LoginScreen";
+import NotificationPermissionScreen from "@/components/auth/NotificationPermissionScreen";
 import OnboardingScreen from "@/components/auth/OnboardingScreen";
 import PermissionsScreen from "@/components/auth/PermissionsScreen";
 
@@ -32,6 +33,7 @@ export const unstable_settings = {
 };
 
 const ONBOARDING_KEY = "@trailblazer_onboarding_seen";
+const HEALTH_PERMISSION_KEY = "@trailblazer_health_permission_seen";
 const PERMISSIONS_KEY = "@trailblazer_permissions_complete";
 
 function RootLayoutNav() {
@@ -39,16 +41,19 @@ function RootLayoutNav() {
   const { user, isLoading } = useAuth();
   const [flagsLoaded, setFlagsLoaded] = useState(false);
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
+  const [hasSeenHealthPermission, setHasSeenHealthPermission] = useState(false);
   const [hasCompletedPermissions, setHasCompletedPermissions] = useState(false);
 
   useEffect(() => {
     async function loadFlags() {
       try {
-        const [onboarding, permissions] = await Promise.all([
+        const [onboarding, healthPermission, permissions] = await Promise.all([
           AsyncStorage.getItem(ONBOARDING_KEY),
+          AsyncStorage.getItem(HEALTH_PERMISSION_KEY),
           AsyncStorage.getItem(PERMISSIONS_KEY),
         ]);
         setHasSeenOnboarding(onboarding === "true");
+        setHasSeenHealthPermission(healthPermission === "true");
         setHasCompletedPermissions(permissions === "true");
       } catch {
         // Defaults are false
@@ -75,8 +80,9 @@ function RootLayoutNav() {
     if (prevUser.current && !user) {
       // User went from logged-in to logged-out = sign out
       setHasSeenOnboarding(false);
+      setHasSeenHealthPermission(false);
       setHasCompletedPermissions(false);
-      AsyncStorage.multiRemove([ONBOARDING_KEY, PERMISSIONS_KEY]).catch(() => {});
+      AsyncStorage.multiRemove([ONBOARDING_KEY, HEALTH_PERMISSION_KEY, PERMISSIONS_KEY]).catch(() => {});
     }
     prevUser.current = user;
   }, [user]);
@@ -108,10 +114,22 @@ function RootLayoutNav() {
     );
   }
 
+  if (!hasSeenHealthPermission) {
+    return (
+      <>
+        <PermissionsScreen onComplete={() => {
+          AsyncStorage.setItem(HEALTH_PERMISSION_KEY, "true").catch(() => {});
+          setHasSeenHealthPermission(true);
+        }} />
+        <StatusBar style="auto" />
+      </>
+    );
+  }
+
   if (!hasCompletedPermissions) {
     return (
       <>
-        <PermissionsScreen onComplete={handlePermissionsComplete} />
+        <NotificationPermissionScreen onComplete={handlePermissionsComplete} />
         <StatusBar style="auto" />
       </>
     );
