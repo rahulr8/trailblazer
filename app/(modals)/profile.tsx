@@ -1,8 +1,22 @@
 import { useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
-import { LogOut, User, X } from "lucide-react-native";
+import * as WebBrowser from "expo-web-browser";
+import {
+  Activity,
+  ChevronRight,
+  Crown,
+  Download,
+  FileText,
+  Heart,
+  LogOut,
+  RotateCcw,
+  Settings,
+  Shield,
+  User,
+  X,
+} from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "heroui-native";
 
@@ -32,11 +46,22 @@ const EMOJI_MAP: Record<string, string> = {
   calendar: "📅",
 };
 
+const THEME_COLORS = [
+  { id: "green", color: "#22C55E" },
+  { id: "blue", color: "#3B82F6" },
+  { id: "purple", color: "#8B5CF6" },
+  { id: "pink", color: "#EC4899" },
+  { id: "orange", color: "#F97316" },
+];
+
 export default function ProfileScreen() {
   const { colors, shadows } = useTheme();
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
   const [selectedPersonality, setSelectedPersonality] = useState<CoachPersonality>("bestie");
+  const [selectedTheme, setSelectedTheme] = useState<string>("green");
+  const [appleHealthEnabled, setAppleHealthEnabled] = useState<boolean>(false);
+  const [googleFitEnabled, setGoogleFitEnabled] = useState<boolean>(false);
 
   const handleSignOut = async () => {
     try {
@@ -51,6 +76,15 @@ export default function ProfileScreen() {
     toast.show({
       label: "Coming Soon",
       description: "Edit Profile will be available soon.",
+      variant: "default",
+      placement: "top",
+    });
+  };
+
+  const handleComingSoon = () => {
+    toast.show({
+      label: "Coming Soon",
+      description: "This feature will be available soon.",
       variant: "default",
       placement: "top",
     });
@@ -232,15 +266,221 @@ export default function ProfileScreen() {
           </ScrollView>
         </View>
 
-        {/* Placeholder for Plan 02 sections (settings, integrations, etc.) */}
-
-        {/* Sign Out Button */}
-        <Pressable style={styles.signOutButton} onPress={handleSignOut}>
-          <View style={[styles.signOutIcon, { backgroundColor: colors.danger + "20" }]}>
-            <LogOut size={20} color={colors.danger} />
+        {/* App Theme Section */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionLabel, { color: colors.textPrimary }]}>App Theme:</Text>
+          <View style={styles.themeColors}>
+            {THEME_COLORS.map((theme) => {
+              const isSelected = selectedTheme === theme.id;
+              return (
+                <Pressable
+                  key={theme.id}
+                  onPress={() => setSelectedTheme(theme.id)}
+                  style={styles.themeColorWrapper}
+                >
+                  {isSelected && (
+                    <View
+                      style={[
+                        styles.themeColorRing,
+                        {
+                          borderColor: colors.background,
+                          backgroundColor: colors.background,
+                        },
+                      ]}
+                    >
+                      <View
+                        style={[
+                          styles.themeColorRingInner,
+                          { borderColor: colors.textPrimary },
+                        ]}
+                      />
+                    </View>
+                  )}
+                  <View
+                    style={[styles.themeColorCircle, { backgroundColor: theme.color }]}
+                    accessibilityRole="button"
+                    accessibilityLabel={`${theme.id} theme`}
+                    accessibilityState={{ selected: isSelected }}
+                  />
+                </Pressable>
+              );
+            })}
           </View>
-          <Text style={[styles.signOutText, { color: colors.danger }]}>Sign Out</Text>
-        </Pressable>
+        </View>
+
+        {/* Data Sync & Account Section */}
+        <View
+          style={[
+            styles.menuCard,
+            {
+              backgroundColor: colors.cardBackground,
+              borderColor: colors.cardBorder,
+            },
+          ]}
+        >
+          {/* Apple Health */}
+          <Pressable style={styles.menuItem}>
+            <View style={[styles.menuIcon, { backgroundColor: "#007AFF20" }]}>
+              <Heart size={20} color="#007AFF" />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Apple Health</Text>
+            <Switch
+              value={appleHealthEnabled}
+              onValueChange={setAppleHealthEnabled}
+              trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+              thumbColor={appleHealthEnabled ? colors.primary : "#f4f3f4"}
+            />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+
+          {/* Google Fit */}
+          <Pressable style={styles.menuItem}>
+            <View style={[styles.menuIcon, { backgroundColor: "#4285F420" }]}>
+              <Activity size={20} color="#4285F4" />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Google Fit</Text>
+            <Switch
+              value={googleFitEnabled}
+              onValueChange={setGoogleFitEnabled}
+              trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+              thumbColor={googleFitEnabled ? colors.primary : "#f4f3f4"}
+            />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+
+          {/* Account Management */}
+          <Pressable
+            style={styles.menuItem}
+            onPress={() => WebBrowser.openBrowserAsync("https://example.com/account")}
+          >
+            <View
+              style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}
+            >
+              <Settings size={20} color={colors.textSecondary} />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>
+              Account Management
+            </Text>
+            <ChevronRight size={20} color={colors.textSecondary} />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+
+          {/* Privacy Policy */}
+          <Pressable
+            style={styles.menuItem}
+            onPress={() => WebBrowser.openBrowserAsync("https://example.com/privacy")}
+          >
+            <View
+              style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}
+            >
+              <Shield size={20} color={colors.textSecondary} />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>
+              Privacy Policy
+            </Text>
+            <ChevronRight size={20} color={colors.textSecondary} />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+
+          {/* Terms of Use */}
+          <Pressable
+            style={styles.menuItem}
+            onPress={() => WebBrowser.openBrowserAsync("https://example.com/terms")}
+          >
+            <View
+              style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}
+            >
+              <FileText size={20} color={colors.textSecondary} />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Terms of Use</Text>
+            <ChevronRight size={20} color={colors.textSecondary} />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+
+          {/* Sign Out */}
+          <Pressable style={styles.menuItem} onPress={handleSignOut}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.danger + "20" }]}>
+              <LogOut size={20} color={colors.danger} />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.danger }]}>Sign Out</Text>
+          </Pressable>
+        </View>
+
+        {/* Action Buttons Grid */}
+        <View style={styles.actionGrid}>
+          {/* Upgrade */}
+          <Pressable
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+            onPress={handleComingSoon}
+          >
+            <Crown size={24} color={colors.primary} />
+            <Text style={[styles.actionButtonText, { color: colors.textPrimary }]}>
+              Upgrade
+            </Text>
+          </Pressable>
+
+          {/* Download App */}
+          <Pressable
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+            onPress={handleComingSoon}
+          >
+            <Download size={24} color={colors.primary} />
+            <Text style={[styles.actionButtonText, { color: colors.textPrimary }]}>
+              Download App
+            </Text>
+          </Pressable>
+
+          {/* Settings */}
+          <Pressable
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+            onPress={handleComingSoon}
+          >
+            <Settings size={24} color={colors.primary} />
+            <Text style={[styles.actionButtonText, { color: colors.textPrimary }]}>
+              Settings
+            </Text>
+          </Pressable>
+
+          {/* Reset Challenge */}
+          <Pressable
+            style={[
+              styles.actionButton,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.cardBorder,
+              },
+            ]}
+            onPress={() => router.push("/(modals)/reset-challenge")}
+          >
+            <RotateCcw size={24} color={colors.primary} />
+            <Text style={[styles.actionButtonText, { color: colors.textPrimary }]}>
+              Reset Challenge
+            </Text>
+          </Pressable>
+        </View>
       </ScrollView>
     </View>
   );
@@ -387,23 +627,80 @@ const styles = StyleSheet.create({
     marginTop: Spacing.xs,
     maxWidth: 70,
   },
-  signOutButton: {
+  themeColors: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: Spacing.sm,
+  },
+  themeColorWrapper: {
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  themeColorCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: BorderRadius.full,
+  },
+  themeColorRing: {
+    position: "absolute",
+    width: 52,
+    height: 52,
+    borderRadius: BorderRadius.full,
+    borderWidth: 2,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  themeColorRingInner: {
+    width: 50,
+    height: 50,
+    borderRadius: BorderRadius.full,
+    borderWidth: 3,
+  },
+  menuCard: {
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    overflow: "hidden",
+  },
+  menuItem: {
     flexDirection: "row",
     alignItems: "center",
     padding: Spacing.lg,
     gap: Spacing.md,
-    marginTop: Spacing.xl,
   },
-  signOutIcon: {
+  menuIcon: {
     width: 36,
     height: 36,
     borderRadius: BorderRadius.md,
     justifyContent: "center",
     alignItems: "center",
   },
-  signOutText: {
+  menuLabel: {
     flex: 1,
     fontSize: 16,
+    fontWeight: "500",
+  },
+  divider: {
+    height: 1,
+    marginLeft: Spacing.lg + 36 + Spacing.md,
+  },
+  actionGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: Spacing.md,
+  },
+  actionButton: {
+    flex: 1,
+    minWidth: "45%",
+    paddingVertical: Spacing.lg,
+    borderRadius: BorderRadius.xl,
+    borderWidth: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: Spacing.sm,
+  },
+  actionButtonText: {
+    fontSize: 14,
     fontWeight: "500",
   },
 });
