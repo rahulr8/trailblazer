@@ -1,40 +1,34 @@
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
+import * as Notifications from "expo-notifications";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
 
-async function requestHealthPermission(): Promise<void> {
-  try {
-    const { requestAuthorization } = await import("@kingstinct/react-native-healthkit");
-    await requestAuthorization({
-      toRead: ["HKQuantityTypeIdentifierActiveEnergyBurned" as const],
-    });
-  } catch {
-    console.log("[Permissions] HealthKit request failed or unavailable");
-  }
-}
-
-export default function PermissionsScreen({ onComplete }: { onComplete?: () => void } = {}) {
+export default function NotificationPermissionScreen({ onComplete }: { onComplete?: () => void } = {}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
   const handleAccept = async () => {
-    await requestHealthPermission();
+    try {
+      await Notifications.requestPermissionsAsync({
+        ios: {
+          allowAlert: true,
+          allowBadge: true,
+          allowSound: true,
+        },
+      });
+    } catch (error) {
+      // Fails gracefully on simulator or if permission already granted
+      console.log("[Permissions] Notification request failed or unavailable:", error);
+    }
     onComplete?.();
   };
 
   const handleDecline = () => {
-    Alert.alert(
-      "Missing Out",
-      "Without health data, you'll miss automatic activity tracking and accurate time logs. Sure?",
-      [
-        { text: "Go Back", style: "cancel" },
-        { text: "Continue Anyway", style: "destructive", onPress: () => onComplete?.() },
-      ]
-    );
+    onComplete?.();
   };
 
   return (
@@ -42,9 +36,9 @@ export default function PermissionsScreen({ onComplete }: { onComplete?: () => v
       <View style={styles.page}>
         <View style={styles.content}>
           <RotatingLogo size={80} />
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Track automatically?</Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Stay motivated.</Text>
           <Text style={[styles.body, { color: colors.textSecondary }]}>
-            Giving permission to use your existing health integrations will make tracking a breeze.
+            Giving permission to deliver notifications will help make sure you never miss a day!
           </Text>
         </View>
       </View>
@@ -59,7 +53,7 @@ export default function PermissionsScreen({ onComplete }: { onComplete?: () => v
 
         <Pressable onPress={handleDecline}>
           <Text style={[styles.declineText, { color: colors.textSecondary }]}>
-            No, don't use my health data
+            No, don't notify me
           </Text>
         </Pressable>
       </View>
