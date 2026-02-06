@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 ## Current Position
 
 Phase: 6 of 6 (Onboarding Flow)
-Plan: 1 of 1 in current phase
-Status: In progress
-Last activity: 2026-02-06 -- Completed 06-01-PLAN.md
+Plan: 2 of 2 in current phase
+Status: Phase complete
+Last activity: 2026-02-06 -- Completed 06-02-PLAN.md
 
-Progress: [██████████████░░░░░░] 74%
+Progress: [████████████████░░░░] 78%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 14
-- Average duration: 2.4min
-- Total execution time: 0.58 hours
+- Total plans completed: 15
+- Average duration: 2.5min
+- Total execution time: 0.63 hours
 
 **By Phase:**
 
@@ -32,10 +32,10 @@ Progress: [██████████████░░░░░░] 74%
 | 03-home-screen | 3/3 | 8.8min | 2.9min |
 | 04-your-stash-your-squad | 3/3 | 10min | 3.3min |
 | 05-profile-screen | 1/3 | 2.3min | 2.3min |
-| 06-onboarding-flow | 1/1 | 1.6min | 1.6min |
+| 06-onboarding-flow | 2/2 | 4.7min | 2.4min |
 
 **Recent Trend:**
-- Last 5 plans: 2.1min, 2min, 3min, 2.3min, 1.6min
+- Last 5 plans: 2min, 3min, 2.3min, 1.6min, 3.1min
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -87,6 +87,10 @@ Recent decisions affecting current work:
 - Skip button positioned top-right with generous hitSlop for better UX (06-01)
 - Terms link opens in-app browser (not external) to keep user in app (06-01)
 - Changed Terms text color to primary for clear link affordance (06-01)
+- Health decline warning shows Alert.alert explaining consequences before allowing skip (06-02)
+- Push notification decline proceeds directly without warning (nice-to-have, not core) (06-02)
+- Partial completion tracking via HEALTH_PERMISSION_KEY for mid-flow resume support (06-02)
+- Permission screens use callback-based navigation, parent _layout.tsx handles AsyncStorage (06-02)
 
 ### Pending Todos
 
@@ -100,6 +104,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-06T18:20:28Z
-Stopped at: Completed 06-01-PLAN.md
+Last session: 2026-02-06T18:23:57Z
+Stopped at: Completed 06-02-PLAN.md
 Resume file: None
