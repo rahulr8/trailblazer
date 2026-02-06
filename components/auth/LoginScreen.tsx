@@ -20,6 +20,7 @@ import {
 } from "firebase/auth";
 import { Eye, EyeOff, Lock, Mail, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import * as WebBrowser from "expo-web-browser";
 
 import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
 import { BorderRadius, Spacing } from "@/constants";
@@ -109,6 +110,12 @@ export default function LoginScreen() {
     console.log("[Auth] Apple sign-in pressed - not yet implemented");
   };
 
+  const handleTermsPress = async () => {
+    await WebBrowser.openBrowserAsync("https://trailblazer.com/terms", {
+      presentationStyle: WebBrowser.WebBrowserPresentationStyle.AUTOMATIC,
+    });
+  };
+
   return (
     <View
       style={[
@@ -147,7 +154,12 @@ export default function LoginScreen() {
         </Pressable>
       </View>
 
-      <Text style={[styles.terms, { color: colors.textTertiary }]}>Terms & Conditions Apply</Text>
+      <Pressable
+        onPress={handleTermsPress}
+        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+      >
+        <Text style={[styles.terms, { color: colors.primary }]}>Terms & Conditions Apply</Text>
+      </Pressable>
 
       <Modal
         visible={showLoginModal}
