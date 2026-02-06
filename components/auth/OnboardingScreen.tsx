@@ -80,6 +80,17 @@ export default function OnboardingScreen({ onComplete }: { onComplete?: () => vo
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Pressable
+        style={[
+          styles.skipButton,
+          { top: insets.top + Spacing.lg, right: Spacing["2xl"] },
+        ]}
+        onPress={() => onComplete?.()}
+        hitSlop={{ top: 10, bottom: 10, left: 20, right: 20 }}
+      >
+        <Text style={[styles.skipText, { color: colors.textSecondary }]}>Skip</Text>
+      </Pressable>
+
       <FlatList
         ref={flatListRef}
         data={PAGES}
@@ -124,6 +135,14 @@ export default function OnboardingScreen({ onComplete }: { onComplete?: () => vo
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  skipButton: {
+    position: "absolute",
+    zIndex: 10,
+  },
+  skipText: {
+    fontSize: 16,
+    fontWeight: "600",
   },
   page: {
     flex: 1,
