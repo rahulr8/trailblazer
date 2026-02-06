@@ -114,11 +114,11 @@ Plans:
   4. Push Notifications permission screen appears with "Yes, I agree" / "No" options (UI-only, does not request real push permission)
   5. AsyncStorage records onboarding completion so subsequent launches skip the welcome pager and go directly to login or main screen
 
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 06-01: Welcome pager and login screen
-- [ ] 06-02: Permission screens and launch routing
+- [ ] 06-01-PLAN.md -- Welcome pager skip button, rotating logo animation, and T&C link (Wave 1)
+- [ ] 06-02-PLAN.md -- Health decline warning, notification permission screen, and two-step routing (Wave 2)
 
 ## Progress
 
@@ -136,4 +136,4 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 
 ---
 *Roadmap created: 2026-01-27*
-*Last updated: 2026-02-06 -- Phase 5 planned*
+*Last updated: 2026-02-06 -- Phase 6 planned*
