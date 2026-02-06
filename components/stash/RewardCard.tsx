@@ -42,7 +42,10 @@ export function RewardCard({ reward, onPress, variant }: RewardCardProps) {
         onPressOut={handlePressOut}
         style={animatedStyle}
       >
-        <View className="rounded-2xl overflow-hidden" style={{ aspectRatio: 16 / 10 }}>
+        <View
+          className="rounded-2xl overflow-hidden"
+          style={{ aspectRatio: 16 / 10, backgroundColor: colors.cardBackground }}
+        >
           <Image
             source={{ uri: reward.imageUrl }}
             style={{ width: "100%", height: "100%" }}
@@ -81,7 +84,10 @@ export function RewardCard({ reward, onPress, variant }: RewardCardProps) {
       onPressOut={handlePressOut}
       style={animatedStyle}
     >
-      <View className="rounded-2xl overflow-hidden" style={{ height: 200 }}>
+      <View
+        className="rounded-2xl overflow-hidden"
+        style={{ height: 200, backgroundColor: colors.cardBackground }}
+      >
         <Image
           source={{ uri: reward.imageUrl }}
           style={{ width: "100%", height: 120 }}
