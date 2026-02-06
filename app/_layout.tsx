@@ -69,6 +69,15 @@ function RootLayoutNav() {
     setHasCompletedPermissions(true);
   };
 
+  // Reset onboarding/permissions when user signs out
+  useEffect(() => {
+    if (!isLoading && !user) {
+      setHasSeenOnboarding(false);
+      setHasCompletedPermissions(false);
+      AsyncStorage.multiRemove([ONBOARDING_KEY, PERMISSIONS_KEY]).catch(() => {});
+    }
+  }, [user, isLoading]);
+
   if (isLoading || !flagsLoaded) {
     return (
       <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
