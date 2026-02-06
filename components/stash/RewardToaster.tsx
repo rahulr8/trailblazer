@@ -124,7 +124,7 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
     return (
       <BottomSheetModal
         ref={ref}
-        snapPoints={["50%"]}
+        enableDynamicSizing={true}
         enablePanDownToClose={true}
         backdropComponent={renderBackdrop}
         onDismiss={onDismiss}
