@@ -131,7 +131,7 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
         backgroundStyle={{ backgroundColor: colors.surfaceRaised }}
         handleIndicatorStyle={{ backgroundColor: colors.cardBorder }}
       >
-        <BottomSheetView style={{ paddingHorizontal: 20, paddingVertical: 16 }}>
+        <BottomSheetView style={{ paddingHorizontal: 20, paddingTop: 16, paddingBottom: 40 }}>
           {reward && (
             <>
               <View className="mb-6">
