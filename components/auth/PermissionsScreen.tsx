@@ -1,14 +1,4 @@
-import { useCallback, useRef, useState } from "react";
-
-import {
-  Dimensions,
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  type ViewToken,
-} from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -17,34 +7,7 @@ import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
 
-const { width: SCREEN_WIDTH } = Dimensions.get("window");
-
 const PERMISSIONS_COMPLETE_KEY = "@trailblazer_permissions_complete";
-
-interface PermissionPage {
-  id: string;
-  title: string;
-  body: string;
-  acceptLabel: string;
-  declineLabel: string;
-}
-
-const PAGES: PermissionPage[] = [
-  {
-    id: "health",
-    title: "Track automatically?",
-    body: "Giving permission to use your existing health integrations will make tracking a breeze.",
-    acceptLabel: "Yes, I agree",
-    declineLabel: "No, don't use my health data",
-  },
-  {
-    id: "notifications",
-    title: "Stay motivated.",
-    body: "Giving permission to deliver notifications will help make sure you never miss a day!",
-    acceptLabel: "Yes, I agree",
-    declineLabel: "No, don't notify me",
-  },
-];
 
 async function requestHealthPermission(): Promise<void> {
   try {
@@ -57,124 +20,43 @@ async function requestHealthPermission(): Promise<void> {
   }
 }
 
-async function requestNotificationPermission(): Promise<void> {
-  try {
-    const { Alert } = await import("react-native");
-    Alert.alert(
-      "Notifications",
-      "Push notification support will be available in a future update.",
-      [{ text: "OK" }]
-    );
-  } catch {
-    console.log("[Permissions] Notification request failed");
-  }
-}
-
 export default function PermissionsScreen({ onComplete }: { onComplete?: () => void } = {}) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const flatListRef = useRef<FlatList<PermissionPage>>(null);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken<PermissionPage>[] }) => {
-      if (viewableItems.length > 0 && viewableItems[0].index !== null) {
-        setCurrentIndex(viewableItems[0].index);
-      }
-    },
-    []
-  );
-
-  const viewabilityConfig = useRef({ viewAreaCoveragePercentThreshold: 50 }).current;
 
   const finishPermissions = async () => {
     await AsyncStorage.setItem(PERMISSIONS_COMPLETE_KEY, "true");
     onComplete?.();
   };
 
-  const advanceOrFinish = async () => {
-    if (currentIndex < PAGES.length - 1) {
-      const nextIndex = currentIndex + 1;
-      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
-      setCurrentIndex(nextIndex);
-    } else {
-      await finishPermissions();
-    }
-  };
-
   const handleAccept = async () => {
-    const page = PAGES[currentIndex];
-    if (page.id === "health") {
-      await requestHealthPermission();
-    } else if (page.id === "notifications") {
-      await requestNotificationPermission();
-    }
-    await advanceOrFinish();
+    await requestHealthPermission();
+    await finishPermissions();
   };
-
-  const handleDecline = async () => {
-    await advanceOrFinish();
-  };
-
-  const renderPage = useCallback(
-    ({ item }: { item: PermissionPage }) => (
-      <View style={[styles.page, { width: SCREEN_WIDTH }]}>
-        <View style={styles.content}>
-          <RotatingLogo size={80} />
-          <Text style={[styles.title, { color: colors.textPrimary }]}>{item.title}</Text>
-          <Text style={[styles.body, { color: colors.textSecondary }]}>{item.body}</Text>
-        </View>
-      </View>
-    ),
-    [colors]
-  );
-
-  const currentPage = PAGES[currentIndex];
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <FlatList
-        ref={flatListRef}
-        data={PAGES}
-        renderItem={renderPage}
-        keyExtractor={(item) => item.id}
-        horizontal
-        pagingEnabled
-        scrollEnabled={false}
-        showsHorizontalScrollIndicator={false}
-        onViewableItemsChanged={onViewableItemsChanged}
-        viewabilityConfig={viewabilityConfig}
-      />
+      <View style={styles.page}>
+        <View style={styles.content}>
+          <RotatingLogo size={80} />
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Track automatically?</Text>
+          <Text style={[styles.body, { color: colors.textSecondary }]}>
+            Giving permission to use your existing health integrations will make tracking a breeze.
+          </Text>
+        </View>
+      </View>
 
       <View style={[styles.footer, { paddingBottom: insets.bottom + Spacing.xl }]}>
-        <View style={styles.dots}>
-          {PAGES.map((page, index) => (
-            <View
-              key={page.id}
-              style={[
-                styles.dot,
-                {
-                  backgroundColor:
-                    index === currentIndex ? colors.textPrimary : colors.textTertiary,
-                  opacity: index === currentIndex ? 1 : 0.4,
-                },
-              ]}
-            />
-          ))}
-        </View>
-
         <Pressable
           style={[styles.acceptButton, { backgroundColor: colors.textPrimary }]}
           onPress={handleAccept}
         >
-          <Text style={[styles.acceptButtonText, { color: colors.background }]}>
-            {currentPage.acceptLabel}
-          </Text>
+          <Text style={[styles.acceptButtonText, { color: colors.background }]}>Yes, I agree</Text>
         </Pressable>
 
-        <Pressable onPress={handleDecline}>
+        <Pressable onPress={finishPermissions}>
           <Text style={[styles.declineText, { color: colors.textSecondary }]}>
-            {currentPage.declineLabel}
+            No, don't use my health data
           </Text>
         </Pressable>
       </View>
@@ -216,16 +98,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: Spacing.lg,
     paddingHorizontal: Spacing["2xl"],
-  },
-  dots: {
-    flexDirection: "row",
-    gap: Spacing.sm,
-    marginBottom: Spacing.sm,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
   },
   acceptButton: {
     width: "100%",
