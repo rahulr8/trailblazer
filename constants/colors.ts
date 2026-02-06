@@ -14,19 +14,19 @@ export const Colors = {
     textTertiary: "#C7C7CC",
 
     // Brand colors
-    primary: "#007AFF",
-    accent: "#34C759",
-    accentText: "#248A3D",
-    highlight: "#FF9500",
-    purple: "#BF5AF2",
-    danger: "#FF3B30",
+    primary: "#2D6A4F",
+    accent: "#52B788",
+    accentText: "#1B4332",
+    highlight: "#D4A373",
+    purple: "#7B68AE",
+    danger: "#E63946",
 
     // Tab bar
     tabBarBackground: "#FFFFFF",
     tabBarBorder: "rgba(0, 0, 0, 0.08)",
-    tabIconActive: "#007AFF",
+    tabIconActive: "#2D6A4F",
     tabIconInactive: "#8E8E93",
-    tabIconActiveBg: "rgba(0, 122, 255, 0.12)",
+    tabIconActiveBg: "rgba(45, 106, 79, 0.12)",
 
     // Cards & surfaces
     cardBackground: "#FFFFFF",
@@ -59,19 +59,19 @@ export const Colors = {
     textTertiary: "#6B6B70",
 
     // Brand colors
-    primary: "#00F2FF",
-    accent: "#2AFF5D",
-    accentText: "#2AFF5D",
-    highlight: "#FFAA00",
-    purple: "#BF5AF2",
-    danger: "#FF453A",
+    primary: "#74C69D",
+    accent: "#95D5B2",
+    accentText: "#B7E4C7",
+    highlight: "#DDB892",
+    purple: "#A594C9",
+    danger: "#FF6B6B",
 
     // Tab bar
     tabBarBackground: "#1A1A1F",
     tabBarBorder: "rgba(255, 255, 255, 0.08)",
-    tabIconActive: "#00F2FF",
+    tabIconActive: "#74C69D",
     tabIconInactive: "#6B6B70",
-    tabIconActiveBg: "rgba(0, 242, 255, 0.15)",
+    tabIconActiveBg: "rgba(116, 198, 157, 0.15)",
 
     // Cards & surfaces
     cardBackground: "rgba(255, 255, 255, 0.08)",

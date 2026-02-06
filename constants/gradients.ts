@@ -16,45 +16,45 @@ interface GradientValue {
 export const Gradients = {
   light: {
     primary: {
-      colors: ["#007AFF", "#0055FF"] as const,
+      colors: ["#2D6A4F", "#1B4332"] as const,
       ...diagonal,
     },
     accent: {
-      colors: ["#34C759", "#248A3D"] as const,
+      colors: ["#52B788", "#40916C"] as const,
       ...diagonal,
     },
     ai: {
-      colors: ["#BF5AF2", "#7928CA"] as const,
+      colors: ["#7B68AE", "#5A4E8C"] as const,
       ...diagonal,
     },
     gold: {
-      colors: ["#FFD700", "#FDB931", "#E6AC00"] as const,
+      colors: ["#D4A373", "#C48B5C", "#A67C52"] as const,
       ...horizontal,
     },
     danger: {
-      colors: ["#FF3B30", "#FF453A"] as const,
+      colors: ["#E63946", "#D62839"] as const,
       ...diagonal,
     },
   },
   dark: {
     primary: {
-      colors: ["#00F2FF", "#0066FF"] as const,
+      colors: ["#74C69D", "#52B788"] as const,
       ...diagonal,
     },
     accent: {
-      colors: ["#2AFF5D", "#00CC44"] as const,
+      colors: ["#95D5B2", "#74C69D"] as const,
       ...diagonal,
     },
     ai: {
-      colors: ["#FF0080", "#7928CA"] as const,
+      colors: ["#A594C9", "#7B68AE"] as const,
       ...diagonal,
     },
     gold: {
-      colors: ["#FFD700", "#FDB931", "#E6AC00"] as const,
+      colors: ["#DDB892", "#D4A373", "#C48B5C"] as const,
       ...horizontal,
     },
     danger: {
-      colors: ["#FF453A", "#FF6961"] as const,
+      colors: ["#FF6B6B", "#FF5252"] as const,
       ...diagonal,
     },
   },
