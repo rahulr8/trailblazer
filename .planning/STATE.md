@@ -9,19 +9,19 @@ See: .planning/PROJECT.md (updated 2026-01-27)
 
 ## Current Position
 
-Phase: 5 of 6 (Profile Screen)
-Plan: 1 of 3 in current phase
+Phase: 6 of 6 (Onboarding Flow)
+Plan: 1 of 1 in current phase
 Status: In progress
-Last activity: 2026-02-06 -- Completed 05-01-PLAN.md
+Last activity: 2026-02-06 -- Completed 06-01-PLAN.md
 
-Progress: [██████████████░░░░░░] 70%
+Progress: [██████████████░░░░░░] 74%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
-- Average duration: 2.5min
-- Total execution time: 0.55 hours
+- Total plans completed: 14
+- Average duration: 2.4min
+- Total execution time: 0.58 hours
 
 **By Phase:**
 
@@ -32,9 +32,10 @@ Progress: [██████████████░░░░░░] 70%
 | 03-home-screen | 3/3 | 8.8min | 2.9min |
 | 04-your-stash-your-squad | 3/3 | 10min | 3.3min |
 | 05-profile-screen | 1/3 | 2.3min | 2.3min |
+| 06-onboarding-flow | 1/1 | 1.6min | 1.6min |
 
 **Recent Trend:**
-- Last 5 plans: 2.7min, 2.1min, 2min, 3min, 2.3min
+- Last 5 plans: 2.1min, 2min, 3min, 2.3min, 1.6min
 - Trend: Steady
 
 *Updated after each plan completion*
@@ -82,6 +83,10 @@ Recent decisions affecting current work:
 - Profile screen split into Plan 01 (top half: header/hero/coach/stats/achievements) and Plan 02 (bottom half: settings/integrations) (05-01)
 - Coach personality selection uses local state with visual selection indicators (05-01)
 - Achievement iconName to emoji mapping via EMOJI_MAP constant with trophy fallback (05-01)
+- 8-second rotation duration for slow compass-like effect on TB+ logo (06-01)
+- Skip button positioned top-right with generous hitSlop for better UX (06-01)
+- Terms link opens in-app browser (not external) to keep user in app (06-01)
+- Changed Terms text color to primary for clear link affordance (06-01)
 
 ### Pending Todos
 
@@ -95,6 +100,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-02-06T15:11:54Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-02-06T18:20:28Z
+Stopped at: Completed 06-01-PLAN.md
 Resume file: None
