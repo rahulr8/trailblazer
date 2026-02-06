@@ -77,7 +77,7 @@ export const MOCK_REWARDS: MockReward[] = [
     rewardType: "qr",
     rewardValue: "MEC-TRAIL-25OFF",
     color: "#00A651",
-    imageUrl: "https://images.unsplash.com/photo-1622260614927-552c3fc21db1?w=800&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=800&q=80",
   },
   {
     id: "reward-4",
