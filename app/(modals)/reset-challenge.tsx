@@ -3,8 +3,6 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 
-import { Button } from "heroui-native";
-
 import { AlertTriangle, X } from "lucide-react-native";
 
 import { BorderRadius, Spacing } from "@/constants";
@@ -55,9 +53,12 @@ export default function ResetChallengeModal() {
             >
               <Text style={[styles.cancelButtonText, { color: colors.textPrimary }]}>Cancel</Text>
             </Pressable>
-            <View style={styles.resetButtonContainer}>
-              <Button onPress={handleReset}>Reset Challenge</Button>
-            </View>
+            <Pressable
+              style={[styles.resetButton, { backgroundColor: colors.primary }]}
+              onPress={handleReset}
+            >
+              <Text style={styles.resetButtonText}>Reset</Text>
+            </Pressable>
           </View>
         </Pressable>
       </BlurView>
@@ -128,7 +129,15 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
   },
-  resetButtonContainer: {
+  resetButton: {
     flex: 1,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    alignItems: "center",
+  },
+  resetButtonText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#FFFFFF",
   },
 });
