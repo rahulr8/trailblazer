@@ -11,6 +11,7 @@ import {
   FileText,
   Heart,
   LogOut,
+  Moon,
   RotateCcw,
   Settings,
   Shield,
@@ -55,7 +56,7 @@ const THEME_COLORS = [
 ];
 
 export default function ProfileScreen() {
-  const { colors, shadows } = useTheme();
+  const { colors, shadows, isDark, toggleColorScheme } = useTheme();
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
   const [selectedPersonality, setSelectedPersonality] = useState<CoachPersonality>("bestie");
@@ -345,6 +346,22 @@ export default function ProfileScreen() {
               onValueChange={setGoogleFitEnabled}
               trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
               thumbColor={googleFitEnabled ? colors.primary : "#f4f3f4"}
+            />
+          </Pressable>
+
+          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+
+          {/* Dark Mode */}
+          <Pressable style={styles.menuItem}>
+            <View style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}>
+              <Moon size={20} color={colors.textSecondary} />
+            </View>
+            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Dark Mode</Text>
+            <Switch
+              value={isDark}
+              onValueChange={toggleColorScheme}
+              trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+              thumbColor={isDark ? colors.primary : "#f4f3f4"}
             />
           </Pressable>
 
