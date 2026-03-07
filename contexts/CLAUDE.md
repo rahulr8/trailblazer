@@ -50,6 +50,29 @@ const { isDark, colors, toggleColorScheme } = useTheme();
 - Falls back to system preference on first launch
 - Provides pre-computed `colors`, `shadows`, `gradients` for current theme
 
+### ChatContext (`chat-context.tsx`)
+
+In-memory chat session state for Parker AI assistant. Persists messages across screen open/close within a single app session.
+
+```typescript
+interface ChatContextValue {
+  messages: ChatMessage[];
+  isTyping: boolean;
+  sendMessage: (text: string) => void;
+  clearMessages: () => void;
+}
+
+// Usage
+const { messages, isTyping, sendMessage, clearMessages } = useChat();
+```
+
+**Behavior**:
+
+- Messages persist in memory as long as the app is running
+- `sendMessage` adds user message and triggers simulated AI response (placeholder)
+- `clearMessages` resets to the initial welcome message
+- `isTyping` tracks whether Parker is "thinking"
+
 ## Provider Hierarchy
 
 Order is critical - defined in `app/_layout.tsx`:
@@ -74,7 +97,8 @@ Order is critical - defined in `app/_layout.tsx`:
 2. `HeroUINativeProvider` - HeroUI theming (needs gesture handler)
 3. `ThemeProvider` - App theme (provides colors to subsequent providers)
 4. `AuthProvider` - Auth state
-5. `BottomSheetModalProvider` - Bottom sheet modals
+5. `ChatProvider` - In-memory chat session
+6. `BottomSheetModalProvider` - Bottom sheet modals
 
 ## Creating New Contexts
 

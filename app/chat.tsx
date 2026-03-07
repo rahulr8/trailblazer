@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import {
   FlatList,
@@ -13,10 +13,20 @@ import {
 
 import { Stack, router } from "expo-router";
 
+import * as Haptics from "expo-haptics";
 import { Bot, Send, User, X } from "lucide-react-native";
+import Animated, {
+  FadeIn,
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { BorderRadius, Spacing } from "@/constants";
+import { useChat } from "@/contexts/chat-context";
 import { useTheme } from "@/contexts/theme-context";
 
 interface ChatMessage {
@@ -25,82 +35,149 @@ interface ChatMessage {
   content: string;
 }
 
-const INITIAL_MESSAGES: ChatMessage[] = [
-  {
-    id: "1",
-    role: "assistant",
-    content:
-      "Hi! I'm Parker, your BC Parks trail guide. Ask me about trails, wildlife, weather conditions, or anything else about your outdoor adventures!",
-  },
-];
+function TypingIndicator({ color }: { color: string }) {
+  const dot1 = useSharedValue(0);
+  const dot2 = useSharedValue(0);
+  const dot3 = useSharedValue(0);
+
+  useEffect(() => {
+    const duration = 400;
+    dot1.value = withRepeat(
+      withSequence(withTiming(-6, { duration }), withTiming(0, { duration })),
+      -1
+    );
+    setTimeout(() => {
+      dot2.value = withRepeat(
+        withSequence(withTiming(-6, { duration }), withTiming(0, { duration })),
+        -1
+      );
+    }, 150);
+    setTimeout(() => {
+      dot3.value = withRepeat(
+        withSequence(withTiming(-6, { duration }), withTiming(0, { duration })),
+        -1
+      );
+    }, 300);
+  }, [dot1, dot2, dot3]);
+
+  const style1 = useAnimatedStyle(() => ({ transform: [{ translateY: dot1.value }] }));
+  const style2 = useAnimatedStyle(() => ({ transform: [{ translateY: dot2.value }] }));
+  const style3 = useAnimatedStyle(() => ({ transform: [{ translateY: dot3.value }] }));
+
+  return (
+    <View style={styles.typingContainer}>
+      <Animated.View style={[styles.typingDot, { backgroundColor: color }, style1]} />
+      <Animated.View style={[styles.typingDot, { backgroundColor: color }, style2]} />
+      <Animated.View style={[styles.typingDot, { backgroundColor: color }, style3]} />
+    </View>
+  );
+}
 
 export default function ChatScreen() {
   const { colors, shadows } = useTheme();
+  const { messages, isTyping, sendMessage } = useChat();
   const insets = useSafeAreaInsets();
-  const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES);
   const [inputText, setInputText] = useState("");
   const flatListRef = useRef<FlatList>(null);
+
+  // Inverted FlatList needs reversed data
+  const invertedMessages = useMemo(() => [...messages].reverse(), [messages]);
 
   const handleSend = useCallback(() => {
     if (!inputText.trim()) return;
 
-    const userMessage: ChatMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      content: inputText.trim(),
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    sendMessage(inputText);
     setInputText("");
-
-    // Simulate AI response
-    setTimeout(() => {
-      const aiMessage: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content:
-          "That's a great question! I'm still being connected to my knowledge base, but soon I'll be able to help you with trail recommendations, weather updates, and more.",
-      };
-      setMessages((prev) => [...prev, aiMessage]);
-    }, 1000);
-  }, [inputText]);
+  }, [inputText, sendMessage]);
 
   const renderMessage = useCallback(
-    ({ item }: { item: ChatMessage }) => {
+    ({ item, index }: { item: ChatMessage; index: number }) => {
       const isUser = item.role === "user";
+      // In inverted list, index 0 = newest. Previous message is index+1.
+      const nextItem = invertedMessages[index + 1];
+      const isFirstInGroup = !nextItem || nextItem.role !== item.role;
+
       return (
-        <View
-          style={[styles.messageRow, isUser ? styles.messageRowUser : styles.messageRowAssistant]}
-        >
-          {!isUser && (
+        <Animated.View entering={index === 0 ? FadeIn.duration(200) : undefined}>
+          <View
+            style={[
+              styles.messageRow,
+              isUser ? styles.messageRowUser : styles.messageRowAssistant,
+              !isFirstInGroup && styles.messageRowGrouped,
+            ]}
+          >
+            {!isUser && (
+              <View style={styles.avatarSlot}>
+                {isFirstInGroup && (
+                  <View style={[styles.avatar, { backgroundColor: colors.primary + "20" }]}>
+                    <Bot size={18} color={colors.primary} />
+                  </View>
+                )}
+              </View>
+            )}
+            <View
+              style={[
+                styles.messageBubble,
+                isUser
+                  ? { backgroundColor: colors.primary }
+                  : {
+                      backgroundColor: colors.cardBackground,
+                      borderColor: colors.cardBorder,
+                      borderWidth: 1,
+                    },
+                shadows.sm,
+              ]}
+            >
+              <Text
+                style={[styles.messageText, { color: isUser ? "#FFFFFF" : colors.textPrimary }]}
+              >
+                {item.content}
+              </Text>
+            </View>
+            {isUser && (
+              <View style={styles.avatarSlot}>
+                {isFirstInGroup && (
+                  <View style={[styles.avatar, { backgroundColor: colors.accent + "20" }]}>
+                    <User size={18} color={colors.accent} />
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        </Animated.View>
+      );
+    },
+    [colors, shadows, invertedMessages]
+  );
+
+  const renderTypingIndicator = useCallback(() => {
+    if (!isTyping) return null;
+    return (
+      <Animated.View entering={FadeIn.duration(200)}>
+        <View style={[styles.messageRow, styles.messageRowAssistant, { marginBottom: Spacing.md }]}>
+          <View style={styles.avatarSlot}>
             <View style={[styles.avatar, { backgroundColor: colors.primary + "20" }]}>
               <Bot size={18} color={colors.primary} />
             </View>
-          )}
+          </View>
           <View
             style={[
               styles.messageBubble,
-              isUser
-                ? { backgroundColor: colors.primary }
-                : { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
-              !isUser && styles.messageBubbleAssistant,
+              {
+                backgroundColor: colors.cardBackground,
+                borderColor: colors.cardBorder,
+                borderWidth: 1,
+              },
               shadows.sm,
             ]}
           >
-            <Text style={[styles.messageText, { color: isUser ? "#FFFFFF" : colors.textPrimary }]}>
-              {item.content}
-            </Text>
+            <TypingIndicator color={colors.textSecondary} />
           </View>
-          {isUser && (
-            <View style={[styles.avatar, { backgroundColor: colors.accent + "20" }]}>
-              <User size={18} color={colors.accent} />
-            </View>
-          )}
         </View>
-      );
-    },
-    [colors, shadows]
-  );
+      </Animated.View>
+    );
+  }, [isTyping, colors, shadows]);
 
   return (
     <>
@@ -122,12 +199,15 @@ export default function ChatScreen() {
         </View>
         <FlatList
           ref={flatListRef}
-          data={messages}
+          data={invertedMessages}
           renderItem={renderMessage}
           keyExtractor={(item) => item.id}
-          contentContainerStyle={[styles.messageList, { paddingBottom: Spacing.lg }]}
-          onContentSizeChange={() => flatListRef.current?.scrollToEnd()}
+          contentContainerStyle={styles.messageList}
           showsVerticalScrollIndicator={false}
+          inverted
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="handled"
+          ListHeaderComponent={renderTypingIndicator}
         />
 
         <View
@@ -143,8 +223,6 @@ export default function ChatScreen() {
             placeholderTextColor={colors.textSecondary}
             value={inputText}
             onChangeText={setInputText}
-            onSubmitEditing={handleSend}
-            returnKeyType="send"
             multiline
             maxLength={500}
           />
@@ -201,6 +279,13 @@ const styles = StyleSheet.create({
   messageRowAssistant: {
     justifyContent: "flex-start",
   },
+  messageRowGrouped: {
+    marginTop: -Spacing.sm,
+  },
+  avatarSlot: {
+    width: 32,
+    height: 32,
+  },
   avatar: {
     width: 32,
     height: 32,
@@ -212,9 +297,6 @@ const styles = StyleSheet.create({
     maxWidth: "75%",
     padding: Spacing.md,
     borderRadius: BorderRadius.xl,
-  },
-  messageBubbleAssistant: {
-    borderWidth: 1,
   },
   messageText: {
     fontSize: 15,
@@ -242,5 +324,18 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
     justifyContent: "center",
     alignItems: "center",
+  },
+  typingContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 4,
+  },
+  typingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    opacity: 0.6,
   },
 });

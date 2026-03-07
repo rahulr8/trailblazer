@@ -19,6 +19,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import "react-native-reanimated";
 
 import { AuthProvider, useAuth } from "@/contexts/auth-context";
+import { ChatProvider } from "@/contexts/chat-context";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 
 import LoginScreen from "@/components/auth/LoginScreen";
@@ -165,9 +166,11 @@ export default function RootLayout() {
       <HeroUINativeProvider>
         <ThemeProvider>
           <AuthProvider>
-            <BottomSheetModalProvider>
-              <RootLayoutNav />
-            </BottomSheetModalProvider>
+            <ChatProvider>
+              <BottomSheetModalProvider>
+                <RootLayoutNav />
+              </BottomSheetModalProvider>
+            </ChatProvider>
           </AuthProvider>
         </ThemeProvider>
       </HeroUINativeProvider>
