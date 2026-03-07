@@ -1,18 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Alert, Platform } from "react-native";
-import {
-  doc,
-  onSnapshot,
-  updateDoc,
-  serverTimestamp,
-  deleteField,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { HealthConnection } from "@/lib/db/types";
+
+import { supabase } from "@/lib/supabase";
 import { isHealthKitAvailableAsync, initHealthKit } from "./config";
 import { syncHealthWorkouts } from "./sync";
 
-// Detect HealthKit authorization errors
 function isHealthKitAuthError(error: unknown): boolean {
   const message = error instanceof Error ? error.message : String(error);
   return (
@@ -22,13 +14,11 @@ function isHealthKitAuthError(error: unknown): boolean {
   );
 }
 
-// Clear health connection from Firestore
 async function clearHealthConnection(uid: string): Promise<void> {
-  const userRef = doc(db, "users", uid);
-  await updateDoc(userRef, {
-    healthConnection: deleteField(),
-    updatedAt: serverTimestamp(),
-  });
+  await supabase
+    .from("health_connections")
+    .delete()
+    .eq("user_id", uid);
 }
 
 interface HealthConnectionState {
@@ -57,7 +47,6 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
   const [isAvailable, setIsAvailable] = useState(false);
   const hasAutoSynced = useRef(false);
 
-  // Check HealthKit availability on mount (iOS only)
   useEffect(() => {
     if (Platform.OS !== "ios") {
       setIsAvailable(false);
@@ -70,38 +59,63 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       .catch(() => setIsAvailable(false));
   }, []);
 
-  // Listen to Firestore for connection status
+  // Fetch health connection status from Supabase
   useEffect(() => {
     if (!uid) {
       setState((prev) => ({ ...prev, isLoading: false }));
       return;
     }
 
-    const userRef = doc(db, "users", uid);
-    const unsubscribe = onSnapshot(
-      userRef,
-      (snapshot) => {
-        const data = snapshot.data();
-        const connection = data?.healthConnection as HealthConnection | undefined;
+    async function fetchConnection() {
+      const { data } = await supabase
+        .from("health_connections")
+        .select()
+        .eq("user_id", uid!)
+        .maybeSingle();
 
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          isConnected: !!connection?.isAuthorized,
-          lastSyncAt: connection?.lastSyncAt?.toDate() || null,
-        }));
-      },
-      (error) => {
-        console.error("[Health] Connection listener error:", error);
-        setState((prev) => ({
-          ...prev,
-          isLoading: false,
-          error: "Failed to load Apple Health connection status",
-        }));
-      }
-    );
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        isConnected: !!data?.is_authorized,
+        lastSyncAt: data?.last_sync_at ? new Date(data.last_sync_at) : null,
+      }));
+    }
 
-    return () => unsubscribe();
+    fetchConnection();
+
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel(`health_connections:${uid}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "health_connections",
+          filter: `user_id=eq.${uid}`,
+        },
+        (payload) => {
+          if (payload.eventType === "DELETE") {
+            setState((prev) => ({
+              ...prev,
+              isConnected: false,
+              lastSyncAt: null,
+            }));
+          } else {
+            const row = payload.new as Record<string, unknown>;
+            setState((prev) => ({
+              ...prev,
+              isConnected: !!row.is_authorized,
+              lastSyncAt: row.last_sync_at ? new Date(row.last_sync_at as string) : null,
+            }));
+          }
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [uid]);
 
   // Auto-sync when app opens and already connected
@@ -127,10 +141,9 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
           console.log("[Health] Authorization lost, disconnecting...");
           try {
             await clearHealthConnection(uid);
-            console.log("[Health] Disconnected due to authorization loss");
             Alert.alert(
               "Apple Health Disconnected",
-              "HealthKit authorization was revoked. Please reconnect to continue syncing workouts."
+              "HealthKit authorization was revoked. Please reconnect to continue syncing workouts.",
             );
           } catch (disconnectError) {
             console.error("[Health] Failed to disconnect after auth error:", disconnectError);
@@ -139,7 +152,6 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       });
   }, [uid, state.isConnected, state.isLoading]);
 
-  // Reset auto-sync flag when disconnected
   useEffect(() => {
     if (!state.isConnected) {
       hasAutoSynced.current = false;
@@ -151,7 +163,6 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
 
     if (!uid) {
       const errorMsg = "Must be logged in";
-      console.log("[Health] Connect failed:", errorMsg);
       setState((prev) => ({ ...prev, error: errorMsg }));
       Alert.alert("Connection Failed", errorMsg);
       return;
@@ -159,38 +170,32 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
 
     if (Platform.OS !== "ios") {
       const errorMsg = "Apple Health is only available on iOS";
-      console.log("[Health] Connect failed:", errorMsg);
       setState((prev) => ({ ...prev, error: errorMsg }));
       Alert.alert("Connection Failed", errorMsg);
       return;
     }
 
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
-    console.log("[Health] Starting HealthKit initialization...");
 
     try {
       await initHealthKit();
-      console.log("[Health] HealthKit initialized, saving to Firestore...");
 
-      const userRef = doc(db, "users", uid);
-      await updateDoc(userRef, {
-        healthConnection: {
-          isAuthorized: true,
-          connectedAt: serverTimestamp(),
-          lastSyncAt: null,
+      await supabase.from("health_connections").upsert(
+        {
+          user_id: uid,
+          is_authorized: true,
+          connected_at: new Date().toISOString(),
+          last_sync_at: null,
         },
-        updatedAt: serverTimestamp(),
-      });
+        { onConflict: "user_id" },
+      );
 
-      console.log("[Health] Connection saved to Firestore successfully");
-      // Auto-sync effect will handle the initial sync when isConnected becomes true
+      console.log("[Health] Connection saved successfully");
+      setState((prev) => ({ ...prev, isConnected: true, lastSyncAt: null }));
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to connect";
       console.error("[Health] Connect error:", error);
-      setState((prev) => ({
-        ...prev,
-        error: errorMsg,
-      }));
+      setState((prev) => ({ ...prev, error: errorMsg }));
       Alert.alert("Apple Health Connection Failed", errorMsg);
     } finally {
       setState((prev) => ({ ...prev, isLoading: false }));
@@ -200,16 +205,14 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
   const disconnect = useCallback(async () => {
     console.log("[Health] disconnect() called, uid:", uid);
 
-    if (!uid) {
-      console.log("[Health] Disconnect skipped - no uid");
-      return;
-    }
+    if (!uid) return;
 
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
       await clearHealthConnection(uid);
       console.log("[Health] Disconnected successfully");
+      setState((prev) => ({ ...prev, isConnected: false, lastSyncAt: null }));
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to disconnect";
       console.error("[Health] Disconnect error:", error);
@@ -223,15 +226,10 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
   const sync = useCallback(async (): Promise<number> => {
     console.log("[Health] sync() called, uid:", uid, "isConnected:", state.isConnected);
 
-    if (!uid || !state.isConnected) {
-      console.log("[Health] Sync skipped - not connected");
-      return 0;
-    }
+    if (!uid || !state.isConnected) return 0;
 
     if (Platform.OS !== "ios") {
-      const errorMsg = "Apple Health is only available on iOS";
-      console.log("[Health] Sync failed:", errorMsg);
-      setState((prev) => ({ ...prev, error: errorMsg }));
+      setState((prev) => ({ ...prev, error: "Apple Health is only available on iOS" }));
       return 0;
     }
 
@@ -246,12 +244,11 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       console.error("[Health] Sync error:", error);
 
       if (isHealthKitAuthError(error)) {
-        console.log("[Health] Authorization lost during sync, disconnecting...");
         try {
           await clearHealthConnection(uid);
           Alert.alert(
             "Apple Health Disconnected",
-            "HealthKit authorization was revoked. Please reconnect to continue syncing workouts."
+            "HealthKit authorization was revoked. Please reconnect to continue syncing workouts.",
           );
         } catch (disconnectError) {
           console.error("[Health] Failed to disconnect after auth error:", disconnectError);

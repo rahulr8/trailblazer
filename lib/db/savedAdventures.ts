@@ -1,62 +1,52 @@
-import {
-  collection,
-  doc,
-  setDoc,
-  deleteDoc,
-  getDocs,
-  serverTimestamp,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { collections, querySnapshotToArray } from "./utils";
-import { SavedAdventureDocument } from "./types";
-import { Adventure } from "@/lib/data";
+import { supabase } from "@/lib/supabase";
+import type { Json } from "@/types/supabase";
+import type { Adventure } from "@/lib/data";
 
-// Save an adventure
 export async function saveAdventure(
   uid: string,
-  adventure: Adventure
+  adventure: Adventure,
 ): Promise<void> {
-  const adventureRef = doc(
-    db,
-    collections.savedAdventures(uid),
-    adventure.id.toString()
+  await supabase.from("saved_adventures").upsert(
+    {
+      user_id: uid,
+      adventure_id: adventure.id.toString(),
+      adventure_data: adventure as unknown as Json,
+    },
+    { onConflict: "user_id,adventure_id" },
   );
-
-  await setDoc(adventureRef, {
-    adventure,
-    savedAt: serverTimestamp(),
-  });
 }
 
-// Remove saved adventure
 export async function removeSavedAdventure(
   uid: string,
-  adventureId: number
+  adventureId: number,
 ): Promise<void> {
-  const adventureRef = doc(
-    db,
-    collections.savedAdventures(uid),
-    adventureId.toString()
-  );
-
-  await deleteDoc(adventureRef);
+  await supabase
+    .from("saved_adventures")
+    .delete()
+    .eq("user_id", uid)
+    .eq("adventure_id", adventureId.toString());
 }
 
-// Get all saved adventures
 export async function getSavedAdventures(uid: string): Promise<Adventure[]> {
-  const savedRef = collection(db, collections.savedAdventures(uid));
-  const snapshot = await getDocs(savedRef);
+  const { data, error } = await supabase
+    .from("saved_adventures")
+    .select("adventure_data")
+    .eq("user_id", uid);
 
-  const docs = querySnapshotToArray<SavedAdventureDocument>(snapshot.docs);
-
-  return docs.map((doc) => doc.adventure);
+  if (error) throw error;
+  return (data ?? []).map((row) => row.adventure_data as unknown as Adventure);
 }
 
-// Check if adventure is saved
 export async function isAdventureSaved(
   uid: string,
-  adventureId: number
+  adventureId: number,
 ): Promise<boolean> {
-  const adventures = await getSavedAdventures(uid);
-  return adventures.some((a) => a.id === adventureId);
+  const { data } = await supabase
+    .from("saved_adventures")
+    .select("id")
+    .eq("user_id", uid)
+    .eq("adventure_id", adventureId.toString())
+    .maybeSingle();
+
+  return data !== null;
 }

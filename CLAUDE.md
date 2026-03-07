@@ -8,7 +8,7 @@ BC Parks outdoor activity tracking app built with Expo, HeroUI Native, and Uniwi
 - **Styling**: Uniwind (Tailwind CSS v4 for React Native)
 - **Components**: HeroUI Native
 - **Language**: TypeScript (strict mode)
-- **Backend**: Firebase (Auth, Firestore, Cloud Functions)
+- **Backend**: Supabase (Auth, Postgres with RLS, Edge Functions, Realtime)
 - **Integrations**: Apple HealthKit
 
 ## Commands
@@ -30,11 +30,12 @@ components/             # Reusable components (see components/CLAUDE.md)
 contexts/               # React contexts (see contexts/CLAUDE.md)
 hooks/                  # Custom React hooks (see hooks/CLAUDE.md)
 lib/                    # Business logic
-├── db/                 # Firestore operations (see lib/db/CLAUDE.md)
+├── db/                 # Supabase database operations (see lib/db/CLAUDE.md)
 ├── health/             # Apple Health integration (see lib/health/CLAUDE.md)
+├── supabase.ts         # Supabase client singleton
 └── constants/          # Activity constants (see lib/constants/CLAUDE.md)
-functions/              # Firebase Cloud Functions (see functions/CLAUDE.md)
-firebase/               # Firebase config (see firebase/CLAUDE.md)
+supabase/               # Supabase config, migrations, and edge functions
+types/                  # Generated TypeScript types (supabase.ts)
 agents/                 # AI development agents (see agents/CLAUDE.md)
 ```
 
@@ -145,7 +146,7 @@ Order matters - outermost to innermost in `app/_layout.tsx`:
 1. `GestureHandlerRootView` (required for gestures)
 2. `HeroUINativeProvider` (HeroUI theming)
 3. `ThemeProvider` (app theme + colors)
-4. `AuthProvider` (Firebase Auth state)
+4. `AuthProvider` (Supabase Auth state)
 5. `BottomSheetModalProvider` (bottom sheet modals)
 
 ## Uniwind Setup Notes

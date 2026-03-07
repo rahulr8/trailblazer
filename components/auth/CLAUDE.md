@@ -58,7 +58,7 @@ import LoginScreen from "@/components/auth/LoginScreen";
 - Full-screen background with RotatingLogo at top
 - "Join Trailblazer+" title
 - "Login" button (opens modal)
-- "Sign up with Apple" button (not implemented)
+- "Sign up with Apple" button (Apple Sign In via Supabase)
 - "Terms & Conditions" link at bottom
 
 **Behavior:**
@@ -67,8 +67,9 @@ import LoginScreen from "@/components/auth/LoginScreen";
 - Modal contains email/password TextFields and "Continue" button
 - After successful auth, `app/_layout.tsx` handles routing to permissions or main app
 - Modal dismisses on successful login or when user taps outside
-- Uses Firebase Auth (`signInWithEmailAndPassword`, `createUserWithEmailAndPassword`)
-- Creates Firestore user doc on signup
+- Uses Supabase Auth (`supabase.auth.signUp`, `supabase.auth.signInWithPassword`)
+- Apple Sign In uses `expo-apple-authentication` + `supabase.auth.signInWithIdToken`
+- Profile auto-created via database trigger (no client-side user creation)
 
 **Terms & Conditions:**
 

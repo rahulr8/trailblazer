@@ -1,24 +1,23 @@
-import { Timestamp } from "firebase/firestore";
-import { Adventure } from "@/lib/data";
-
-// Apple Health connection stored on user document (client-side only, no tokens needed)
 export interface HealthConnection {
   isAuthorized: boolean;
-  connectedAt: Timestamp;
-  lastSyncAt: Timestamp | null;
+  connectedAt: string;
+  lastSyncAt: string | null;
 }
 
-// Firestore document types
-export interface UserDocument {
+export interface Profile {
+  id: string;
   email: string;
   displayName: string | null;
-  photoURL: string | null;
+  photoUrl: string | null;
   membershipTier: "free" | "platinum";
-  createdAt: Timestamp;
-  updatedAt: Timestamp;
-  lastActivityDate?: Timestamp;
-  stats: UserStats;
-  healthConnection?: HealthConnection;
+  totalKm: number;
+  totalMinutes: number;
+  totalSteps: number;
+  currentStreak: number;
+  lastActivityDate: string | null;
+  upgradedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface UserStats {
@@ -30,31 +29,19 @@ export interface UserStats {
 
 export type ActivitySource = "manual" | "apple_health";
 
-export interface ActivityDocument {
+export interface Activity {
+  id: number;
   source: ActivitySource;
   externalId: string | null;
   type: string;
   duration: number;
   distance: number;
   location: string | null;
-  date: Timestamp;
-  createdAt: Timestamp;
+  date: Date;
   elapsedTime?: number;
   elevationGain?: number;
   name?: string;
   sportType?: string;
-}
-
-export interface SavedAdventureDocument {
-  adventure: Adventure;
-  savedAt: Timestamp;
-}
-
-// Input types
-export interface CreateUserInput {
-  email: string;
-  displayName: string | null;
-  photoURL: string | null;
 }
 
 export interface LogActivityInput {
@@ -70,46 +57,9 @@ export interface StatDeltas {
   steps?: number;
 }
 
-// Return types (converted from Firestore)
-export interface Activity {
-  id: string;
-  source: ActivitySource;
-  externalId: string | null;
-  type: string;
-  duration: number;
-  distance: number;
-  location: string | null;
-  date: Date;
-  elapsedTime?: number;
-  elevationGain?: number;
-  name?: string;
-  sportType?: string;
-}
-
 export interface QueryOptions {
   limit?: number;
   orderByDate?: "asc" | "desc";
-}
-
-// Conversation types for AI chat tracking (nested structure)
-export interface ConversationDocument {
-  userId: string | null;
-  startedAt: Timestamp;
-  lastMessageAt: Timestamp;
-  messageCount: number;
-}
-
-export interface MessageDocument {
-  query: string;
-  response: string;
-  timestamp: Timestamp;
-}
-
-export interface LogMessageInput {
-  userId: string | null;
-  sessionId: string;
-  query: string;
-  response: string;
 }
 
 export interface Conversation {
@@ -121,8 +71,15 @@ export interface Conversation {
 }
 
 export interface Message {
-  id: string;
-  query: string;
-  response: string;
-  timestamp: Date;
+  id: number;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: Date;
+}
+
+export interface LogMessageInput {
+  userId: string | null;
+  conversationId: string;
+  role: "user" | "assistant";
+  content: string;
 }

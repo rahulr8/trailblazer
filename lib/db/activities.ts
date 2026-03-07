@@ -1,154 +1,139 @@
-import {
-  collection,
-  addDoc,
-  getDocs,
-  getCountFromServer,
-  query,
-  orderBy,
-  where,
-  limit as firestoreLimit,
-  serverTimestamp,
-  writeBatch,
-} from "firebase/firestore";
-import { db } from "@/lib/firebase";
-import { collections, querySnapshotToArray, timestampToDate } from "./utils";
-import {
-  LogActivityInput,
-  Activity,
-  ActivityDocument,
-  ActivitySource,
-  QueryOptions,
-} from "./types";
-import { incrementUserStats, updateStreak } from "./users";
-import { calculateSteps, STEP_COUNTING_ACTIVITIES } from "@/lib/constants";
+import { supabase } from "@/lib/supabase";
+import { calculateSteps } from "@/lib/constants";
+import { incrementUserStats, updateStreak } from "./profiles";
+import type { Activity, ActivitySource, LogActivityInput, QueryOptions } from "./types";
 
-// Log new activity (creates activity + updates user stats)
 export async function logActivity(
   uid: string,
-  input: LogActivityInput
-): Promise<string> {
-  // Add activity document
-  const activitiesRef = collection(db, collections.activities(uid));
-  const docRef = await addDoc(activitiesRef, {
-    source: "manual",
-    externalId: null,
-    type: input.type,
-    duration: input.duration,
-    distance: input.distance,
-    location: input.location,
-    date: serverTimestamp(),
-    createdAt: serverTimestamp(),
-  });
+  input: LogActivityInput,
+): Promise<number> {
+  const { data, error } = await supabase
+    .from("activities")
+    .insert({
+      user_id: uid,
+      source: "manual",
+      type: input.type,
+      duration: input.duration,
+      distance: input.distance,
+      location: input.location,
+      date: new Date().toISOString(),
+    })
+    .select("id")
+    .single();
 
-  // Update user stats atomically
+  if (error) throw error;
+
   const steps = calculateSteps(input.type, input.distance);
 
   await incrementUserStats(uid, {
     km: input.distance,
-    minutes: input.duration,
-    steps: steps,
+    minutes: Math.round(input.duration / 60),
+    steps,
   });
 
-  // Update streak
   await updateStreak(uid);
 
-  return docRef.id;
+  return data.id;
 }
 
-// Get user activities with options
+function rowToActivity(row: Record<string, unknown>): Activity {
+  return {
+    id: row.id as number,
+    source: (row.source as ActivitySource) || "manual",
+    externalId: (row.external_id as string) || null,
+    type: row.type as string,
+    duration: row.duration as number,
+    distance: Number(row.distance),
+    location: (row.location as string) || null,
+    date: new Date(row.date as string),
+    elapsedTime: row.elapsed_time as number | undefined,
+    elevationGain: row.elevation_gain ? Number(row.elevation_gain) : undefined,
+    name: row.name as string | undefined,
+    sportType: row.sport_type as string | undefined,
+  };
+}
+
 export async function getUserActivities(
   uid: string,
-  options: QueryOptions = {}
+  options: QueryOptions = {},
 ): Promise<Activity[]> {
-  const activitiesRef = collection(db, collections.activities(uid));
+  let query = supabase
+    .from("activities")
+    .select()
+    .eq("user_id", uid)
+    .order("date", { ascending: options.orderByDate === "asc" });
 
-  let q = query(activitiesRef);
-
-  // Apply ordering
-  const order = options.orderByDate || "desc";
-  q = query(q, orderBy("date", order));
-
-  // Apply limit
   if (options.limit) {
-    q = query(q, firestoreLimit(options.limit));
+    query = query.limit(options.limit);
   }
 
-  const snapshot = await getDocs(q);
-  const activities = querySnapshotToArray<ActivityDocument>(snapshot.docs);
+  const { data, error } = await query;
+  if (error) throw error;
 
-  // Convert Timestamps to Dates
-  return activities.map((activity) => ({
-    id: activity.id,
-    source: activity.source || "manual",
-    externalId: activity.externalId || null,
-    type: activity.type,
-    duration: activity.duration,
-    distance: activity.distance,
-    location: activity.location,
-    date: timestampToDate(activity.date),
-    elapsedTime: activity.elapsedTime,
-    elevationGain: activity.elevationGain,
-    name: activity.name,
-    sportType: activity.sportType,
-  }));
+  return (data ?? []).map(rowToActivity);
 }
 
-// Get recent activities (shorthand)
 export async function getRecentActivities(
   uid: string,
-  limit: number = 3
+  limit: number = 3,
 ): Promise<Activity[]> {
   return getUserActivities(uid, { limit, orderByDate: "desc" });
 }
 
-// Get start of current week (Sunday)
 function getStartOfWeek(date: Date): Date {
   const d = new Date(date);
-  const day = d.getDay(); // 0 = Sunday
+  const day = d.getDay();
   d.setDate(d.getDate() - day);
   d.setHours(0, 0, 0, 0);
   return d;
 }
 
-// Get count of activities logged this week
 export async function getWeeklyActivityCount(uid: string): Promise<number> {
-  const activities = await getUserActivities(uid);
   const startOfWeek = getStartOfWeek(new Date());
 
-  return activities.filter((activity) => activity.date >= startOfWeek).length;
+  const { count, error } = await supabase
+    .from("activities")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", uid)
+    .gte("date", startOfWeek.toISOString());
+
+  if (error) throw error;
+  return count ?? 0;
 }
 
-// Check if user is eligible for weekly giveaway (3+ activities this week)
 export async function isEligibleForGiveaway(uid: string): Promise<boolean> {
   const count = await getWeeklyActivityCount(uid);
   return count >= 3;
 }
 
-// Get count of activities by source (for source switching dialogs)
 export async function getActivityCountBySource(
   uid: string,
-  source: ActivitySource
+  source: ActivitySource,
 ): Promise<number> {
-  const activitiesRef = collection(db, collections.activities(uid));
-  const q = query(activitiesRef, where("source", "==", source));
-  const snapshot = await getCountFromServer(q);
-  return snapshot.data().count;
+  const { count, error } = await supabase
+    .from("activities")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", uid)
+    .eq("source", source);
+
+  if (error) throw error;
+  return count ?? 0;
 }
 
-// Delete all activities from a specific source (for source switching)
 export async function deleteActivitiesBySource(
   uid: string,
-  source: ActivitySource
+  source: ActivitySource,
 ): Promise<number> {
-  const activitiesRef = collection(db, collections.activities(uid));
-  const q = query(activitiesRef, where("source", "==", source));
-  const snapshot = await getDocs(q);
+  const count = await getActivityCountBySource(uid, source);
 
-  if (snapshot.empty) return 0;
+  if (count === 0) return 0;
 
-  const batch = writeBatch(db);
-  snapshot.docs.forEach((doc) => batch.delete(doc.ref));
-  await batch.commit();
+  const { error } = await supabase
+    .from("activities")
+    .delete()
+    .eq("user_id", uid)
+    .eq("source", source);
 
-  return snapshot.size;
+  if (error) throw error;
+  return count;
 }

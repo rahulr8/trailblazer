@@ -6,12 +6,12 @@ React Context providers for global state management in Trailblazer.
 
 ### AuthContext (`auth-context.tsx`)
 
-Firebase Authentication state management.
+Supabase Authentication state management.
 
 ```typescript
 interface AuthContextValue {
-  user: User | null; // Firebase User object
-  uid: string | null; // Shorthand for user.uid
+  user: User | null; // Supabase User object
+  uid: string | null; // Shorthand for user.id
   isLoading: boolean; // True while checking auth state
 }
 
@@ -21,8 +21,8 @@ const { user, uid, isLoading } = useAuth();
 
 **Behavior**:
 
-- Listens to `onAuthStateChanged` from Firebase
-- Persists auth state via MMKV (see `lib/firebase.ts`)
+- Calls `supabase.auth.getSession()` on mount, then subscribes to `onAuthStateChange`
+- Persists auth state via MMKV (see `lib/supabase.ts`)
 - `isLoading` is true until initial auth check completes
 
 ### ThemeContext (`theme-context.tsx`)

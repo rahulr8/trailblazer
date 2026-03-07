@@ -49,7 +49,7 @@ The library uses an Expo config plugin. In `app.json`:
 | Auth          | On-device HealthKit permission  |
 | Sync trigger  | Manual pull or app open         |
 | Token storage | None needed                     |
-| Data location | On-device → Direct to Firestore |
+| Data location | On-device → Supabase Postgres |
 
 **Apple Health sync is client-side only** - no Cloud Functions needed.
 
@@ -115,7 +115,7 @@ source: "manual" | "apple_health";
 1. User taps "Connect Apple Health" in profile
 2. `requestAuthorization()` requests HealthKit authorization
 3. iOS shows permissions sheet
-4. On approval, `healthConnection` stored in Firestore
+4. On approval, `healthConnection` stored in Supabase
 5. Auto-sync effect triggers when `isConnected` becomes true
 6. **Before fetching**, `ensureHealthKitAuthorized()` verifies permissions are still valid
 7. Sync queries 30 days of workouts via `queryWorkoutSamples()`
@@ -133,9 +133,9 @@ HealthKit authorization can be lost between app sessions (user revoked in Settin
 1. **Before every sync**: `ensureHealthKitAuthorized()` is called to verify/re-request authorization
 2. **On "Authorization not determined" errors**: The user is automatically disconnected from Apple Health
 3. **User notification**: An alert informs them to reconnect via the profile page
-4. **Firestore cleanup**: `healthConnection` field is deleted so UI reflects disconnected state
+4. **Supabase cleanup**: `healthConnection` field is deleted so UI reflects disconnected state
 
-This prevents the sync-error loop that occurs when Firestore says "connected" but iOS says "not authorized".
+This prevents the sync-error loop that occurs when Supabase says "connected" but iOS says "not authorized".
 
 ## iOS-Only Feature
 
@@ -166,7 +166,7 @@ All operations are logged with `[Health]` prefix:
 [Health] Requesting authorization via dynamic import...
 [Health] Module loaded, calling requestAuthorization...
 [Health] Authorization result: true
-[Health] Connection saved to Firestore successfully
+[Health] Connection saved to Supabase successfully
 ```
 
 To debug issues:
@@ -181,7 +181,7 @@ To debug issues:
 // Hook for managing connection state
 export { useHealthConnection } from "./hooks";
 
-// Sync workouts to Firestore
+// Sync workouts to Supabase
 export { syncHealthWorkouts } from "./sync";
 
 // HealthKit utilities

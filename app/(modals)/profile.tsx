@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { router } from "expo-router";
-import { signOut } from "firebase/auth";
 import * as WebBrowser from "expo-web-browser";
 import {
   Activity,
@@ -23,7 +22,7 @@ import { useToast } from "heroui-native";
 
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
-import { auth } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
 import { MOCK_USER, MOCK_STATS, MOCK_ACHIEVEMENTS } from "@/lib/mock";
 
 type CoachPersonality = "drill-sergeant" | "bestie" | "zen" | "hype" | "witty";
@@ -72,7 +71,7 @@ export default function ProfileScreen() {
         onPress: async () => {
           try {
             router.back();
-            await signOut(auth);
+            await supabase.auth.signOut();
           } catch (error) {
             console.error("[Profile] Sign out error:", error);
           }

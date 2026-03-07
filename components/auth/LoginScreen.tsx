@@ -1,7 +1,5 @@
 import { useState } from "react";
 
-import { useToast } from "heroui-native";
-
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,52 +13,30 @@ import {
   View,
 } from "react-native";
 
-import {
-  type AuthError,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-} from "firebase/auth";
+import * as AppleAuthentication from "expo-apple-authentication";
+import * as WebBrowser from "expo-web-browser";
 import { Eye, EyeOff, Lock, Mail, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import * as WebBrowser from "expo-web-browser";
 
 import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
-import { createUser } from "@/lib/db/users";
-import { auth } from "@/lib/firebase";
+import { supabase } from "@/lib/supabase";
 
 type AuthMode = "login" | "signup";
 
-function getFirebaseErrorMessage(error: AuthError): string {
-  switch (error.code) {
-    case "auth/invalid-email":
-      return "Invalid email address";
-    case "auth/user-disabled":
-      return "This account has been disabled";
-    case "auth/user-not-found":
-      return "No account found with this email";
-    case "auth/wrong-password":
-      return "Incorrect password";
-    case "auth/invalid-credential":
-      return "Invalid email or password";
-    case "auth/email-already-in-use":
-      return "Email already registered";
-    case "auth/weak-password":
-      return "Password must be at least 6 characters";
-    case "auth/too-many-requests":
-      return "Too many attempts. Please try again later";
-    case "auth/network-request-failed":
-      return "Network error. Please check your connection";
-    default:
-      return error.message || "Authentication failed";
-  }
+function getSupabaseErrorMessage(message: string): string {
+  if (message.includes("Invalid login credentials")) return "Invalid email or password";
+  if (message.includes("User already registered")) return "Email already registered";
+  if (message.includes("Password should be at least")) return "Password must be at least 6 characters";
+  if (message.includes("Unable to validate email")) return "Invalid email address";
+  if (message.includes("Email rate limit exceeded")) return "Too many attempts. Please try again later";
+  return message || "Authentication failed";
 }
 
 export default function LoginScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { toast } = useToast();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
@@ -80,22 +56,22 @@ export default function LoginScreen() {
 
     try {
       if (mode === "signup") {
-        const { user } = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        await createUser(user.uid, {
-          email: user.email || email.trim(),
-          displayName: null,
-          photoURL: null,
+        const { error: signUpError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
         });
+        if (signUpError) throw signUpError;
       } else {
-        await signInWithEmailAndPassword(auth, email.trim(), password);
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        if (signInError) throw signInError;
       }
       setShowLoginModal(false);
     } catch (err) {
-      if (err && typeof err === "object" && "code" in err) {
-        setError(getFirebaseErrorMessage(err as AuthError));
-      } else {
-        setError(err instanceof Error ? err.message : "An error occurred");
-      }
+      const message = err instanceof Error ? err.message : "An error occurred";
+      setError(getSupabaseErrorMessage(message));
     } finally {
       setLoading(false);
     }
@@ -109,13 +85,45 @@ export default function LoginScreen() {
     setShowLoginModal(true);
   };
 
-  const handleAppleSignUp = () => {
-    toast.show({
-      label: "Coming Soon",
-      description: "Apple Sign In will be available soon!",
-      variant: "default",
-      placement: "top",
-    });
+  const handleAppleSignIn = async () => {
+    try {
+      const credential = await AppleAuthentication.signInAsync({
+        requestedScopes: [
+          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
+          AppleAuthentication.AppleAuthenticationScope.EMAIL,
+        ],
+      });
+
+      if (!credential.identityToken) {
+        setError("Apple Sign In failed — no identity token");
+        return;
+      }
+
+      const { data: signInData, error: appleError } = await supabase.auth.signInWithIdToken({
+        provider: "apple",
+        token: credential.identityToken,
+      });
+      if (appleError) throw appleError;
+
+      if (credential.fullName?.givenName && signInData.user) {
+        const displayName = [credential.fullName.givenName, credential.fullName.familyName]
+          .filter(Boolean)
+          .join(" ");
+        await supabase
+          .from("profiles")
+          .update({ display_name: displayName })
+          .eq("id", signInData.user.id);
+        await supabase.auth.updateUser({
+          data: { display_name: displayName },
+        });
+      }
+    } catch (err) {
+      if (err instanceof Error && "code" in err && (err as { code: string }).code === "ERR_REQUEST_CANCELED") {
+        return;
+      }
+      const message = err instanceof Error ? err.message : "Apple Sign In failed";
+      setError(getSupabaseErrorMessage(message));
+    }
   };
 
   const handleTermsPress = async () => {
@@ -153,7 +161,7 @@ export default function LoginScreen() {
 
         <Pressable
           style={[styles.outlineButton, { borderColor: colors.cardBorder }]}
-          onPress={handleAppleSignUp}
+          onPress={handleAppleSignIn}
         >
           <Text style={[styles.appleIcon, { color: colors.textPrimary }]}></Text>
           <Text style={[styles.outlineButtonText, { color: colors.textPrimary }]}>
