@@ -51,11 +51,13 @@ export default function GiveawayModal() {
           <Pressable
             style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
             onPress={handleDismiss}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <X size={20} color={colors.textSecondary} />
           </Pressable>
         </View>
 
+        {/* Placeholder values — prize name, entry count, and draw countdown should come from backend */}
         <View style={styles.body}>
           <View
             style={[styles.iconContainer, { backgroundColor: colors.highlight + "20" }, shadows.md]}

@@ -14,9 +14,10 @@ interface FlipCardProps {
   back: React.ReactNode;
   height?: number;
   duration?: number;
+  title?: string;
 }
 
-export function FlipCard({ front, back, height = 140, duration = 400 }: FlipCardProps) {
+export function FlipCard({ front, back, height = 140, duration = 400, title }: FlipCardProps) {
   const { colors, shadows } = useTheme();
   const isFlipped = useSharedValue(0);
 
@@ -43,7 +44,11 @@ export function FlipCard({ front, back, height = 140, duration = 400 }: FlipCard
   });
 
   return (
-    <Pressable onPress={handlePress}>
+    <Pressable
+      onPress={handlePress}
+      accessibilityLabel={title ?? "Tap to flip"}
+      accessibilityHint="Reveals additional statistics on the back"
+    >
       <View style={{ position: "relative", height }}>
         <Animated.View
           style={[

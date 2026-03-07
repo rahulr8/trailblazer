@@ -88,10 +88,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   footer: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
     alignItems: "center",
     gap: Spacing.lg,
     paddingHorizontal: Spacing["2xl"],

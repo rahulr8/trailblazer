@@ -1,5 +1,6 @@
-import { forwardRef, useCallback } from "react";
+import { forwardRef, useCallback, useRef, useState } from "react";
 import { View, Text, Pressable } from "react-native";
+import * as Clipboard from "expo-clipboard";
 import {
   BottomSheetModal,
   BottomSheetBackdrop,
@@ -20,6 +21,8 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
   ({ reward, onDismiss }, ref) => {
     const { colors } = useTheme();
     const { toast } = useToast();
+    const [copied, setCopied] = useState(false);
+    const copyTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const renderBackdrop = useCallback(
       (props: BottomSheetDefaultBackdropProps) => (
@@ -31,6 +34,13 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
       ),
       []
     );
+
+    const handleCopyCode = useCallback(async (code: string) => {
+      await Clipboard.setStringAsync(code);
+      if (copyTimeoutRef.current) clearTimeout(copyTimeoutRef.current);
+      setCopied(true);
+      copyTimeoutRef.current = setTimeout(() => setCopied(false), 2000);
+    }, []);
 
     const handleRedeem = useCallback(() => {
       toast.show({
@@ -102,11 +112,13 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
         case "code":
           return (
             <View className="items-center py-8">
-              <View
+              <Pressable
+                onPress={() => handleCopyCode(reward.rewardValue)}
                 className="rounded-2xl items-center justify-center px-6 py-4"
                 style={{
                   borderWidth: 2,
                   borderColor: colors.primary,
+                  opacity: copied ? 0.7 : 1,
                 }}
               >
                 <Text
@@ -115,7 +127,13 @@ export const RewardToaster = forwardRef<BottomSheetModal, RewardToasterProps>(
                 >
                   {reward.rewardValue}
                 </Text>
-              </View>
+                <Text
+                  className="text-xs mt-1"
+                  style={{ color: copied ? colors.primary : colors.textSecondary }}
+                >
+                  {copied ? "Copied!" : "Tap to copy"}
+                </Text>
+              </Pressable>
             </View>
           );
       }

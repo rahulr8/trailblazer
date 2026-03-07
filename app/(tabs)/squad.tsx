@@ -58,8 +58,20 @@ export default function SquadScreen() {
           >
             Your Squad
           </Text>
-          <Pressable onPress={handleAddFriend}>
-            <Text className="text-base font-semibold" style={{ color: colors.accent }}>
+          <Pressable
+            onPress={handleAddFriend}
+            accessibilityLabel="Add Friend"
+            accessibilityRole="button"
+            style={{
+              paddingHorizontal: 14,
+              paddingVertical: 6,
+              borderRadius: 20,
+              borderWidth: 1,
+              borderColor: colors.accent,
+              backgroundColor: `${colors.accent}12`,
+            }}
+          >
+            <Text className="text-sm font-semibold" style={{ color: colors.accent }}>
               Add Friend
             </Text>
           </Pressable>

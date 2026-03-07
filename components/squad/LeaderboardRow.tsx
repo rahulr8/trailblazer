@@ -15,7 +15,8 @@ export function LeaderboardRow({ entry, isHighlighted }: LeaderboardRowProps) {
   const getInitials = (displayName: string): string => {
     return displayName
       .split(" ")
-      .map((word) => word[0])
+      .filter(Boolean)
+      .map((word) => word?.[0] ?? "")
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -23,7 +24,7 @@ export function LeaderboardRow({ entry, isHighlighted }: LeaderboardRowProps) {
 
   const hours = Math.floor(entry.totalTime / 60);
   const minutes = entry.totalTime % 60;
-  const timeDisplay = `${hours}h ${minutes}m`;
+  const timeDisplay = minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
 
   return (
     <View

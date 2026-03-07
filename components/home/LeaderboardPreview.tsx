@@ -23,7 +23,8 @@ export function LeaderboardPreview() {
   const getInitials = (displayName: string): string => {
     return displayName
       .split(" ")
-      .map((word) => word[0])
+      .filter(Boolean)
+      .map((word) => word?.[0] ?? "")
       .join("")
       .toUpperCase()
       .slice(0, 2);
@@ -142,6 +143,8 @@ export function LeaderboardPreview() {
       <Pressable
         onPress={() => router.push("/(tabs)/squad")}
         style={{ paddingVertical: 12 }}
+        accessibilityLabel="View full leaderboard"
+        accessibilityRole="button"
       >
         <Text
           style={{

@@ -49,11 +49,13 @@ export default function BadgeDetailModal() {
           <Pressable
             style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
             onPress={handleDismiss}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <X size={20} color={colors.textSecondary} />
           </Pressable>
         </View>
 
+        {/* Placeholder data — replace with route params once badge data model is defined */}
         <View style={styles.body}>
           <View style={[styles.badgeIcon, { backgroundColor: colors.accent + "20" }, shadows.md]}>
             <Award size={48} color={colors.accent} />

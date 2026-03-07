@@ -5,6 +5,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -72,6 +73,13 @@ function TypingIndicator({ color }: { color: string }) {
     </View>
   );
 }
+
+const SUGGESTED_PROMPTS = [
+  "What trails are near me?",
+  "Tell me about Garibaldi Park",
+  "Best hikes this season",
+  "How do I log an activity?",
+];
 
 export default function ChatScreen() {
   const { colors, shadows } = useTheme();
@@ -179,6 +187,40 @@ export default function ChatScreen() {
     );
   }, [isTyping, colors, shadows]);
 
+  // In an inverted FlatList, ListFooterComponent renders visually at the top
+  const renderSuggestedPrompts = useCallback(() => {
+    if (messages.length > 1) return null;
+    return (
+      <Animated.View entering={FadeIn.duration(300)} style={styles.suggestedContainer}>
+        <Text style={[styles.suggestedLabel, { color: colors.textSecondary }]}>
+          Try asking...
+        </Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.suggestedChips}
+        >
+          {SUGGESTED_PROMPTS.map((prompt) => (
+            <Pressable
+              key={prompt}
+              style={[
+                styles.chip,
+                { backgroundColor: colors.cardBackground, borderColor: colors.cardBorder },
+                shadows.sm,
+              ]}
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                sendMessage(prompt);
+              }}
+            >
+              <Text style={[styles.chipText, { color: colors.textPrimary }]}>{prompt}</Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+      </Animated.View>
+    );
+  }, [messages.length, colors, shadows, sendMessage]);
+
   return (
     <>
       <Stack.Screen options={{ headerShown: false }} />
@@ -188,7 +230,10 @@ export default function ChatScreen() {
         keyboardVerticalOffset={0}
       >
         <View style={[styles.header, { paddingTop: insets.top }]}>
-          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Parker</Text>
+          <View>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Parker</Text>
+            <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>AI Trail Guide</Text>
+          </View>
           <Pressable
             onPress={() => router.back()}
             style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
@@ -208,6 +253,7 @@ export default function ChatScreen() {
           keyboardDismissMode="interactive"
           keyboardShouldPersistTaps="handled"
           ListHeaderComponent={renderTypingIndicator}
+          ListFooterComponent={renderSuggestedPrompts}
         />
 
         <View
@@ -256,6 +302,10 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: "700",
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    marginTop: 1,
   },
   closeButton: {
     width: 36,
@@ -337,5 +387,29 @@ const styles = StyleSheet.create({
     height: 8,
     borderRadius: 4,
     opacity: 0.6,
+  },
+  suggestedContainer: {
+    paddingTop: Spacing.xl,
+    paddingBottom: Spacing.sm,
+    gap: Spacing.md,
+  },
+  suggestedLabel: {
+    fontSize: 13,
+    fontWeight: "500",
+    paddingHorizontal: Spacing.sm,
+  },
+  suggestedChips: {
+    gap: Spacing.sm,
+    paddingHorizontal: Spacing.sm,
+  },
+  chip: {
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+  },
+  chipText: {
+    fontSize: 14,
+    fontWeight: "500",
   },
 });

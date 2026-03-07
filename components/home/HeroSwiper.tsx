@@ -4,7 +4,7 @@ import {
   Text,
   FlatList,
   Pressable,
-  Dimensions,
+  useWindowDimensions,
   type ViewToken,
   type ColorValue,
 } from "react-native";
@@ -16,17 +16,14 @@ import { useTheme } from "@/contexts/theme-context";
 import type { MockHeroCard } from "@/lib/mock/types";
 
 const GAP = 12;
-const CARD_WIDTH = Dimensions.get("window").width - 32;
 
 interface HeroSwiperProps {
   onRefreshMotivation?: () => void;
-  motivationText?: string;
 }
 
-export function HeroSwiper({
-  onRefreshMotivation,
-  motivationText,
-}: HeroSwiperProps) {
+export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
+  const { width } = useWindowDimensions();
+  const CARD_WIDTH = width - 32;
   const { colors, shadows, gradients } = useTheme();
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -49,7 +46,7 @@ export function HeroSwiper({
       offset: (CARD_WIDTH + GAP) * index,
       index,
     }),
-    []
+    [CARD_WIDTH]
   );
 
   const renderCard = useCallback(
@@ -79,6 +76,8 @@ export function HeroSwiper({
                 <Pressable
                   onPress={onRefreshMotivation}
                   hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  accessibilityLabel="Refresh motivation"
+                  accessibilityRole="button"
                 >
                   <RefreshCw size={20} color="white" opacity={0.8} />
                 </Pressable>
@@ -92,7 +91,7 @@ export function HeroSwiper({
                   lineHeight: 28,
                 }}
               >
-                {motivationText ?? item.motivationText}
+                {item.motivationText}
               </Text>
             </LinearGradient>
           </View>
@@ -146,10 +145,10 @@ export function HeroSwiper({
       return null;
     },
     [
+      CARD_WIDTH,
       colors,
       shadows,
       gradients,
-      motivationText,
       onRefreshMotivation,
     ]
   );
@@ -186,7 +185,8 @@ export function HeroSwiper({
               height: 8,
               borderRadius: 4,
               backgroundColor:
-                index === currentIndex ? colors.accent : colors.textTertiary,
+                index === currentIndex ? colors.accent : colors.textSecondary,
+              opacity: index === currentIndex ? 1 : 0.4,
             }}
           />
         ))}

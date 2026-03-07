@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { router } from "expo-router";
 import { signOut } from "firebase/auth";
 import * as WebBrowser from "expo-web-browser";
@@ -7,7 +7,7 @@ import {
   Activity,
   ChevronRight,
   Crown,
-  Download,
+  Share2,
   FileText,
   Heart,
   LogOut,
@@ -22,7 +22,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "heroui-native";
 
 import { BorderRadius, Spacing } from "@/constants";
-import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
 import { auth } from "@/lib/firebase";
 import { MOCK_USER, MOCK_STATS, MOCK_ACHIEVEMENTS } from "@/lib/mock";
@@ -64,13 +63,22 @@ export default function ProfileScreen() {
   const [appleHealthEnabled, setAppleHealthEnabled] = useState<boolean>(false);
   const [googleFitEnabled, setGoogleFitEnabled] = useState<boolean>(false);
 
-  const handleSignOut = async () => {
-    try {
-      router.back();
-      await signOut(auth);
-    } catch (error) {
-      console.error("[Profile] Sign out error:", error);
-    }
+  const handleSignOut = () => {
+    Alert.alert("Sign Out?", "Are you sure you want to sign out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign Out",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            router.back();
+            await signOut(auth);
+          } catch (error) {
+            console.error("[Profile] Sign out error:", error);
+          }
+        },
+      },
+    ]);
   };
 
   const handleEditProfile = () => {
@@ -142,9 +150,16 @@ export default function ProfileScreen() {
           <Text style={[styles.name, { color: colors.textPrimary }]}>
             {MOCK_USER.displayName}
           </Text>
-          <Text style={[styles.membershipTier, { color: colors.textSecondary }]}>
-            {membershipLabel}
-          </Text>
+          <View
+            style={[
+              styles.membershipBadge,
+              { backgroundColor: colors.primary + "25", borderColor: colors.primary + "40" },
+            ]}
+          >
+            <Text style={[styles.membershipTier, { color: colors.primary }]}>
+              {membershipLabel}
+            </Text>
+          </View>
           <Pressable
             style={[
               styles.editButton,
@@ -179,7 +194,12 @@ export default function ProfileScreen() {
                       borderWidth: isSelected ? 2 : 1,
                     },
                   ]}
-                  onPress={() => setSelectedPersonality(option.id)}
+                  onPress={() => {
+                    if (option.id !== selectedPersonality) {
+                      setSelectedPersonality(option.id);
+                      handleComingSoon();
+                    }
+                  }}
                 >
                   <Text style={styles.coachEmoji}>{option.emoji}</Text>
                 </Pressable>
@@ -201,7 +221,7 @@ export default function ProfileScreen() {
         {/* Lifetime Stats Grid */}
         <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: colors.textPrimary }]}>
-            Lifetime stats:
+            Lifetime Stats
           </Text>
           <View
             style={[
@@ -236,7 +256,7 @@ export default function ProfileScreen() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.achievementsScroll}
+            contentContainerStyle={[styles.achievementsScroll, { paddingRight: Spacing.lg }]}
           >
             {MOCK_ACHIEVEMENTS.map((achievement) => {
               const emoji = EMOJI_MAP[achievement.iconName] || "🏆";
@@ -278,6 +298,9 @@ export default function ProfileScreen() {
                   key={theme.id}
                   onPress={() => setSelectedTheme(theme.id)}
                   style={styles.themeColorWrapper}
+                  accessibilityRole="button"
+                  accessibilityLabel={`${theme.id.charAt(0).toUpperCase() + theme.id.slice(1)} theme`}
+                  accessibilityState={{ selected: isSelected }}
                 >
                   {isSelected && (
                     <View
@@ -297,12 +320,7 @@ export default function ProfileScreen() {
                       />
                     </View>
                   )}
-                  <View
-                    style={[styles.themeColorCircle, { backgroundColor: theme.color }]}
-                    accessibilityRole="button"
-                    accessibilityLabel={`${theme.id} theme`}
-                    accessibilityState={{ selected: isSelected }}
-                  />
+                  <View style={[styles.themeColorCircle, { backgroundColor: theme.color }]} />
                 </Pressable>
               );
             })}
@@ -327,7 +345,13 @@ export default function ProfileScreen() {
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Apple Health</Text>
             <Switch
               value={appleHealthEnabled}
-              onValueChange={setAppleHealthEnabled}
+              onValueChange={(value) => {
+                if (value) {
+                  handleComingSoon();
+                } else {
+                  setAppleHealthEnabled(false);
+                }
+              }}
               trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
               thumbColor={appleHealthEnabled ? colors.primary : "#f4f3f4"}
             />
@@ -343,7 +367,13 @@ export default function ProfileScreen() {
             <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Google Fit</Text>
             <Switch
               value={googleFitEnabled}
-              onValueChange={setGoogleFitEnabled}
+              onValueChange={(value) => {
+                if (value) {
+                  handleComingSoon();
+                } else {
+                  setGoogleFitEnabled(false);
+                }
+              }}
               trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
               thumbColor={googleFitEnabled ? colors.primary : "#f4f3f4"}
             />
@@ -370,7 +400,7 @@ export default function ProfileScreen() {
           {/* Account Management */}
           <Pressable
             style={styles.menuItem}
-            onPress={() => WebBrowser.openBrowserAsync("https://example.com/account")}
+            onPress={handleComingSoon}
           >
             <View
               style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}
@@ -388,7 +418,7 @@ export default function ProfileScreen() {
           {/* Privacy Policy */}
           <Pressable
             style={styles.menuItem}
-            onPress={() => WebBrowser.openBrowserAsync("https://example.com/privacy")}
+            onPress={() => WebBrowser.openBrowserAsync("https://bcparksfoundation.ca/privacy-policy/")}
           >
             <View
               style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}
@@ -406,7 +436,7 @@ export default function ProfileScreen() {
           {/* Terms of Use */}
           <Pressable
             style={styles.menuItem}
-            onPress={() => WebBrowser.openBrowserAsync("https://example.com/terms")}
+            onPress={() => WebBrowser.openBrowserAsync("https://bcparksfoundation.ca/terms-of-use/")}
           >
             <View
               style={[styles.menuIcon, { backgroundColor: colors.textSecondary + "20" }]}
@@ -447,7 +477,7 @@ export default function ProfileScreen() {
             </Text>
           </Pressable>
 
-          {/* Download App */}
+          {/* Share App */}
           <Pressable
             style={[
               styles.actionButton,
@@ -458,9 +488,9 @@ export default function ProfileScreen() {
             ]}
             onPress={handleComingSoon}
           >
-            <Download size={24} color={colors.primary} />
+            <Share2 size={24} color={colors.primary} />
             <Text style={[styles.actionButtonText, { color: colors.textPrimary }]}>
-              Download App
+              Share App
             </Text>
           </Pressable>
 
@@ -552,8 +582,15 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
   },
+  membershipBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: BorderRadius.full,
+    borderWidth: 1,
+  },
   membershipTier: {
-    fontSize: 14,
+    fontSize: 12,
+    fontWeight: "600",
   },
   editButton: {
     marginTop: Spacing.xs,

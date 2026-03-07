@@ -82,9 +82,11 @@ Order is critical - defined in `app/_layout.tsx`:
   <HeroUINativeProvider>
     <ThemeProvider>
       <AuthProvider>
-        <BottomSheetModalProvider>
-          {children}
-        </BottomSheetModalProvider>
+        <ChatProvider>
+          <BottomSheetModalProvider>
+            {children}
+          </BottomSheetModalProvider>
+        </ChatProvider>
       </AuthProvider>
     </ThemeProvider>
   </HeroUINativeProvider>

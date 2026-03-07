@@ -46,7 +46,11 @@ export function TopBar({ affirmation, avatarUrl }: TopBarProps) {
         </Text>
       </View>
 
-      <Pressable onPress={() => router.push("/(modals)/profile")}>
+      <Pressable
+        onPress={() => router.push("/(modals)/profile")}
+        accessibilityLabel="View profile"
+        accessibilityRole="button"
+      >
         <Avatar size="md" alt="Profile avatar">
           <Avatar.Image source={{ uri: avatarUrl }} />
           <Avatar.Fallback>TB</Avatar.Fallback>

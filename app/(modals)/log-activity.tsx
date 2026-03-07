@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { router } from "expo-router";
 
-import { Button } from "heroui-native";
+import { Button, useToast } from "heroui-native";
 
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { X } from "lucide-react-native";
@@ -14,11 +14,21 @@ import { useTheme } from "@/contexts/theme-context";
 
 export default function LogActivityModal() {
   const { colors } = useTheme();
+  const { toast } = useToast();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const handleDismiss = useCallback(() => {
     router.back();
   }, []);
+
+  const handleSaveActivity = useCallback(() => {
+    toast.show({
+      label: "Coming Soon",
+      description: "Activity logging will be available in a future update!",
+      variant: "default",
+      placement: "top",
+    });
+  }, [toast]);
 
   const renderBackdrop = useCallback(
     (props: Parameters<typeof BottomSheetBackdrop>[0]) => (
@@ -51,6 +61,7 @@ export default function LogActivityModal() {
           <Pressable
             style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
             onPress={handleDismiss}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <X size={20} color={colors.textSecondary} />
           </Pressable>
@@ -63,7 +74,7 @@ export default function LogActivityModal() {
         </View>
 
         <View style={styles.footer}>
-          <Button onPress={handleDismiss}>Save Activity</Button>
+          <Button onPress={handleSaveActivity}>Save Activity</Button>
         </View>
       </BottomSheetView>
     </BottomSheet>

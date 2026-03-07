@@ -14,6 +14,12 @@ const TAB_ICONS: Record<string, typeof Home> = {
   squad: Users,
 };
 
+const TAB_LABELS: Record<string, string> = {
+  index: "Home",
+  stash: "Your Stash",
+  squad: "Your Squad",
+};
+
 const ICON_SIZE = 26;
 const PARKER_SIZE = 56;
 
@@ -66,6 +72,7 @@ export function CustomTabBar({ state, navigation }: MaterialTopTabBarProps) {
                   backgroundColor: colors.tabIconActiveBg,
                 },
               ]}
+              accessibilityLabel={TAB_LABELS[route.name] ?? route.name}
               accessibilityRole="tab"
               accessibilityState={{ selected: isFocused }}
             >
@@ -81,7 +88,7 @@ export function CustomTabBar({ state, navigation }: MaterialTopTabBarProps) {
       <Pressable
         onPress={() => router.push("/chat")}
         style={[styles.parkerButton, { backgroundColor: colors.accent }]}
-        accessibilityLabel="Open Parker Chat"
+        accessibilityLabel="Chat with Parker"
         accessibilityRole="button"
       >
         <PawPrint size={28} color="#FFFFFF" />

@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+import { useToast } from "heroui-native";
+
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -58,6 +60,7 @@ function getFirebaseErrorMessage(error: AuthError): string {
 export default function LoginScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const { toast } = useToast();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [mode, setMode] = useState<AuthMode>("login");
   const [email, setEmail] = useState("");
@@ -107,7 +110,12 @@ export default function LoginScreen() {
   };
 
   const handleAppleSignUp = () => {
-    console.log("[Auth] Apple sign-in pressed - not yet implemented");
+    toast.show({
+      label: "Coming Soon",
+      description: "Apple Sign In will be available soon!",
+      variant: "default",
+      placement: "top",
+    });
   };
 
   const handleTermsPress = async () => {

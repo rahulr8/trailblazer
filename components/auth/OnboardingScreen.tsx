@@ -57,7 +57,9 @@ export default function OnboardingScreen({ onComplete }: { onComplete?: () => vo
 
   const handleArrowPress = () => {
     if (currentIndex < PAGES.length - 1) {
-      flatListRef.current?.scrollToIndex({ index: currentIndex + 1, animated: true });
+      const nextIndex = currentIndex + 1;
+      flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+      setCurrentIndex(nextIndex);
     } else {
       onComplete?.();
     }

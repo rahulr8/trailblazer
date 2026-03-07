@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
+import { useToast } from "heroui-native";
 
 import { AlertTriangle, X } from "lucide-react-native";
 
@@ -10,12 +11,17 @@ import { useTheme } from "@/contexts/theme-context";
 
 export default function ResetChallengeModal() {
   const { colors, shadows, isDark } = useTheme();
+  const { toast } = useToast();
 
   const handleDismiss = () => router.back();
 
   const handleReset = () => {
-    // Reset logic here
-    router.back();
+    toast.show({
+      label: "Coming Soon",
+      description: "Challenge reset will be available soon.",
+      variant: "default",
+      placement: "top",
+    });
   };
 
   return (
@@ -54,7 +60,7 @@ export default function ResetChallengeModal() {
               <Text style={[styles.cancelButtonText, { color: colors.textPrimary }]}>Cancel</Text>
             </Pressable>
             <Pressable
-              style={[styles.resetButton, { backgroundColor: colors.primary }]}
+              style={[styles.resetButton, { backgroundColor: colors.danger }]}
               onPress={handleReset}
             >
               <Text style={styles.resetButtonText}>Reset</Text>

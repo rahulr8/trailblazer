@@ -4,7 +4,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { router, useLocalSearchParams } from "expo-router";
 
-import { Button } from "heroui-native";
+import { Button, useToast } from "heroui-native";
 
 import BottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
 import { X } from "lucide-react-native";
@@ -14,12 +14,22 @@ import { useTheme } from "@/contexts/theme-context";
 
 export default function RewardDetailModal() {
   const { colors } = useTheme();
+  const { toast } = useToast();
   const { id } = useLocalSearchParams<{ id: string }>();
   const bottomSheetRef = useRef<BottomSheet>(null);
 
   const handleDismiss = useCallback(() => {
     router.back();
   }, []);
+
+  const handleRedeem = useCallback(() => {
+    toast.show({
+      label: "Coming Soon",
+      description: "Redemption will be available soon!",
+      variant: "default",
+      placement: "top",
+    });
+  }, [toast]);
 
   const renderBackdrop = useCallback(
     (props: Parameters<typeof BottomSheetBackdrop>[0]) => (
@@ -66,7 +76,7 @@ export default function RewardDetailModal() {
         </View>
 
         <View style={styles.footer}>
-          <Button onPress={handleDismiss}>Redeem Reward</Button>
+          <Button onPress={handleRedeem}>Redeem Reward</Button>
         </View>
       </BottomSheetView>
     </BottomSheet>

@@ -3,7 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { BlurView } from "expo-blur";
 import { router } from "expo-router";
 
-import { Button } from "heroui-native";
+import { Button, useToast } from "heroui-native";
 
 import { Check, Crown, X } from "lucide-react-native";
 
@@ -12,8 +12,18 @@ import { useTheme } from "@/contexts/theme-context";
 
 export default function UpgradeModal() {
   const { colors, shadows, isDark } = useTheme();
+  const { toast } = useToast();
 
   const handleDismiss = () => router.back();
+
+  const handleGetPlatinum = () => {
+    toast.show({
+      label: "Coming Soon",
+      description: "Platinum membership will be available in a future update!",
+      variant: "default",
+      placement: "top",
+    });
+  };
 
   const features = [
     "Exclusive partner rewards",
@@ -36,6 +46,7 @@ export default function UpgradeModal() {
           <Pressable
             style={[styles.closeButton, { backgroundColor: colors.glassBg }]}
             onPress={handleDismiss}
+            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
           >
             <X size={18} color={colors.textSecondary} />
           </Pressable>
@@ -65,7 +76,7 @@ export default function UpgradeModal() {
             <Text style={[styles.period, { color: colors.textSecondary }]}>/month</Text>
           </View>
 
-          <Button onPress={handleDismiss}>Get Platinum</Button>
+          <Button onPress={handleGetPlatinum}>Get Platinum</Button>
 
           <Pressable onPress={handleDismiss}>
             <Text style={[styles.maybeLater, { color: colors.textSecondary }]}>Maybe later</Text>

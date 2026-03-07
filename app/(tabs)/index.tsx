@@ -58,6 +58,8 @@ export default function HomeScreen() {
           className="mx-4 mt-4 flex-row items-center justify-center gap-2 rounded-xl py-3"
           style={{ backgroundColor: `${colors.accent}15` }}
           onPress={handleAddActivity}
+          accessibilityLabel="Add Activity"
+          accessibilityRole="button"
         >
           <Plus size={20} color={colors.accent} />
           <Text className="text-base font-semibold" style={{ color: colors.accent }}>
@@ -66,10 +68,7 @@ export default function HomeScreen() {
         </Pressable>
 
         <View className="mt-4">
-          <HeroSwiper
-            onRefreshMotivation={onRefresh}
-            motivationText={MOCK_AFFIRMATIONS[affirmationIndex]}
-          />
+          <HeroSwiper onRefreshMotivation={onRefresh} />
         </View>
 
         <View className="flex-row gap-3 px-4 mt-4">
