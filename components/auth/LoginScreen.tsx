@@ -15,7 +15,7 @@ import {
 
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as WebBrowser from "expo-web-browser";
-import { Eye, EyeOff, Lock, Mail, X } from "lucide-react-native";
+import { CheckCircle, Eye, EyeOff, Lock, Mail, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
@@ -44,6 +44,7 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [signupComplete, setSignupComplete] = useState(false);
 
   const handleAuth = async () => {
     if (!email.trim() || !password) {
@@ -61,14 +62,15 @@ export default function LoginScreen() {
           password,
         });
         if (signUpError) throw signUpError;
+        setSignupComplete(true);
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: email.trim(),
           password,
         });
         if (signInError) throw signInError;
+        setShowLoginModal(false);
       }
-      setShowLoginModal(false);
     } catch (err) {
       const message = err instanceof Error ? err.message : "An error occurred";
       setError(getSupabaseErrorMessage(message));
@@ -82,6 +84,7 @@ export default function LoginScreen() {
     setEmail("");
     setPassword("");
     setError(null);
+    setSignupComplete(false);
     setShowLoginModal(true);
   };
 
@@ -200,98 +203,152 @@ export default function LoginScreen() {
             contentContainerStyle={styles.modalContent}
             keyboardShouldPersistTaps="handled"
           >
-            <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
-              {mode === "login" ? "Welcome Back" : "Create Account"}
-            </Text>
-            <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
-              {mode === "login"
-                ? "Sign in to continue your adventure"
-                : "Join the BC Parks community"}
-            </Text>
-
-            <View style={styles.inputGroup}>
-              <View
-                style={[
-                  styles.inputWrapper,
-                  { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
-                ]}
-              >
-                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                <TextInput
-                  placeholder="Email address"
-                  placeholderTextColor={colors.textSecondary}
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  style={[styles.textInput, { color: colors.textPrimary }]}
-                />
-              </View>
-
-              <View
-                style={[
-                  styles.inputWrapper,
-                  { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
-                ]}
-              >
-                <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                <TextInput
-                  placeholder="Password"
-                  placeholderTextColor={colors.textSecondary}
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  style={[styles.textInput, { color: colors.textPrimary }]}
-                />
-                <Pressable
-                  onPress={() => setShowPassword(!showPassword)}
-                  style={styles.eyeButton}
+            {signupComplete ? (
+              <View style={styles.confirmationContainer}>
+                <View
+                  style={[
+                    styles.confirmationIconCircle,
+                    { backgroundColor: colors.primary + "15" },
+                  ]}
                 >
-                  {showPassword ? (
-                    <EyeOff size={20} color={colors.textSecondary} />
-                  ) : (
-                    <Eye size={20} color={colors.textSecondary} />
-                  )}
+                  <CheckCircle size={40} color={colors.primary} />
+                </View>
+                <Text style={[styles.confirmationTitle, { color: colors.textPrimary }]}>
+                  Check your email
+                </Text>
+                <Text style={[styles.confirmationBody, { color: colors.textSecondary }]}>
+                  We sent a confirmation link to
+                </Text>
+                <Text style={[styles.confirmationEmail, { color: colors.textPrimary }]}>
+                  {email.trim()}
+                </Text>
+                <View
+                  style={[
+                    styles.confirmationDivider,
+                    { backgroundColor: colors.cardBorder },
+                  ]}
+                />
+                <Text style={[styles.confirmationHint, { color: colors.textSecondary }]}>
+                  Tap the link in the email to verify your account, then come back here to sign in.
+                </Text>
+                <Pressable
+                  style={[styles.confirmationButton, { backgroundColor: colors.textPrimary }]}
+                  onPress={() => {
+                    setSignupComplete(false);
+                    setMode("login");
+                    setPassword("");
+                    setError(null);
+                  }}
+                >
+                  <Text style={[styles.submitButtonText, { color: colors.background }]}>
+                    Back to Sign In
+                  </Text>
+                </Pressable>
+                <Pressable
+                  onPress={() => setShowLoginModal(false)}
+                  style={styles.confirmationDismiss}
+                >
+                  <Text style={[styles.toggleLink, { color: colors.textSecondary }]}>
+                    Close
+                  </Text>
                 </Pressable>
               </View>
-            </View>
+            ) : (
+              <>
+                <Text style={[styles.modalTitle, { color: colors.textPrimary }]}>
+                  {mode === "login" ? "Welcome Back" : "Create Account"}
+                </Text>
+                <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
+                  {mode === "login"
+                    ? "Sign in to continue your adventure"
+                    : "Join the BC Parks community"}
+                </Text>
 
-            {error && (
-              <View style={[styles.errorContainer, { backgroundColor: colors.danger + "15" }]}>
-                <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
-              </View>
+                <View style={styles.inputGroup}>
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
+                    ]}
+                  >
+                    <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Email address"
+                      placeholderTextColor={colors.textSecondary}
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      style={[styles.textInput, { color: colors.textPrimary }]}
+                    />
+                  </View>
+
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      { backgroundColor: colors.glassBg, borderColor: colors.cardBorder },
+                    ]}
+                  >
+                    <Lock size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Password"
+                      placeholderTextColor={colors.textSecondary}
+                      value={password}
+                      onChangeText={setPassword}
+                      secureTextEntry={!showPassword}
+                      style={[styles.textInput, { color: colors.textPrimary }]}
+                    />
+                    <Pressable
+                      onPress={() => setShowPassword(!showPassword)}
+                      style={styles.eyeButton}
+                    >
+                      {showPassword ? (
+                        <EyeOff size={20} color={colors.textSecondary} />
+                      ) : (
+                        <Eye size={20} color={colors.textSecondary} />
+                      )}
+                    </Pressable>
+                  </View>
+                </View>
+
+                {error && (
+                  <View style={[styles.errorContainer, { backgroundColor: colors.danger + "15" }]}>
+                    <Text style={[styles.errorText, { color: colors.danger }]}>{error}</Text>
+                  </View>
+                )}
+
+                <Pressable
+                  style={[styles.submitButton, { backgroundColor: colors.textPrimary }]}
+                  onPress={handleAuth}
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <ActivityIndicator size="small" color={colors.background} />
+                  ) : (
+                    <Text style={[styles.submitButtonText, { color: colors.background }]}>
+                      {mode === "login" ? "Sign In" : "Create Account"}
+                    </Text>
+                  )}
+                </Pressable>
+
+                <View style={styles.toggleContainer}>
+                  <Text style={[styles.toggleText, { color: colors.textSecondary }]}>
+                    {mode === "login" ? "Don't have an account?" : "Already have an account?"}
+                  </Text>
+                  <Pressable
+                    onPress={() => {
+                      setMode(mode === "login" ? "signup" : "login");
+                      setError(null);
+                    }}
+                  >
+                    <Text style={[styles.toggleLink, { color: colors.primary }]}>
+                      {mode === "login" ? "Sign Up" : "Sign In"}
+                    </Text>
+                  </Pressable>
+                </View>
+              </>
             )}
-
-            <Pressable
-              style={[styles.submitButton, { backgroundColor: colors.textPrimary }]}
-              onPress={handleAuth}
-              disabled={loading}
-            >
-              {loading ? (
-                <ActivityIndicator size="small" color={colors.background} />
-              ) : (
-                <Text style={[styles.submitButtonText, { color: colors.background }]}>
-                  {mode === "login" ? "Sign In" : "Create Account"}
-                </Text>
-              )}
-            </Pressable>
-
-            <View style={styles.toggleContainer}>
-              <Text style={[styles.toggleText, { color: colors.textSecondary }]}>
-                {mode === "login" ? "Don't have an account?" : "Already have an account?"}
-              </Text>
-              <Pressable
-                onPress={() => {
-                  setMode(mode === "login" ? "signup" : "login");
-                  setError(null);
-                }}
-              >
-                <Text style={[styles.toggleLink, { color: colors.primary }]}>
-                  {mode === "login" ? "Sign Up" : "Sign In"}
-                </Text>
-              </Pressable>
-            </View>
           </ScrollView>
         </KeyboardAvoidingView>
       </Modal>
@@ -436,5 +493,57 @@ const styles = StyleSheet.create({
   toggleLink: {
     fontSize: 15,
     fontWeight: "600",
+  },
+  confirmationContainer: {
+    alignItems: "center",
+    paddingTop: Spacing["5xl"],
+  },
+  confirmationIconCircle: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  confirmationTitle: {
+    fontSize: 26,
+    fontWeight: "700",
+    textAlign: "center",
+    marginTop: Spacing.xl,
+  },
+  confirmationBody: {
+    fontSize: 15,
+    lineHeight: 22,
+    textAlign: "center",
+    marginTop: Spacing.md,
+  },
+  confirmationEmail: {
+    fontSize: 15,
+    fontWeight: "600",
+    textAlign: "center",
+    marginTop: 4,
+  },
+  confirmationDivider: {
+    width: 40,
+    height: 1,
+    marginVertical: Spacing.xl,
+  },
+  confirmationHint: {
+    fontSize: 14,
+    lineHeight: 21,
+    textAlign: "center",
+    paddingHorizontal: Spacing.xl,
+  },
+  confirmationButton: {
+    height: 52,
+    borderRadius: BorderRadius.lg,
+    alignItems: "center",
+    justifyContent: "center",
+    alignSelf: "stretch",
+    marginTop: Spacing["2xl"],
+  },
+  confirmationDismiss: {
+    marginTop: Spacing.lg,
+    padding: Spacing.sm,
   },
 });
