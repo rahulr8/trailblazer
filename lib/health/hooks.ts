@@ -32,6 +32,7 @@ interface HealthConnectionState {
 
 interface UseHealthConnectionReturn extends HealthConnectionState {
   isAvailable: boolean;
+  isAutoSync: boolean;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sync: () => Promise<number>;
@@ -46,6 +47,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     error: null,
   });
   const [isAvailable, setIsAvailable] = useState(false);
+  const [isAutoSync, setIsAutoSync] = useState(false);
   const hasAutoSynced = useRef(false);
 
   useEffect(() => {
@@ -132,6 +134,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     }
 
     hasAutoSynced.current = true;
+    setIsAutoSync(true);
     setState((prev) => ({ ...prev, isSyncing: true }));
 
     console.log("[Health] App opened with active connection, starting auto-sync...");
@@ -139,10 +142,12 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       .then((result) => {
         console.log("[Health] Auto-sync complete:", result);
         setState((prev) => ({ ...prev, isSyncing: false }));
+        setIsAutoSync(false);
       })
       .catch(async (error) => {
         console.error("[Health] Auto-sync failed:", error);
         setState((prev) => ({ ...prev, isSyncing: false }));
+        setIsAutoSync(false);
 
         if (isHealthKitAuthError(error)) {
           console.log("[Health] Authorization lost, disconnecting...");
@@ -274,6 +279,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
   return {
     ...state,
     isAvailable,
+    isAutoSync,
     connect,
     disconnect,
     sync,

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Alert, Image, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
@@ -20,13 +20,14 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "heroui-native";
 
-import { BorderRadius, Spacing } from "@/constants";
+import { BorderRadius, Spacing, ACCENT_THEME_LIST } from "@/constants";
 import { LoadingModal } from "@/components/LoadingModal";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
+import { getUser } from "@/lib/db";
 import { useHealthConnection } from "@/lib/health";
 import { supabase } from "@/lib/supabase";
-import { MOCK_USER, MOCK_STATS, MOCK_ACHIEVEMENTS } from "@/lib/mock";
+import { MOCK_STATS, MOCK_ACHIEVEMENTS } from "@/lib/mock";
 
 type CoachPersonality = "drill-sergeant" | "bestie" | "zen" | "hype" | "witty";
 
@@ -48,23 +49,30 @@ const EMOJI_MAP: Record<string, string> = {
   calendar: "📅",
 };
 
-const THEME_COLORS = [
-  { id: "green", color: "#22C55E" },
-  { id: "blue", color: "#3B82F6" },
-  { id: "purple", color: "#8B5CF6" },
-  { id: "pink", color: "#EC4899" },
-  { id: "orange", color: "#F97316" },
-];
 
 export default function ProfileScreen() {
-  const { colors, shadows, isDark, toggleColorScheme } = useTheme();
-  const { uid } = useAuth();
+  const { colors, shadows, isDark, toggleColorScheme, accentTheme, setAccentTheme } = useTheme();
+  const { uid, user } = useAuth();
   const health = useHealthConnection(uid);
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
   const [selectedPersonality, setSelectedPersonality] = useState<CoachPersonality>("bestie");
-  const [selectedTheme, setSelectedTheme] = useState<string>("green");
   const [googleFitEnabled, setGoogleFitEnabled] = useState<boolean>(false);
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const [membershipTier, setMembershipTier] = useState<"free" | "platinum">("free");
+
+  useEffect(() => {
+    if (!uid) return;
+    getUser(uid).then((profile) => {
+      if (!profile) return;
+      setDisplayName(profile.displayName);
+      setPhotoUrl(profile.photoUrl);
+      setMembershipTier(profile.membershipTier);
+    });
+  }, [uid]);
+
+  const resolvedName = displayName || user?.email?.split("@")[0] || "Trailblazer";
   const showAppleHealth = Platform.OS === "ios" && health.isAvailable;
   const showGoogleFit = Platform.OS === "android";
   const showIntegrationSection = showAppleHealth || showGoogleFit;
@@ -106,7 +114,7 @@ export default function ProfileScreen() {
   };
 
   const membershipLabel =
-    MOCK_USER.membershipTier === "platinum" ? "Platinum Member" : "Free Member";
+    membershipTier === "platinum" ? "Platinum Member" : "Free Member";
 
   const statsItems = [
     { label: "Total Mins", value: MOCK_STATS.totalMinutes.toLocaleString() },
@@ -150,11 +158,15 @@ export default function ProfileScreen() {
 
         {/* Hero Identity Section */}
         <View style={styles.heroSection}>
-          <View style={[styles.avatar, { backgroundColor: colors.primary + "20" }]}>
-            <User size={48} color={colors.primary} />
-          </View>
+          {photoUrl ? (
+            <Image source={{ uri: photoUrl }} style={styles.avatarImage} />
+          ) : (
+            <View style={[styles.avatar, { backgroundColor: colors.primary + "20" }]}>
+              <User size={48} color={colors.primary} />
+            </View>
+          )}
           <Text style={[styles.name, { color: colors.textPrimary }]}>
-            {MOCK_USER.displayName}
+            {resolvedName}
           </Text>
           <View
             style={[
@@ -297,15 +309,15 @@ export default function ProfileScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionLabel, { color: colors.textPrimary }]}>App Theme:</Text>
           <View style={styles.themeColors}>
-            {THEME_COLORS.map((theme) => {
-              const isSelected = selectedTheme === theme.id;
+            {ACCENT_THEME_LIST.map((theme) => {
+              const isSelected = accentTheme === theme.id;
               return (
                 <Pressable
                   key={theme.id}
-                  onPress={() => setSelectedTheme(theme.id)}
+                  onPress={() => setAccentTheme(theme.id)}
                   style={styles.themeColorWrapper}
                   accessibilityRole="button"
-                  accessibilityLabel={`${theme.id.charAt(0).toUpperCase() + theme.id.slice(1)} theme`}
+                  accessibilityLabel={`${theme.label} theme`}
                   accessibilityState={{ selected: isSelected }}
                 >
                   {isSelected && (
@@ -326,7 +338,7 @@ export default function ProfileScreen() {
                       />
                     </View>
                   )}
-                  <View style={[styles.themeColorCircle, { backgroundColor: theme.color }]} />
+                  <View style={[styles.themeColorCircle, { backgroundColor: theme.preview }]} />
                 </Pressable>
               );
             })}
@@ -542,7 +554,7 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <LoadingModal
-        visible={health.isSyncing}
+        visible={health.isSyncing && !health.isAutoSync}
         title="Syncing Workouts"
         message="Importing your activities from Apple Health. This may take a moment..."
       />
@@ -594,6 +606,11 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.full,
     justifyContent: "center",
     alignItems: "center",
+  },
+  avatarImage: {
+    width: 100,
+    height: 100,
+    borderRadius: BorderRadius.full,
   },
   name: {
     fontSize: 24,

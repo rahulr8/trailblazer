@@ -13,13 +13,14 @@ import { useColorScheme as useSystemColorScheme } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 import {
+  type AccentThemeId,
   type ColorScheme,
   type ColorTokens,
-  Colors,
   type GradientTokens,
-  Gradients,
   type ShadowTokens,
   Shadows,
+  buildColors,
+  buildGradients,
 } from "@/constants";
 
 interface ThemeContextValue {
@@ -30,11 +31,14 @@ interface ThemeContextValue {
   colors: ColorTokens;
   shadows: ShadowTokens;
   gradients: GradientTokens;
+  accentTheme: AccentThemeId;
+  setAccentTheme: (theme: AccentThemeId) => void;
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const STORAGE_KEY = "@trailblazer_theme";
+const ACCENT_STORAGE_KEY = "@trailblazer_accent_theme";
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -43,19 +47,26 @@ interface ThemeProviderProps {
 export function ThemeProvider({ children }: ThemeProviderProps) {
   const systemScheme = useSystemColorScheme();
   const [colorScheme, setColorSchemeState] = useState<ColorScheme>("dark");
+  const [accentTheme, setAccentThemeState] = useState<AccentThemeId>("forest");
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     async function loadTheme() {
       try {
-        const saved = await AsyncStorage.getItem(STORAGE_KEY);
-        if (saved === "light" || saved === "dark") {
-          setColorSchemeState(saved);
+        const [savedScheme, savedAccent] = await Promise.all([
+          AsyncStorage.getItem(STORAGE_KEY),
+          AsyncStorage.getItem(ACCENT_STORAGE_KEY),
+        ]);
+        if (savedScheme === "light" || savedScheme === "dark") {
+          setColorSchemeState(savedScheme);
         } else if (systemScheme) {
           setColorSchemeState(systemScheme);
         }
+        if (savedAccent) {
+          setAccentThemeState(savedAccent as AccentThemeId);
+        }
       } catch {
-        // Use default on error
+        // Use defaults on error
       } finally {
         setIsLoaded(true);
       }
@@ -65,9 +76,12 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
 
   const setColorScheme = useCallback((scheme: ColorScheme) => {
     setColorSchemeState(scheme);
-    AsyncStorage.setItem(STORAGE_KEY, scheme).catch(() => {
-      // Ignore storage errors
-    });
+    AsyncStorage.setItem(STORAGE_KEY, scheme).catch(() => {});
+  }, []);
+
+  const setAccentTheme = useCallback((theme: AccentThemeId) => {
+    setAccentThemeState(theme);
+    AsyncStorage.setItem(ACCENT_STORAGE_KEY, theme).catch(() => {});
   }, []);
 
   const toggleColorScheme = useCallback(() => {
@@ -80,11 +94,13 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
       setColorScheme,
       toggleColorScheme,
       isDark: colorScheme === "dark",
-      colors: Colors[colorScheme],
+      colors: buildColors(colorScheme, accentTheme),
       shadows: Shadows[colorScheme],
-      gradients: Gradients[colorScheme],
+      gradients: buildGradients(colorScheme, accentTheme),
+      accentTheme,
+      setAccentTheme,
     }),
-    [colorScheme, setColorScheme, toggleColorScheme]
+    [colorScheme, setColorScheme, toggleColorScheme, accentTheme, setAccentTheme]
   );
 
   if (!isLoaded) {
