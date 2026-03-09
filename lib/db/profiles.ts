@@ -77,6 +77,17 @@ export async function recalculateUserStats(uid: string): Promise<void> {
   if (error) throw error;
 }
 
+export async function updateDisplayName(
+  uid: string,
+  displayName: string,
+): Promise<void> {
+  const { error } = await supabase
+    .from("profiles")
+    .update({ display_name: displayName })
+    .eq("id", uid);
+  if (error) throw error;
+}
+
 export async function updateMembershipTier(
   uid: string,
   tier: "free" | "platinum",

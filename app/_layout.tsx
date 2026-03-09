@@ -23,9 +23,11 @@ import { ChatProvider } from "@/contexts/chat-context";
 import { ThemeProvider, useTheme } from "@/contexts/theme-context";
 
 import LoginScreen from "@/components/auth/LoginScreen";
+import NameScreen from "@/components/auth/NameScreen";
 import NotificationPermissionScreen from "@/components/auth/NotificationPermissionScreen";
 import OnboardingScreen from "@/components/auth/OnboardingScreen";
 import PermissionsScreen from "@/components/auth/PermissionsScreen";
+import { getUser } from "@/lib/db";
 
 import "../global.css";
 
@@ -44,6 +46,7 @@ function RootLayoutNav() {
   const [hasSeenOnboarding, setHasSeenOnboarding] = useState(false);
   const [hasSeenHealthPermission, setHasSeenHealthPermission] = useState(false);
   const [hasCompletedPermissions, setHasCompletedPermissions] = useState(false);
+  const [hasDisplayName, setHasDisplayName] = useState<boolean | null>(null);
 
   useEffect(() => {
     async function loadFlags() {
@@ -71,6 +74,20 @@ function RootLayoutNav() {
     loadFlags();
   }, []);
 
+  // Check if user already has a display name (e.g. from Apple Sign In)
+  useEffect(() => {
+    if (!user) {
+      setHasDisplayName(null);
+      return;
+    }
+
+    getUser(user.id).then((profile) => {
+      setHasDisplayName(!!profile?.displayName);
+    }).catch(() => {
+      setHasDisplayName(false);
+    });
+  }, [user]);
+
   const handleOnboardingComplete = () => {
     AsyncStorage.setItem(ONBOARDING_KEY, "true").catch(() => {});
     setHasSeenOnboarding(true);
@@ -89,6 +106,7 @@ function RootLayoutNav() {
       setHasSeenOnboarding(false);
       setHasSeenHealthPermission(false);
       setHasCompletedPermissions(false);
+      setHasDisplayName(null);
       AsyncStorage.multiRemove([ONBOARDING_KEY, HEALTH_PERMISSION_KEY, PERMISSIONS_KEY]).catch(() => {});
     }
     prevUser.current = user;
@@ -116,6 +134,24 @@ function RootLayoutNav() {
     return (
       <>
         <LoginScreen />
+        <StatusBar style="auto" />
+      </>
+    );
+  }
+
+  // Wait for profile check before showing name screen
+  if (hasDisplayName === null) {
+    return (
+      <View style={[styles.loadingContainer, { backgroundColor: colors.background }]}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  if (!hasDisplayName) {
+    return (
+      <>
+        <NameScreen onComplete={() => setHasDisplayName(true)} />
         <StatusBar style="auto" />
       </>
     );

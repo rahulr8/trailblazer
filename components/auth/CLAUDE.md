@@ -8,11 +8,12 @@ The app uses a multi-step onboarding flow managed by AsyncStorage flags in `app/
 
 1. **First launch** (`@trailblazer_onboarding_seen` not set): `OnboardingScreen` (2 welcome pages)
 2. **After onboarding / returning unauthenticated users**: `LoginScreen` (Join screen)
-3. **After auth, health permission not shown** (`@trailblazer_health_permission_seen` not set): `PermissionsScreen` (health permission)
-4. **After health permission, final permissions not done** (`@trailblazer_permissions_complete` not set): `NotificationPermissionScreen` (push notification permission)
-5. **Returning authenticated users with all flags set**: `/(tabs)` (main app)
+3. **After auth, no display name** (checked via `profiles.display_name`): `NameScreen` (asks for name)
+4. **After name, health permission not shown** (`@trailblazer_health_permission_seen` not set): `PermissionsScreen` (health permission)
+5. **After health permission, final permissions not done** (`@trailblazer_permissions_complete` not set): `NotificationPermissionScreen` (push notification permission)
+6. **Returning authenticated users with all flags set**: `/(tabs)` (main app)
 
-This ensures partial completion tracking: users who exit after health permission will resume at notification permission on next launch.
+This ensures partial completion tracking: users who exit after health permission will resume at notification permission on next launch. The name step is skipped automatically if the user already has a display name (e.g. from Apple Sign In first-time).
 
 ## Components
 

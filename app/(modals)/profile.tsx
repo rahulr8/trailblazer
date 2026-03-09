@@ -52,7 +52,7 @@ const EMOJI_MAP: Record<string, string> = {
 
 export default function ProfileScreen() {
   const { colors, shadows, isDark, toggleColorScheme, accentTheme, setAccentTheme } = useTheme();
-  const { uid, user } = useAuth();
+  const { uid } = useAuth();
   const health = useHealthConnection(uid);
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
@@ -72,7 +72,7 @@ export default function ProfileScreen() {
     });
   }, [uid]);
 
-  const resolvedName = displayName || user?.email?.split("@")[0] || "Trailblazer";
+  const resolvedName = displayName || "Trailblazer";
   const showAppleHealth = Platform.OS === "ios" && health.isAvailable;
   const showGoogleFit = Platform.OS === "android";
   const showIntegrationSection = showAppleHealth || showGoogleFit;
@@ -554,7 +554,7 @@ export default function ProfileScreen() {
       </ScrollView>
 
       <LoadingModal
-        visible={health.isSyncing && !health.isAutoSync}
+        visible={health.isSyncing}
         title="Syncing Workouts"
         message="Importing your activities from Apple Health. This may take a moment..."
       />

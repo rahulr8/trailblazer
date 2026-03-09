@@ -32,7 +32,6 @@ interface HealthConnectionState {
 
 interface UseHealthConnectionReturn extends HealthConnectionState {
   isAvailable: boolean;
-  isAutoSync: boolean;
   connect: () => Promise<void>;
   disconnect: () => Promise<void>;
   sync: () => Promise<number>;
@@ -47,9 +46,52 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     error: null,
   });
   const [isAvailable, setIsAvailable] = useState(false);
-  const [isAutoSync, setIsAutoSync] = useState(false);
   const hasAutoSynced = useRef(false);
+  const isSyncingRef = useRef(false);
 
+  // Shared sync runner. `silent` = no UI feedback (for background auto-sync).
+  const runSync = useCallback(async (userId: string, silent: boolean): Promise<number> => {
+    if (isSyncingRef.current) return 0;
+    isSyncingRef.current = true;
+
+    if (!silent) {
+      setState((prev) => ({ ...prev, isSyncing: true, error: null }));
+    }
+
+    try {
+      const result = await syncHealthWorkouts(userId);
+      console.log("[Health] Sync complete:", result);
+      return result.syncedCount;
+    } catch (error) {
+      console.error("[Health] Sync failed:", error);
+
+      if (isHealthKitAuthError(error)) {
+        console.log("[Health] Authorization lost, disconnecting...");
+        try {
+          await clearHealthConnection(userId);
+          Alert.alert(
+            "Apple Health Disconnected",
+            "HealthKit authorization was revoked. Please reconnect to continue syncing workouts.",
+          );
+        } catch (disconnectError) {
+          console.error("[Health] Failed to disconnect after auth error:", disconnectError);
+        }
+      } else if (!silent) {
+        const errorMsg = error instanceof Error ? error.message : "Failed to sync";
+        setState((prev) => ({ ...prev, error: errorMsg }));
+        Alert.alert("Sync Failed", errorMsg);
+      }
+
+      return 0;
+    } finally {
+      isSyncingRef.current = false;
+      if (!silent) {
+        setState((prev) => ({ ...prev, isSyncing: false }));
+      }
+    }
+  }, []);
+
+  // Check HealthKit availability (iOS only)
   useEffect(() => {
     if (Platform.OS !== "ios") {
       setIsAvailable(false);
@@ -62,7 +104,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       .catch(() => setIsAvailable(false));
   }, []);
 
-  // Fetch health connection status from Supabase
+  // Fetch health connection status from Supabase + subscribe to changes
   useEffect(() => {
     if (!uid) {
       setState((prev) => ({ ...prev, isLoading: false }));
@@ -92,7 +134,6 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
 
     fetchConnection();
 
-    // Subscribe to realtime changes
     const channel = supabase
       .channel(`health_connections:${uid}`)
       .on(
@@ -105,11 +146,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
         },
         (payload) => {
           if (payload.eventType === "DELETE") {
-            setState((prev) => ({
-              ...prev,
-              isConnected: false,
-              lastSyncAt: null,
-            }));
+            setState((prev) => ({ ...prev, isConnected: false, lastSyncAt: null }));
           } else {
             const row = payload.new as Record<string, unknown>;
             setState((prev) => ({
@@ -127,43 +164,18 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     };
   }, [uid]);
 
-  // Auto-sync when app opens and already connected
+  // Silent background sync when hook mounts with an existing connection
   useEffect(() => {
     if (!uid || !state.isConnected || state.isLoading || hasAutoSynced.current) {
       return;
     }
 
     hasAutoSynced.current = true;
-    setIsAutoSync(true);
-    setState((prev) => ({ ...prev, isSyncing: true }));
+    console.log("[Health] Background auto-sync on mount...");
+    runSync(uid, true);
+  }, [uid, state.isConnected, state.isLoading, runSync]);
 
-    console.log("[Health] App opened with active connection, starting auto-sync...");
-    syncHealthWorkouts(uid)
-      .then((result) => {
-        console.log("[Health] Auto-sync complete:", result);
-        setState((prev) => ({ ...prev, isSyncing: false }));
-        setIsAutoSync(false);
-      })
-      .catch(async (error) => {
-        console.error("[Health] Auto-sync failed:", error);
-        setState((prev) => ({ ...prev, isSyncing: false }));
-        setIsAutoSync(false);
-
-        if (isHealthKitAuthError(error)) {
-          console.log("[Health] Authorization lost, disconnecting...");
-          try {
-            await clearHealthConnection(uid);
-            Alert.alert(
-              "Apple Health Disconnected",
-              "HealthKit authorization was revoked. Please reconnect to continue syncing workouts.",
-            );
-          } catch (disconnectError) {
-            console.error("[Health] Failed to disconnect after auth error:", disconnectError);
-          }
-        }
-      });
-  }, [uid, state.isConnected, state.isLoading]);
-
+  // Reset auto-sync guard when disconnected
   useEffect(() => {
     if (!state.isConnected) {
       hasAutoSynced.current = false;
@@ -171,19 +183,15 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
   }, [state.isConnected]);
 
   const connect = useCallback(async () => {
-    console.log("[Health] connect() called, uid:", uid);
-
     if (!uid) {
-      const errorMsg = "Must be logged in";
-      setState((prev) => ({ ...prev, error: errorMsg }));
-      Alert.alert("Connection Failed", errorMsg);
+      setState((prev) => ({ ...prev, error: "Must be logged in" }));
+      Alert.alert("Connection Failed", "Must be logged in");
       return;
     }
 
     if (Platform.OS !== "ios") {
-      const errorMsg = "Apple Health is only available on iOS";
-      setState((prev) => ({ ...prev, error: errorMsg }));
-      Alert.alert("Connection Failed", errorMsg);
+      setState((prev) => ({ ...prev, error: "Apple Health is only available on iOS" }));
+      Alert.alert("Connection Failed", "Apple Health is only available on iOS");
       return;
     }
 
@@ -203,21 +211,25 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
       );
       if (upsertError) throw upsertError;
 
-      console.log("[Health] Connection saved successfully");
-      setState((prev) => ({ ...prev, isConnected: true, lastSyncAt: null }));
+      console.log("[Health] Connection saved, starting sync...");
+      hasAutoSynced.current = true;
+      setState((prev) => ({
+        ...prev,
+        isConnected: true,
+        isLoading: false,
+        lastSyncAt: null,
+      }));
+
+      await runSync(uid, false);
     } catch (error) {
       const errorMsg = error instanceof Error ? error.message : "Failed to connect";
       console.error("[Health] Connect error:", error);
-      setState((prev) => ({ ...prev, error: errorMsg }));
+      setState((prev) => ({ ...prev, isLoading: false, error: errorMsg }));
       Alert.alert("Apple Health Connection Failed", errorMsg);
-    } finally {
-      setState((prev) => ({ ...prev, isLoading: false }));
     }
-  }, [uid]);
+  }, [uid, runSync]);
 
   const disconnect = useCallback(async () => {
-    console.log("[Health] disconnect() called, uid:", uid);
-
     if (!uid) return;
 
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
@@ -237,49 +249,17 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
   }, [uid]);
 
   const sync = useCallback(async (): Promise<number> => {
-    console.log("[Health] sync() called, uid:", uid, "isConnected:", state.isConnected);
-
     if (!uid || !state.isConnected) return 0;
-
     if (Platform.OS !== "ios") {
       setState((prev) => ({ ...prev, error: "Apple Health is only available on iOS" }));
       return 0;
     }
-
-    setState((prev) => ({ ...prev, isSyncing: true, error: null }));
-
-    try {
-      const result = await syncHealthWorkouts(uid);
-      console.log("[Health] Sync completed:", result);
-      return result.syncedCount;
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : "Failed to sync";
-      console.error("[Health] Sync error:", error);
-
-      if (isHealthKitAuthError(error)) {
-        try {
-          await clearHealthConnection(uid);
-          Alert.alert(
-            "Apple Health Disconnected",
-            "HealthKit authorization was revoked. Please reconnect to continue syncing workouts.",
-          );
-        } catch (disconnectError) {
-          console.error("[Health] Failed to disconnect after auth error:", disconnectError);
-        }
-      } else {
-        setState((prev) => ({ ...prev, error: errorMsg }));
-        Alert.alert("Sync Failed", errorMsg);
-      }
-      return 0;
-    } finally {
-      setState((prev) => ({ ...prev, isSyncing: false }));
-    }
-  }, [uid, state.isConnected]);
+    return runSync(uid, false);
+  }, [uid, state.isConnected, runSync]);
 
   return {
     ...state,
     isAvailable,
-    isAutoSync,
     connect,
     disconnect,
     sync,
