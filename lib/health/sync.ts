@@ -43,32 +43,68 @@ async function transformWorkout(workout: Awaited<ReturnType<typeof getHealthKitW
   );
 
   let distanceKm = 0;
-  const distanceTypes = [
-    "HKQuantityTypeIdentifierDistanceWalkingRunning",
-    "HKQuantityTypeIdentifierDistanceCycling",
-    "HKQuantityTypeIdentifierDistanceSwimming",
-  ] as const;
+  let elevationGain: number | null = null;
 
-  for (const distanceType of distanceTypes) {
-    try {
-      const stat = await workout.getStatistic(distanceType);
+  // Use getAllStatistics() to read distance/elevation from the workout object.
+  // This reads stats embedded in the workout sample (authorized via HKWorkoutTypeIdentifier)
+  // rather than requiring separate quantity type read permissions.
+  try {
+    const allStats = await workout.getAllStatistics();
+    console.log("[Health] Stats keys for workout:", Object.keys(allStats));
+
+    const distanceTypes = [
+      "HKQuantityTypeIdentifierDistanceWalkingRunning",
+      "HKQuantityTypeIdentifierDistanceCycling",
+      "HKQuantityTypeIdentifierDistanceSwimming",
+    ] as const;
+
+    for (const distanceType of distanceTypes) {
+      const stat = allStats[distanceType];
       if (stat?.sumQuantity?.quantity) {
         distanceKm = stat.sumQuantity.quantity / 1000;
         break;
       }
-    } catch {
-      // Permission not granted for this type, try next
     }
-  }
 
-  let elevationGain: number | null = null;
-  try {
-    const flightsStat = await workout.getStatistic("HKQuantityTypeIdentifierFlightsClimbed");
+    const flightsStat = allStats["HKQuantityTypeIdentifierFlightsClimbed"];
     if (flightsStat?.sumQuantity?.quantity) {
       elevationGain = Math.round(flightsStat.sumQuantity.quantity * 3 * 100) / 100;
     }
-  } catch {
-    // Flights climbed not available for this workout type
+  } catch (statsError) {
+    console.warn("[Health] getAllStatistics() failed, falling back to individual getStatistic():", statsError);
+
+    // Fallback to individual getStatistic() calls
+    const distanceTypes = [
+      "HKQuantityTypeIdentifierDistanceWalkingRunning",
+      "HKQuantityTypeIdentifierDistanceCycling",
+      "HKQuantityTypeIdentifierDistanceSwimming",
+    ] as const;
+
+    for (const distanceType of distanceTypes) {
+      try {
+        const stat = await workout.getStatistic(distanceType);
+        if (stat?.sumQuantity?.quantity) {
+          distanceKm = stat.sumQuantity.quantity / 1000;
+          break;
+        }
+      } catch {
+        // Permission not granted for this type, try next
+      }
+    }
+
+    try {
+      const flightsStat = await workout.getStatistic("HKQuantityTypeIdentifierFlightsClimbed");
+      if (flightsStat?.sumQuantity?.quantity) {
+        elevationGain = Math.round(flightsStat.sumQuantity.quantity * 3 * 100) / 100;
+      }
+    } catch {
+      // Flights climbed not available
+    }
+  }
+
+  // Also try workout metadata for elevation if not found in statistics
+  if (elevationGain === null && workout.metadataElevationAscended?.quantity) {
+    elevationGain = Math.round(workout.metadataElevationAscended.quantity * 100) / 100;
   }
 
   const HealthKit = await import("@kingstinct/react-native-healthkit");
@@ -79,7 +115,11 @@ async function transformWorkout(workout: Awaited<ReturnType<typeof getHealthKitW
     external_id: workout.uuid,
     type: mapWorkoutType(workout.workoutActivityType),
     duration: Math.round(durationSeconds),
-    distance: Math.round(distanceKm * 100) / 100,
+    distance: (() => {
+      const d = Math.round(distanceKm * 100) / 100;
+      if (d === 0) console.warn("[Health] Distance is 0 for workout:", workout.uuid);
+      return d;
+    })(),
     elapsed_time: elapsedTimeSeconds,
     elevation_gain: elevationGain,
     location: null,
@@ -115,19 +155,18 @@ export async function syncHealthWorkouts(
     }),
   );
 
-  // Batch insert with ON CONFLICT DO NOTHING for deduplication
+  // Batch upsert - updates existing rows on conflict to fix stale data (e.g. distance=0)
   const { data, error } = await supabase
     .from("activities")
     .upsert(rows, {
       onConflict: "user_id,source,external_id",
-      ignoreDuplicates: true,
     })
     .select("id, external_id");
 
   if (error) throw error;
 
-  const insertedExternalIds = new Set((data ?? []).map((r) => r.external_id));
-  const syncedCount = insertedExternalIds.size;
+  const upsertedCount = (data ?? []).length;
+  const syncedCount = upsertedCount;
   const skippedCount = workouts.length - syncedCount;
 
   if (syncedCount > 0) {
