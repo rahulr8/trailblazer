@@ -1,14 +1,31 @@
+# Parker Chat: Gemini + RAG Implementation Plan
+
+> **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
+
+**Goal:** Replace the Anthropic Claude backend in the chat edge function with Google Gemini + file search RAG, and inject user context from Supabase.
+
+**Architecture:** Single edge function rewrite. The app-side code (chat.tsx, chat-context.tsx) remains unchanged — only the Supabase edge function `chat/index.ts` changes. Gemini is called via `@google/genai` SDK (imported from esm.sh for Deno). User profile and recent activities are fetched with a service-role client and injected into the system prompt.
+
+**Tech Stack:** Deno (Supabase Edge Functions), Google Gemini API (`@google/genai`), Supabase JS client
+
+---
+
+### Task 1: Rewrite chat edge function with Gemini + RAG + user context
+
+**Files:**
+- Modify: `supabase/functions/chat/index.ts` (full rewrite)
+
+**Step 1: Replace the edge function**
+
+Replace the entire contents of `supabase/functions/chat/index.ts` with:
+
+```typescript
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
-import {
-  GoogleGenAI,
-  HarmCategory,
-  HarmBlockThreshold,
-} from "https://esm.sh/@google/genai";
+import { GoogleGenAI, HarmCategory, HarmBlockThreshold } from "https://esm.sh/@google/genai";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 const PARKER_SYSTEM_INSTRUCTION = `You are Parker, the official bear mascot for BC Parks Trailblazer+.
@@ -45,10 +62,7 @@ YOUR DIRECTIVES:
 CONTEXTUAL DATA:
 Use the provided File Search context as your primary source of truth. If the information isn't in the files, you may use general knowledge about BC outdoors, but state that you are speaking generally.`;
 
-function buildUserContext(
-  profile: Record<string, unknown> | null,
-  activities: Record<string, unknown>[],
-): string {
+function buildUserContext(profile: Record<string, unknown> | null, activities: Record<string, unknown>[]): string {
   if (!profile) return "";
 
   const lines = ["\n\nUSER CONTEXT:"];
@@ -62,9 +76,7 @@ function buildUserContext(
     lines.push("\nRecent Activities:");
     for (const a of activities) {
       const date = new Date(a.date as string).toLocaleDateString("en-CA");
-      lines.push(
-        `- ${date}: ${a.type} — ${a.distance ?? 0} km, ${Math.round(((a.duration as number) ?? 0) / 60)} min${a.location ? `, at ${a.location}` : ""}`,
-      );
+      lines.push(`- ${date}: ${a.type} — ${a.distance ?? 0} km, ${Math.round((a.duration as number ?? 0) / 60)} min${a.location ? `, at ${a.location}` : ""}`);
     }
   }
 
@@ -94,10 +106,7 @@ Deno.serve(async (req) => {
     );
 
     // Verify user
-    const {
-      data: { user },
-      error: authError,
-    } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
@@ -113,13 +122,8 @@ Deno.serve(async (req) => {
     });
     if (insertError) {
       return new Response(
-        JSON.stringify({
-          error: "Failed to store message: " + insertError.message,
-        }),
-        {
-          status: 400,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
+        JSON.stringify({ error: "Failed to store message: " + insertError.message }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -133,9 +137,7 @@ Deno.serve(async (req) => {
         .limit(20),
       supabaseAdmin
         .from("profiles")
-        .select(
-          "display_name, membership_tier, total_km, total_minutes, current_streak",
-        )
+        .select("display_name, membership_tier, total_km, total_minutes, current_streak")
         .eq("id", user.id)
         .single(),
       supabaseAdmin
@@ -148,30 +150,20 @@ Deno.serve(async (req) => {
 
     if (historyResult.error) {
       return new Response(
-        JSON.stringify({
-          error: "Failed to load history: " + historyResult.error.message,
-        }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
+        JSON.stringify({ error: "Failed to load history: " + historyResult.error.message }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
     // Build system prompt with user context
-    const userContext = buildUserContext(
-      profileResult.data,
-      activitiesResult.data ?? [],
-    );
+    const userContext = buildUserContext(profileResult.data, activitiesResult.data ?? []);
     const systemPrompt = PARKER_SYSTEM_INSTRUCTION + userContext;
 
-    // Convert history to Gemini format (Gemini uses "model" instead of "assistant")
-    const contents = (historyResult.data ?? []).map(
-      (m: { role: string; content: string }) => ({
-        role: m.role === "assistant" ? "model" : "user",
-        parts: [{ text: m.content }],
-      }),
-    );
+    // Convert history to Gemini format
+    const contents = (historyResult.data ?? []).map((m: { role: string; content: string }) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [{ text: m.content }],
+    }));
 
     // Call Gemini
     const geminiApiKey = Deno.env.get("GEMINI_API_KEY");
@@ -180,10 +172,7 @@ Deno.serve(async (req) => {
     if (!geminiApiKey) {
       return new Response(
         JSON.stringify({ error: "GEMINI_API_KEY not configured" }),
-        {
-          status: 500,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        },
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
 
@@ -196,14 +185,8 @@ Deno.serve(async (req) => {
         maxOutputTokens: 1000,
         temperature: 0.3,
         safetySettings: [
-          {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
-          {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-            threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
-          },
+          { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
+          { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH },
         ],
         tools: storeId
           ? [{ fileSearch: { fileSearchStoreNames: [storeId] } }]
@@ -211,29 +194,22 @@ Deno.serve(async (req) => {
       },
     });
 
-    const assistantMessage =
-      response.text ?? "Sorry, I couldn't generate a response.";
+    const assistantMessage = response.text ?? "Sorry, I couldn't generate a response.";
 
     // Store assistant message
-    const { error: assistantInsertError } = await supabase
-      .from("messages")
-      .insert({
-        conversation_id,
-        role: "assistant",
-        content: assistantMessage,
-      });
+    const { error: assistantInsertError } = await supabase.from("messages").insert({
+      conversation_id,
+      role: "assistant",
+      content: assistantMessage,
+    });
     if (assistantInsertError) {
-      console.error(
-        "Failed to store assistant message:",
-        assistantInsertError.message,
-      );
+      console.error("Failed to store assistant message:", assistantInsertError.message);
     }
 
-    // Increment message count (single call — fixes previous double-call bug)
-    const { error: countError } = await supabase.rpc(
-      "increment_message_count",
-      { p_conversation_id: conversation_id },
-    );
+    // Increment message count (once — fixes the double-call bug)
+    const { error: countError } = await supabase.rpc("increment_message_count", {
+      p_conversation_id: conversation_id,
+    });
     if (countError) {
       console.error("Failed to update conversation:", countError.message);
     }
@@ -244,13 +220,49 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error("Chat function error:", error);
     return new Response(
-      JSON.stringify({
-        error: error instanceof Error ? error.message : "Internal error",
-      }),
-      {
-        status: 500,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
+      JSON.stringify({ error: error instanceof Error ? error.message : "Internal error" }),
+      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
 });
+```
+
+**Step 2: Verify the function compiles**
+
+Run: `cd /Users/turbolaunch/Apps/corvus-tech/bc-parks-foundation/trailblazer && supabase functions serve chat`
+
+Expected: Function starts without import errors. Test with curl or the app.
+
+**Step 3: Set secrets and deploy**
+
+```bash
+supabase secrets set GEMINI_API_KEY=<your-key>
+supabase secrets set BC_PARKS_STORE_ID=<your-store-id>
+supabase functions deploy chat
+```
+
+**Step 4: Commit**
+
+```bash
+git add supabase/functions/chat/index.ts
+git commit -m "feat: replace Anthropic with Gemini + RAG + user context in chat edge function"
+```
+
+---
+
+### Task 2: Update CLAUDE.md docs
+
+**Files:**
+- Modify: `supabase/functions/chat/index.ts` (no change — already done)
+- Modify: `docs/plans/2026-03-09-parker-gemini-rag-design.md` (mark complete)
+
+Update any CLAUDE.md files that reference the chat edge function to note it now uses Gemini instead of Anthropic.
+
+---
+
+### Setup Checklist
+
+- [ ] `GEMINI_API_KEY` set in Supabase secrets
+- [ ] `BC_PARKS_STORE_ID` set in Supabase secrets (reuse from POC)
+- [ ] `supabase functions deploy chat` run successfully
+- [ ] Test via app: send a message, verify Gemini response with trail data
