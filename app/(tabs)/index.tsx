@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import { Pressable, RefreshControl, ScrollView, Text, View } from "react-native";
 
+import { useFocusEffect } from "expo-router";
 import { useToast } from "heroui-native";
 import { Plus } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -9,23 +10,80 @@ import { TopBar } from "@/components/navigation/TopBar";
 import { HeroSwiper } from "@/components/home/HeroSwiper";
 import { StreakFlipCard, NatureScoreFlipCard } from "@/components/home/StatsFlipCard";
 import { LeaderboardPreview } from "@/components/home/LeaderboardPreview";
+import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
+import { getActivityCount, getWeeklyActivityCount } from "@/lib/db/activities";
+import { getUserStats } from "@/lib/db/profiles";
+import { buildHomeActivityStats } from "@/lib/home/activity-stats";
 import { MOCK_AFFIRMATIONS, MOCK_USER } from "@/lib/mock";
 
 export default function HomeScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
+  const { uid } = useAuth();
   const [affirmationIndex, setAffirmationIndex] = useState(
     () => Math.floor(Math.random() * MOCK_AFFIRMATIONS.length)
   );
   const [refreshing, setRefreshing] = useState(false);
+  const [homeStats, setHomeStats] = useState(() => buildHomeActivityStats({}));
 
-  const onRefresh = useCallback(() => {
+  const loadHomeStats = useCallback(async () => {
+    if (!uid) {
+      return buildHomeActivityStats({});
+    }
+
+    const [userStats, totalActivities, weeklyActivities] = await Promise.all([
+      getUserStats(uid),
+      getActivityCount(uid),
+      getWeeklyActivityCount(uid),
+    ]);
+
+    return buildHomeActivityStats({
+      currentStreak: userStats?.currentStreak,
+      totalActivities,
+      totalMinutes: userStats?.totalMinutes,
+      weeklyActivities,
+    });
+  }, [uid]);
+
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      void loadHomeStats()
+        .then((stats) => {
+          if (isActive) {
+            setHomeStats(stats);
+          }
+        })
+        .catch((error) => {
+          console.error("[Home] Failed to load activity stats", error);
+        });
+
+      return () => {
+        isActive = false;
+      };
+    }, [loadHomeStats])
+  );
+
+  const onRefresh = useCallback(async () => {
     setRefreshing(true);
     setAffirmationIndex((prev) => (prev + 1) % MOCK_AFFIRMATIONS.length);
-    setTimeout(() => setRefreshing(false), 500);
-  }, []);
+    try {
+      setHomeStats(await loadHomeStats());
+    } catch (error) {
+      console.error("[Home] Failed to refresh activity stats", error);
+      toast.show({
+        label: "Refresh failed",
+        description: "We couldn't load your latest activity stats right now.",
+        placement: "top",
+        variant: "default",
+      });
+    } finally {
+      setRefreshing(false);
+    }
+  }, [loadHomeStats, toast]);
 
   const handleAddActivity = useCallback(() => {
     toast.show({
@@ -68,15 +126,26 @@ export default function HomeScreen() {
         </Pressable>
 
         <View className="mt-4">
-          <HeroSwiper onRefreshMotivation={onRefresh} />
+          <HeroSwiper
+            minutesActive={homeStats.totalMinutes}
+            motivationText={MOCK_AFFIRMATIONS[affirmationIndex]}
+            onRefreshMotivation={onRefresh}
+          />
         </View>
 
         <View className="flex-row gap-3 px-4 mt-4">
           <View className="flex-1">
-            <StreakFlipCard />
+            <StreakFlipCard
+              currentStreak={homeStats.currentStreak}
+              weeklyActivities={homeStats.weeklyActivities}
+            />
           </View>
           <View className="flex-1">
-            <NatureScoreFlipCard />
+            <NatureScoreFlipCard
+              natureScore={homeStats.natureScore}
+              totalActivities={homeStats.totalActivities}
+              totalMinutes={homeStats.totalMinutes}
+            />
           </View>
         </View>
 

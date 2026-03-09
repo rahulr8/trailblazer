@@ -3,11 +3,24 @@ import { Text, View } from "react-native";
 import { Flame, Leaf } from "lucide-react-native";
 
 import { useTheme } from "@/contexts/theme-context";
-import { MOCK_STATS } from "@/lib/mock";
 
 import { FlipCard } from "./FlipCard";
 
-export function StreakFlipCard() {
+interface StreakFlipCardProps {
+  currentStreak: number;
+  weeklyActivities: number;
+}
+
+interface NatureScoreFlipCardProps {
+  natureScore: number;
+  totalActivities: number;
+  totalMinutes: number;
+}
+
+export function StreakFlipCard({
+  currentStreak,
+  weeklyActivities,
+}: StreakFlipCardProps) {
   const { colors } = useTheme();
 
   const front = (
@@ -28,7 +41,7 @@ export function StreakFlipCard() {
           color: colors.textPrimary,
         }}
       >
-        {MOCK_STATS.currentStreak}
+        {currentStreak}
       </Text>
       <Text
         style={{
@@ -56,7 +69,7 @@ export function StreakFlipCard() {
           color: colors.textSecondary,
         }}
       >
-        Personal Best
+        This Week
       </Text>
       <Text
         style={{
@@ -65,7 +78,7 @@ export function StreakFlipCard() {
           color: colors.highlight,
         }}
       >
-        {MOCK_STATS.longestStreak}
+        {weeklyActivities}
       </Text>
       <Text
         style={{
@@ -73,7 +86,7 @@ export function StreakFlipCard() {
           color: colors.textSecondary,
         }}
       >
-        day streak
+        {weeklyActivities === 1 ? "activity logged" : "activities logged"}
       </Text>
     </View>
   );
@@ -81,10 +94,12 @@ export function StreakFlipCard() {
   return <FlipCard front={front} back={back} height={140} duration={400} />;
 }
 
-export function NatureScoreFlipCard() {
+export function NatureScoreFlipCard({
+  natureScore,
+  totalActivities,
+  totalMinutes,
+}: NatureScoreFlipCardProps) {
   const { colors } = useTheme();
-
-  const natureScore = Math.round(MOCK_STATS.totalMinutes * 0.05);
 
   const front = (
     <View
@@ -142,8 +157,8 @@ export function NatureScoreFlipCard() {
           paddingHorizontal: 12,
         }}
       >
-        Based on {MOCK_STATS.totalMinutes} minutes of outdoor activity across{" "}
-        {MOCK_STATS.totalActivities} sessions
+        Based on {totalMinutes} minutes of outdoor activity across {totalActivities}{" "}
+        {totalActivities === 1 ? "session" : "sessions"}
       </Text>
     </View>
   );

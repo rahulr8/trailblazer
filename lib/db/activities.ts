@@ -82,6 +82,16 @@ export async function getWeeklyActivityCount(uid: string): Promise<number> {
   return count ?? 0;
 }
 
+export async function getActivityCount(uid: string): Promise<number> {
+  const { count, error } = await supabase
+    .from("activities")
+    .select("*", { count: "exact", head: true })
+    .eq("user_id", uid);
+
+  if (error) throw error;
+  return count ?? 0;
+}
+
 export async function isEligibleForGiveaway(uid: string): Promise<boolean> {
   const count = await getWeeklyActivityCount(uid);
   return count >= 3;

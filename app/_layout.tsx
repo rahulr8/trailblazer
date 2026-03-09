@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { ActivityIndicator, Platform, StyleSheet, View } from "react-native";
 
-import { router, Stack } from "expo-router";
+import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 
 import {

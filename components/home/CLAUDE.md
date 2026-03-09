@@ -57,22 +57,22 @@ Two specialized flip cards for stats display, both exported from `StatsFlipCard.
 ```typescript
 import { StreakFlipCard, NatureScoreFlipCard } from "@/components/home/StatsFlipCard";
 
-<StreakFlipCard />
-<NatureScoreFlipCard />
+<StreakFlipCard currentStreak={12} weeklyActivities={3} />
+<NatureScoreFlipCard natureScore={171} totalMinutes={3420} totalActivities={87} />
 ```
 
 **StreakFlipCard:**
 
 - Front: Flame icon, current streak days, "Days Active" label
-- Back: "Personal Best" label, longest streak number, "day streak" label
-- Data from `MOCK_STATS.currentStreak` and `MOCK_STATS.longestStreak`
+- Back: "This Week" label, weekly activity count, "activity/activities logged" label
+- Props: `currentStreak`, `weeklyActivities`
 - Flame icon uses `colors.highlight` (orange)
 
 **NatureScoreFlipCard:**
 
 - Front: Leaf icon, nature score number, "Room to Improve" label
 - Back: "Nature Score" label, breakdown text showing minutes and sessions
-- Nature score calculated as `Math.round(MOCK_STATS.totalMinutes * 0.05)` (mock formula)
+- Props: `natureScore`, `totalMinutes`, `totalActivities`
 - Leaf icon uses `colors.accent` (green)
 
 **Note:** Real Nature Score calculation algorithm is deferred to backend integration phase.
@@ -87,13 +87,15 @@ import { HeroSwiper } from "@/components/home/HeroSwiper";
 <HeroSwiper
   onRefreshMotivation={() => {/* cycle affirmation */}}
   motivationText="Every step counts!"
+  minutesActive={125}
 />
 ```
 
 **Props:**
 
 - `onRefreshMotivation?: () => void` - Callback when refresh icon tapped on motivation card
-- `motivationText?: string` - Override motivation text (defaults to card's `motivationText` from mock data)
+- `motivationText: string` - Motivation text shown on the first card
+- `minutesActive: number` - Total minutes rendered in the counter card
 
 **Layout:**
 
@@ -163,13 +165,11 @@ All components use `useTheme()` hook for dynamic colors:
 
 ### Mock Data Sources
 
-All components import from `@/lib/mock`:
+Leaderboard content still imports from `@/lib/mock`:
 
-- `MOCK_HERO_CARDS` - HeroSwiper cards data
-- `MOCK_STATS` - Stats for flip cards
 - `MOCK_LEADERBOARD_FRIENDS` / `MOCK_LEADERBOARD_GLOBAL` - Leaderboard data
 
-Ready for Firebase integration in later phase - just swap imports.
+Home activity cards are now prop-driven so the screen can provide Supabase-backed values directly.
 
 ### FlatList Optimization
 

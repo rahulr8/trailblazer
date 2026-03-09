@@ -11,17 +11,32 @@ import {
 import { LinearGradient } from "expo-linear-gradient";
 import { RefreshCw } from "lucide-react-native";
 
-import { MOCK_HERO_CARDS } from "@/lib/mock";
 import { useTheme } from "@/contexts/theme-context";
-import type { MockHeroCard } from "@/lib/mock/types";
+import { formatMinutesActive } from "@/lib/home/activity-stats";
 
 const GAP = 12;
 
 interface HeroSwiperProps {
+  minutesActive: number;
+  motivationText: string;
   onRefreshMotivation?: () => void;
 }
 
-export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
+interface HeroCard {
+  id: string;
+  type: "motivation" | "counter";
+}
+
+const HERO_CARDS: HeroCard[] = [
+  { id: "motivation-card", type: "motivation" },
+  { id: "counter-card", type: "counter" },
+];
+
+export function HeroSwiper({
+  minutesActive,
+  motivationText,
+  onRefreshMotivation,
+}: HeroSwiperProps) {
   const { width } = useWindowDimensions();
   const CARD_WIDTH = width - 32;
   const { colors, shadows, gradients } = useTheme();
@@ -32,7 +47,7 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
   }).current;
 
   const onViewableItemsChanged = useCallback(
-    ({ viewableItems }: { viewableItems: ViewToken<MockHeroCard>[] }) => {
+    ({ viewableItems }: { viewableItems: ViewToken<HeroCard>[] }) => {
       if (viewableItems.length > 0 && viewableItems[0]?.index != null) {
         setCurrentIndex(viewableItems[0].index);
       }
@@ -41,7 +56,7 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
   );
 
   const getItemLayout = useCallback(
-    (_data: ArrayLike<MockHeroCard> | null | undefined, index: number) => ({
+    (_data: ArrayLike<HeroCard> | null | undefined, index: number) => ({
       length: CARD_WIDTH + GAP,
       offset: (CARD_WIDTH + GAP) * index,
       index,
@@ -50,7 +65,7 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
   );
 
   const renderCard = useCallback(
-    ({ item }: { item: MockHeroCard }) => {
+    ({ item }: { item: HeroCard }) => {
       if (item.type === "motivation") {
         return (
           <View
@@ -91,18 +106,14 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
                   lineHeight: 28,
                 }}
               >
-                {item.motivationText}
+                {motivationText}
               </Text>
             </LinearGradient>
           </View>
         );
       }
 
-      if (item.type === "counter" && item.minutesActive != null) {
-        const hours = Math.floor(item.minutesActive / 60);
-        const minutes = item.minutesActive % 60;
-        const formattedTime = `${hours}h ${minutes.toString().padStart(2, "0")}m`;
-
+      if (item.type === "counter") {
         return (
           <View
             style={{
@@ -127,7 +138,7 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
                 color: colors.textPrimary,
               }}
             >
-              {formattedTime}
+              {formatMinutesActive(minutesActive)}
             </Text>
             <Text
               style={{
@@ -147,6 +158,8 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
     [
       CARD_WIDTH,
       colors,
+      minutesActive,
+      motivationText,
       shadows,
       gradients,
       onRefreshMotivation,
@@ -156,7 +169,7 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
   return (
     <View>
       <FlatList
-        data={MOCK_HERO_CARDS}
+        data={HERO_CARDS}
         renderItem={renderCard}
         keyExtractor={(item) => item.id}
         horizontal
@@ -177,7 +190,7 @@ export function HeroSwiper({ onRefreshMotivation }: HeroSwiperProps) {
           marginTop: 12,
         }}
       >
-        {MOCK_HERO_CARDS.map((_, index) => (
+        {HERO_CARDS.map((_, index) => (
           <View
             key={index}
             style={{
