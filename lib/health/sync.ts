@@ -10,6 +10,15 @@ interface SyncResult {
   skippedCount: number;
 }
 
+type WorkoutSample = Awaited<ReturnType<typeof getHealthKitWorkouts>>[number];
+
+// Distance quantity types to check, in priority order
+const DISTANCE_TYPES = [
+  "HKQuantityTypeIdentifierDistanceWalkingRunning",
+  "HKQuantityTypeIdentifierDistanceCycling",
+  "HKQuantityTypeIdentifierDistanceSwimming",
+] as const;
+
 async function getHealthKitWorkouts(since: Date) {
   if (Platform.OS !== "ios") return [] as const;
 
@@ -35,97 +44,68 @@ async function getHealthKitWorkouts(since: Date) {
   }
 }
 
-async function transformWorkout(workout: Awaited<ReturnType<typeof getHealthKitWorkouts>>[number]) {
-  const durationSeconds = workout.duration?.quantity || 0;
-
-  const elapsedTimeSeconds = Math.round(
-    (workout.endDate.getTime() - workout.startDate.getTime()) / 1000
-  );
-
-  let distanceKm = 0;
-  let elevationGain: number | null = null;
-
-  // Use getAllStatistics() to read distance/elevation from the workout object.
-  // This reads stats embedded in the workout sample (authorized via HKWorkoutTypeIdentifier)
-  // rather than requiring separate quantity type read permissions.
-  try {
-    const allStats = await workout.getAllStatistics();
-    console.log("[Health] Stats keys for workout:", Object.keys(allStats));
-
-    const distanceTypes = [
-      "HKQuantityTypeIdentifierDistanceWalkingRunning",
-      "HKQuantityTypeIdentifierDistanceCycling",
-      "HKQuantityTypeIdentifierDistanceSwimming",
-    ] as const;
-
-    for (const distanceType of distanceTypes) {
-      const stat = allStats[distanceType];
-      if (stat?.sumQuantity?.quantity) {
-        distanceKm = stat.sumQuantity.quantity / 1000;
-        break;
-      }
-    }
-
-    const flightsStat = allStats["HKQuantityTypeIdentifierFlightsClimbed"];
-    if (flightsStat?.sumQuantity?.quantity) {
-      elevationGain = Math.round(flightsStat.sumQuantity.quantity * 3 * 100) / 100;
-    }
-  } catch (statsError) {
-    console.warn("[Health] getAllStatistics() failed, falling back to individual getStatistic():", statsError);
-
-    // Fallback to individual getStatistic() calls
-    const distanceTypes = [
-      "HKQuantityTypeIdentifierDistanceWalkingRunning",
-      "HKQuantityTypeIdentifierDistanceCycling",
-      "HKQuantityTypeIdentifierDistanceSwimming",
-    ] as const;
-
-    for (const distanceType of distanceTypes) {
-      try {
-        const stat = await workout.getStatistic(distanceType);
-        if (stat?.sumQuantity?.quantity) {
-          distanceKm = stat.sumQuantity.quantity / 1000;
-          break;
-        }
-      } catch {
-        // Permission not granted for this type, try next
-      }
-    }
-
+async function getWorkoutDistanceKm(workout: WorkoutSample): Promise<number> {
+  // getStatistic reads from workout.statistics(for:) which requires iOS 16+
+  // workouts created with HKWorkoutBuilder. Explicit unit override ("m")
+  // bypasses store.preferredUnits() which throws Code=5 when quantity type
+  // authorization is "not determined".
+  for (const distanceType of DISTANCE_TYPES) {
     try {
-      const flightsStat = await workout.getStatistic("HKQuantityTypeIdentifierFlightsClimbed");
-      if (flightsStat?.sumQuantity?.quantity) {
-        elevationGain = Math.round(flightsStat.sumQuantity.quantity * 3 * 100) / 100;
+      const stat = await workout.getStatistic(distanceType, "m");
+      if (stat?.sumQuantity?.quantity) {
+        return Math.round((stat.sumQuantity.quantity / 1000) * 100) / 100;
       }
     } catch {
-      // Flights climbed not available
+      // Statistic not available for this workout/type combination
     }
   }
+  return 0;
+}
 
-  // Also try workout metadata for elevation if not found in statistics
-  if (elevationGain === null && workout.metadataElevationAscended?.quantity) {
-    elevationGain = Math.round(workout.metadataElevationAscended.quantity * 100) / 100;
+async function getWorkoutElevationGain(workout: WorkoutSample): Promise<number | null> {
+  // Prefer metadata elevation (direct sensor data, more accurate than flights × 3m)
+  if (workout.metadataElevationAscended?.quantity) {
+    return Math.round(workout.metadataElevationAscended.quantity * 100) / 100;
   }
 
+  // Fall back to flights climbed statistic (≈3m per flight)
+  try {
+    const stat = await workout.getStatistic("HKQuantityTypeIdentifierFlightsClimbed", "count");
+    if (stat?.sumQuantity?.quantity) {
+      return Math.round(stat.sumQuantity.quantity * 3 * 100) / 100;
+    }
+  } catch {
+    // Flights climbed not available
+  }
+
+  return null;
+}
+
+async function transformWorkout(workout: WorkoutSample) {
   const HealthKit = await import("@kingstinct/react-native-healthkit");
   const activityTypeName = HealthKit.WorkoutActivityType[workout.workoutActivityType] || "Workout";
+  const durationSeconds = workout.duration?.quantity || 0;
+  const elapsedTimeSeconds = Math.round(
+    (workout.endDate.getTime() - workout.startDate.getTime()) / 1000,
+  );
+
+  const [distanceKm, elevationGain] = await Promise.all([
+    getWorkoutDistanceKm(workout),
+    getWorkoutElevationGain(workout),
+  ]);
 
   return {
     source: "apple_health" as const,
     external_id: workout.uuid,
     type: mapWorkoutType(workout.workoutActivityType),
-    duration: Math.round(durationSeconds),
-    distance: (() => {
-      const d = Math.round(distanceKm * 100) / 100;
-      if (d === 0) console.warn("[Health] Distance is 0 for workout:", workout.uuid);
-      return d;
-    })(),
-    elapsed_time: elapsedTimeSeconds,
-    elevation_gain: elevationGain,
-    location: null,
-    date: workout.startDate.toISOString(),
     name: activityTypeName,
     sport_type: activityTypeName,
+    date: workout.startDate.toISOString(),
+    duration: Math.round(durationSeconds),
+    elapsed_time: elapsedTimeSeconds,
+    distance: distanceKm,
+    elevation_gain: elevationGain,
+    location: null,
   };
 }
 
@@ -138,7 +118,6 @@ export async function syncHealthWorkouts(
   await ensureHealthKitAuthorized();
 
   const syncStartDate = since || new Date(Date.now() - DEFAULT_SYNC_DAYS * 24 * 60 * 60 * 1000);
-
   const workouts = await getHealthKitWorkouts(syncStartDate);
 
   if (workouts.length === 0) {
@@ -146,35 +125,28 @@ export async function syncHealthWorkouts(
   }
 
   const rows = await Promise.all(
-    workouts.map(async (w) => {
-      const transformed = await transformWorkout(w);
-      return {
-        user_id: uid,
-        ...transformed,
-      };
-    }),
+    workouts.map(async (w) => ({
+      user_id: uid,
+      ...(await transformWorkout(w)),
+    })),
   );
 
-  // Batch upsert - updates existing rows on conflict to fix stale data (e.g. distance=0)
+  // Upsert updates existing rows on conflict to correct stale data
   const { data, error } = await supabase
     .from("activities")
     .upsert(rows, {
       onConflict: "user_id,source,external_id",
     })
-    .select("id, external_id");
+    .select("id");
 
   if (error) throw error;
 
-  const upsertedCount = (data ?? []).length;
-  const syncedCount = upsertedCount;
+  const syncedCount = (data ?? []).length;
   const skippedCount = workouts.length - syncedCount;
 
   if (syncedCount > 0) {
-    // Recalculate all stats from actual activity data to avoid
-    // rounding drift and streak corruption from historical dates
     await recalculateUserStats(uid);
 
-    // Update last sync timestamp on health_connections
     const { error: syncError } = await supabase
       .from("health_connections")
       .upsert(
