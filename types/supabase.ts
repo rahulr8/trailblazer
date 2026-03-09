@@ -257,6 +257,12 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
+      increment_message_count: {
+        Args: {
+          p_conversation_id: string;
+        };
+        Returns: undefined;
+      };
       increment_user_stats: {
         Args: {
           p_user_id: string;
@@ -266,7 +272,23 @@ export type Database = {
         };
         Returns: undefined;
       };
+      log_manual_activity: {
+        Args: {
+          p_user_id: string;
+          p_type: string;
+          p_duration: number;
+          p_distance: number;
+          p_location?: string | null;
+        };
+        Returns: number;
+      };
       recalculate_user_stats: {
+        Args: {
+          p_user_id: string;
+        };
+        Returns: undefined;
+      };
+      reset_user_challenge: {
         Args: {
           p_user_id: string;
         };
@@ -275,6 +297,7 @@ export type Database = {
       update_streak: {
         Args: {
           p_user_id: string;
+          p_activity_date?: string | null;
         };
         Returns: undefined;
       };

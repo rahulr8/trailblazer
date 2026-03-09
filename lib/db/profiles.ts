@@ -100,22 +100,8 @@ export async function upgradeToPlatinum(uid: string): Promise<void> {
 }
 
 export async function resetUserChallenge(uid: string): Promise<void> {
-  const results = await Promise.all([
-    supabase.from("activities").delete().eq("user_id", uid),
-    supabase.from("saved_adventures").delete().eq("user_id", uid),
-    supabase
-      .from("profiles")
-      .update({
-        total_km: 0,
-        total_minutes: 0,
-        total_steps: 0,
-        current_streak: 0,
-        membership_tier: "free",
-        last_activity_date: null,
-      })
-      .eq("id", uid),
-  ]);
-
-  const firstError = results.find((r) => r.error)?.error;
-  if (firstError) throw firstError;
+  const { error } = await supabase.rpc("reset_user_challenge", {
+    p_user_id: uid,
+  });
+  if (error) throw error;
 }

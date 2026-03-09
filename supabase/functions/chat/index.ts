@@ -94,24 +94,13 @@ Deno.serve(async (req) => {
       console.error("Failed to store assistant message:", assistantInsertError.message);
     }
 
-    // Update conversation metadata
-    const { data: convData, error: convReadError } = await supabase
-      .from("conversations")
-      .select("message_count")
-      .eq("id", conversation_id)
-      .single();
-
-    if (!convReadError && convData) {
-      const { error: convUpdateError } = await supabase
-        .from("conversations")
-        .update({
-          last_message_at: new Date().toISOString(),
-          message_count: convData.message_count + 2,
-        })
-        .eq("id", conversation_id);
-      if (convUpdateError) {
-        console.error("Failed to update conversation:", convUpdateError.message);
-      }
+    // Atomic conversation metadata update (once per message inserted)
+    await supabase.rpc("increment_message_count", { p_conversation_id: conversation_id });
+    const { error: countError } = await supabase.rpc("increment_message_count", {
+      p_conversation_id: conversation_id,
+    });
+    if (countError) {
+      console.error("Failed to update conversation:", countError.message);
     }
 
     return new Response(JSON.stringify({ response: assistantMessage }), {

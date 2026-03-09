@@ -158,6 +158,35 @@ import { CustomTabBar } from "@/components/navigation/CustomTabBar";
 
 Previously a floating action button overlaying the tab bar. Replaced by the Parker button integrated into `CustomTabBar`. File still exists at `navigation/ParkerFAB.tsx` but is no longer used.
 
+## LoadingModal
+
+Reusable non-dismissible loading overlay for long-running operations.
+
+```typescript
+import { LoadingModal } from "@/components/LoadingModal";
+
+<LoadingModal
+  visible={isSyncing}
+  title="Syncing Workouts"
+  message="Importing your activities from Apple Health. This may take a moment..."
+/>
+```
+
+**Props:**
+
+- `visible: boolean` - Controls modal visibility
+- `title: string` - Bold heading text
+- `message?: string` - Optional descriptive text below the title
+
+**Features:**
+
+- Non-dismissible (no backdrop press to close)
+- Animated spinning ring + pulse effect using the theme's primary color
+- Dark backdrop overlay (70% opacity)
+- Centered card with themed background/border
+
+Used in: Profile screen (Apple Health sync), reusable for any long operation.
+
 ## Existing Components
 
 - `external-link.tsx` - Link that opens in in-app browser
@@ -166,6 +195,7 @@ Previously a floating action button overlaying the tab bar. Replaced by the Park
 - `navigation/TopBar.tsx` - Shared top bar with date, affirmation, and avatar
 - `navigation/CustomTabBar.tsx` - Custom bottom tab bar with grouped icons + Parker button
 - `navigation/ParkerFAB.tsx` - Parker AI chat FAB (deprecated, replaced by CustomTabBar)
+- `LoadingModal.tsx` - Reusable non-dismissible loading overlay (syncs, imports, any long operation)
 - `ui/` - UI primitives
 
 

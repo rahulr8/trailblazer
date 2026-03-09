@@ -1,39 +1,20 @@
 import { supabase } from "@/lib/supabase";
-import { calculateSteps } from "@/lib/constants";
-import { incrementUserStats, updateStreak } from "./profiles";
 import type { Activity, ActivitySource, LogActivityInput, QueryOptions } from "./types";
 
 export async function logActivity(
   uid: string,
   input: LogActivityInput,
 ): Promise<number> {
-  const { data, error } = await supabase
-    .from("activities")
-    .insert({
-      user_id: uid,
-      source: "manual",
-      type: input.type,
-      duration: input.duration,
-      distance: input.distance,
-      location: input.location,
-      date: new Date().toISOString(),
-    })
-    .select("id")
-    .single();
-
-  if (error) throw error;
-
-  const steps = calculateSteps(input.type, input.distance);
-
-  await incrementUserStats(uid, {
-    km: input.distance,
-    minutes: Math.round(input.duration / 60),
-    steps,
+  const { data, error } = await supabase.rpc("log_manual_activity", {
+    p_user_id: uid,
+    p_type: input.type,
+    p_duration: input.duration,
+    p_distance: input.distance,
+    p_location: input.location,
   });
 
-  await updateStreak(uid);
-
-  return data.id;
+  if (error) throw error;
+  return data as number;
 }
 
 function rowToActivity(row: Record<string, unknown>): Activity {

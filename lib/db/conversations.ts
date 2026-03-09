@@ -14,20 +14,10 @@ export async function logChatMessage(input: LogMessageInput): Promise<number> {
 
   if (error) throw error;
 
-  // Update conversation last_message_at and increment count
-  const conversation = await supabase
-    .from("conversations")
-    .select("message_count")
-    .eq("id", input.conversationId)
-    .single();
-
-  await supabase
-    .from("conversations")
-    .update({
-      last_message_at: new Date().toISOString(),
-      message_count: (conversation.data?.message_count ?? 0) + 1,
-    })
-    .eq("id", input.conversationId);
+  // Atomic increment (avoids race condition)
+  await supabase.rpc("increment_message_count", {
+    p_conversation_id: input.conversationId,
+  });
 
   return data.id;
 }
@@ -71,12 +61,14 @@ export async function getConversations(
 
 export async function getConversationMessages(
   conversationId: string,
+  limit: number = 100,
 ): Promise<Message[]> {
   const { data, error } = await supabase
     .from("messages")
     .select()
     .eq("conversation_id", conversationId)
-    .order("created_at", { ascending: true });
+    .order("created_at", { ascending: true })
+    .limit(limit);
 
   if (error) throw error;
 

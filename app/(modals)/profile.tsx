@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { Alert, Platform, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
@@ -21,6 +21,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "heroui-native";
 
 import { BorderRadius, Spacing } from "@/constants";
+import { LoadingModal } from "@/components/LoadingModal";
 import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
 import { useHealthConnection } from "@/lib/health";
@@ -29,7 +30,7 @@ import { MOCK_USER, MOCK_STATS, MOCK_ACHIEVEMENTS } from "@/lib/mock";
 
 type CoachPersonality = "drill-sergeant" | "bestie" | "zen" | "hype" | "witty";
 
-const COACH_OPTIONS: Array<{ id: CoachPersonality; emoji: string; label: string }> = [
+const COACH_OPTIONS: { id: CoachPersonality; emoji: string; label: string }[] = [
   { id: "drill-sergeant", emoji: "\u{1F3CB}", label: "Drill Sgt" },
   { id: "bestie", emoji: "\u{1F917}", label: "Bestie" },
   { id: "zen", emoji: "\u{1F9D8}", label: "Zen" },
@@ -64,6 +65,9 @@ export default function ProfileScreen() {
   const [selectedPersonality, setSelectedPersonality] = useState<CoachPersonality>("bestie");
   const [selectedTheme, setSelectedTheme] = useState<string>("green");
   const [googleFitEnabled, setGoogleFitEnabled] = useState<boolean>(false);
+  const showAppleHealth = Platform.OS === "ios" && health.isAvailable;
+  const showGoogleFit = Platform.OS === "android";
+  const showIntegrationSection = showAppleHealth || showGoogleFit;
 
   const handleSignOut = () => {
     Alert.alert("Sign Out?", "Are you sure you want to sign out?", [
@@ -340,57 +344,53 @@ export default function ProfileScreen() {
           ]}
         >
           {/* Apple Health */}
-          {health.isAvailable && (
+          {showAppleHealth && (
             <Pressable style={styles.menuItem}>
               <View style={[styles.menuIcon, { backgroundColor: "#007AFF20" }]}>
                 <Heart size={20} color="#007AFF" />
               </View>
               <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Apple Health</Text>
-              {health.isSyncing ? (
-                <ActivityIndicator size="small" color={colors.primary} />
-              ) : (
-                <Switch
-                  value={health.isConnected}
-                  disabled={health.isLoading}
-                  onValueChange={(value) => {
-                    if (value) {
-                      health.connect();
-                    } else {
-                      health.disconnect();
-                    }
-                  }}
-                  trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
-                  thumbColor={health.isConnected ? colors.primary : "#f4f3f4"}
-                />
-              )}
+              <Switch
+                value={health.isConnected}
+                disabled={health.isLoading || health.isSyncing}
+                onValueChange={(value) => {
+                  if (value) {
+                    health.connect();
+                  } else {
+                    health.disconnect();
+                  }
+                }}
+                trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+                thumbColor={health.isConnected ? colors.primary : "#f4f3f4"}
+              />
             </Pressable>
           )}
 
-          {health.isAvailable && (
-            <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+          {/* Google Fit */}
+          {showGoogleFit && (
+            <Pressable style={styles.menuItem}>
+              <View style={[styles.menuIcon, { backgroundColor: "#4285F420" }]}>
+                <Activity size={20} color="#4285F4" />
+              </View>
+              <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Google Fit</Text>
+              <Switch
+                value={googleFitEnabled}
+                onValueChange={(value) => {
+                  if (value) {
+                    handleComingSoon();
+                  } else {
+                    setGoogleFitEnabled(false);
+                  }
+                }}
+                trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+                thumbColor={googleFitEnabled ? colors.primary : "#f4f3f4"}
+              />
+            </Pressable>
           )}
 
-          {/* Google Fit */}
-          <Pressable style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: "#4285F420" }]}>
-              <Activity size={20} color="#4285F4" />
-            </View>
-            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Google Fit</Text>
-            <Switch
-              value={googleFitEnabled}
-              onValueChange={(value) => {
-                if (value) {
-                  handleComingSoon();
-                } else {
-                  setGoogleFitEnabled(false);
-                }
-              }}
-              trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
-              thumbColor={googleFitEnabled ? colors.primary : "#f4f3f4"}
-            />
-          </Pressable>
-
-          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+          {showIntegrationSection && (
+            <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+          )}
 
           {/* Dark Mode */}
           <Pressable style={styles.menuItem}>
@@ -540,6 +540,12 @@ export default function ProfileScreen() {
           </Pressable>
         </View>
       </ScrollView>
+
+      <LoadingModal
+        visible={health.isSyncing}
+        title="Syncing Workouts"
+        message="Importing your activities from Apple Health. This may take a moment..."
+      />
     </View>
   );
 }
