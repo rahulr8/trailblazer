@@ -1,8 +1,8 @@
 import { Platform } from "react-native";
 
 import { supabase } from "@/lib/supabase";
-import { incrementUserStats, updateStreak } from "@/lib/db/profiles";
-import { calculateSteps, DEFAULT_SYNC_DAYS } from "@/lib/constants";
+import { recalculateUserStats } from "@/lib/db/profiles";
+import { DEFAULT_SYNC_DAYS } from "@/lib/constants";
 import { mapWorkoutType, ensureHealthKitAuthorized } from "./config";
 
 interface SyncResult {
@@ -131,27 +131,12 @@ export async function syncHealthWorkouts(
   const skippedCount = workouts.length - syncedCount;
 
   if (syncedCount > 0) {
-    const newRows = rows.filter((r) => insertedExternalIds.has(r.external_id));
-    let totalKm = 0;
-    let totalMinutes = 0;
-    let totalSteps = 0;
-
-    for (const row of newRows) {
-      totalKm += row.distance;
-      totalMinutes += Math.round(row.duration / 60);
-      totalSteps += calculateSteps(row.type, row.distance);
-    }
-
-    await incrementUserStats(uid, {
-      km: totalKm,
-      minutes: totalMinutes,
-      steps: totalSteps,
-    });
-
-    await updateStreak(uid);
+    // Recalculate all stats from actual activity data to avoid
+    // rounding drift and streak corruption from historical dates
+    await recalculateUserStats(uid);
 
     // Update last sync timestamp on health_connections
-    await supabase
+    const { error: syncError } = await supabase
       .from("health_connections")
       .upsert(
         {
@@ -161,6 +146,7 @@ export async function syncHealthWorkouts(
         },
         { onConflict: "user_id" },
       );
+    if (syncError) throw syncError;
   }
 
   console.log("[Health] Sync complete:", { syncedCount, skippedCount });

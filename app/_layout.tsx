@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, Platform, StyleSheet, View } from "react-native";
 
 import { router, Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
@@ -54,7 +54,13 @@ function RootLayoutNav() {
           AsyncStorage.getItem(PERMISSIONS_KEY),
         ]);
         setHasSeenOnboarding(onboarding === "true");
-        setHasSeenHealthPermission(healthPermission === "true");
+        // Auto-skip health permission on non-iOS (HealthKit unavailable)
+        if (Platform.OS !== "ios" && healthPermission !== "true") {
+          await AsyncStorage.setItem(HEALTH_PERMISSION_KEY, "true");
+          setHasSeenHealthPermission(true);
+        } else {
+          setHasSeenHealthPermission(healthPermission === "true");
+        }
         setHasCompletedPermissions(permissions === "true");
       } catch {
         // Defaults are false

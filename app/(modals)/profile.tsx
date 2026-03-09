@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
+import { ActivityIndicator, Alert, Pressable, ScrollView, StyleSheet, Switch, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as WebBrowser from "expo-web-browser";
 import {
@@ -21,7 +21,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToast } from "heroui-native";
 
 import { BorderRadius, Spacing } from "@/constants";
+import { useAuth } from "@/contexts/auth-context";
 import { useTheme } from "@/contexts/theme-context";
+import { useHealthConnection } from "@/lib/health";
 import { supabase } from "@/lib/supabase";
 import { MOCK_USER, MOCK_STATS, MOCK_ACHIEVEMENTS } from "@/lib/mock";
 
@@ -55,11 +57,12 @@ const THEME_COLORS = [
 
 export default function ProfileScreen() {
   const { colors, shadows, isDark, toggleColorScheme } = useTheme();
+  const { uid } = useAuth();
+  const health = useHealthConnection(uid);
   const insets = useSafeAreaInsets();
   const { toast } = useToast();
   const [selectedPersonality, setSelectedPersonality] = useState<CoachPersonality>("bestie");
   const [selectedTheme, setSelectedTheme] = useState<string>("green");
-  const [appleHealthEnabled, setAppleHealthEnabled] = useState<boolean>(false);
   const [googleFitEnabled, setGoogleFitEnabled] = useState<boolean>(false);
 
   const handleSignOut = () => {
@@ -337,26 +340,35 @@ export default function ProfileScreen() {
           ]}
         >
           {/* Apple Health */}
-          <Pressable style={styles.menuItem}>
-            <View style={[styles.menuIcon, { backgroundColor: "#007AFF20" }]}>
-              <Heart size={20} color="#007AFF" />
-            </View>
-            <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Apple Health</Text>
-            <Switch
-              value={appleHealthEnabled}
-              onValueChange={(value) => {
-                if (value) {
-                  handleComingSoon();
-                } else {
-                  setAppleHealthEnabled(false);
-                }
-              }}
-              trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
-              thumbColor={appleHealthEnabled ? colors.primary : "#f4f3f4"}
-            />
-          </Pressable>
+          {health.isAvailable && (
+            <Pressable style={styles.menuItem}>
+              <View style={[styles.menuIcon, { backgroundColor: "#007AFF20" }]}>
+                <Heart size={20} color="#007AFF" />
+              </View>
+              <Text style={[styles.menuLabel, { color: colors.textPrimary }]}>Apple Health</Text>
+              {health.isSyncing ? (
+                <ActivityIndicator size="small" color={colors.primary} />
+              ) : (
+                <Switch
+                  value={health.isConnected}
+                  disabled={health.isLoading}
+                  onValueChange={(value) => {
+                    if (value) {
+                      health.connect();
+                    } else {
+                      health.disconnect();
+                    }
+                  }}
+                  trackColor={{ false: colors.progressTrack, true: colors.primary + "60" }}
+                  thumbColor={health.isConnected ? colors.primary : "#f4f3f4"}
+                />
+              )}
+            </Pressable>
+          )}
 
-          <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+          {health.isAvailable && (
+            <View style={[styles.divider, { backgroundColor: colors.cardBorder }]} />
+          )}
 
           {/* Google Fit */}
           <Pressable style={styles.menuItem}>

@@ -126,8 +126,8 @@ source: "manual" | "apple_health";
 7. Sync queries 30 days of workouts via `queryWorkoutSamples()`
 8. Workouts deduplicated by `externalId` (HealthKit's `uuid`)
 9. Distance retrieved via `workout.getStatistic()` for each distance type
-10. New activities stored in `users/{uid}/activities`
-11. User stats updated with totals
+10. New activities stored in `activities` table
+11. User stats recalculated from all activity data via `recalculate_user_stats()` (avoids rounding drift and streak corruption from historical dates)
 
 **Important**: Only ONE sync runs at a time. The auto-sync effect uses a `hasAutoSynced` ref to prevent duplicate syncs on app open.
 

@@ -15,10 +15,11 @@ function isHealthKitAuthError(error: unknown): boolean {
 }
 
 async function clearHealthConnection(uid: string): Promise<void> {
-  await supabase
+  const { error } = await supabase
     .from("health_connections")
     .delete()
     .eq("user_id", uid);
+  if (error) throw error;
 }
 
 interface HealthConnectionState {
@@ -67,11 +68,17 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     }
 
     async function fetchConnection() {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("health_connections")
         .select()
         .eq("user_id", uid!)
         .maybeSingle();
+
+      if (error) {
+        console.error("[Health] Failed to fetch connection:", error);
+        setState((prev) => ({ ...prev, isLoading: false, error: error.message }));
+        return;
+      }
 
       setState((prev) => ({
         ...prev,
@@ -180,7 +187,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
     try {
       await initHealthKit();
 
-      await supabase.from("health_connections").upsert(
+      const { error: upsertError } = await supabase.from("health_connections").upsert(
         {
           user_id: uid,
           is_authorized: true,
@@ -189,6 +196,7 @@ export function useHealthConnection(uid: string | null): UseHealthConnectionRetu
         },
         { onConflict: "user_id" },
       );
+      if (upsertError) throw upsertError;
 
       console.log("[Health] Connection saved successfully");
       setState((prev) => ({ ...prev, isConnected: true, lastSyncAt: null }));

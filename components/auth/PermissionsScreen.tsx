@@ -1,4 +1,4 @@
-import { Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Platform, Pressable, StyleSheet, Text, View } from "react-native";
 
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -6,14 +6,24 @@ import { RotatingLogo } from "@/components/onboarding/RotatingLogo";
 import { BorderRadius, Spacing } from "@/constants";
 import { useTheme } from "@/contexts/theme-context";
 
-async function requestHealthPermission(): Promise<void> {
+async function requestHealthPermission(): Promise<boolean> {
+  if (Platform.OS !== "ios") return false;
+
   try {
     const { requestAuthorization } = await import("@kingstinct/react-native-healthkit");
-    await requestAuthorization({
-      toRead: ["HKQuantityTypeIdentifierActiveEnergyBurned" as const],
+    const authorized = await requestAuthorization({
+      toRead: [
+        "HKWorkoutTypeIdentifier",
+        "HKQuantityTypeIdentifierDistanceWalkingRunning",
+        "HKQuantityTypeIdentifierDistanceCycling",
+        "HKQuantityTypeIdentifierDistanceSwimming",
+        "HKQuantityTypeIdentifierFlightsClimbed",
+      ],
     });
-  } catch {
-    console.log("[Permissions] HealthKit request failed or unavailable");
+    return !!authorized;
+  } catch (error) {
+    console.error("[Permissions] HealthKit request failed:", error);
+    return false;
   }
 }
 
@@ -22,8 +32,19 @@ export default function PermissionsScreen({ onComplete }: { onComplete?: () => v
   const insets = useSafeAreaInsets();
 
   const handleAccept = async () => {
-    await requestHealthPermission();
-    onComplete?.();
+    const granted = await requestHealthPermission();
+    if (granted) {
+      onComplete?.();
+    } else {
+      Alert.alert(
+        "Permission Not Granted",
+        "HealthKit permission was not granted. You can enable it later in Settings, or continue without it.",
+        [
+          { text: "Try Again", style: "cancel", onPress: handleAccept },
+          { text: "Continue Without", onPress: () => onComplete?.() },
+        ]
+      );
+    }
   };
 
   const handleDecline = () => {
