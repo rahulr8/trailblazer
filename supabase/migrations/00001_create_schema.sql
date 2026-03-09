@@ -252,7 +252,7 @@ begin
     coalesce(sum(distance), 0),
     coalesce(sum(duration) / 60, 0),
     coalesce(sum(
-      case when distance > 0 then round(distance * 1312.34) else 0 end
+      case when type in ('walk', 'hike', 'run') and distance > 0 then round(distance * 1300) else 0 end
     ), 0),
     max(date)
   into v_total_km, v_total_minutes, v_total_steps, v_last_date

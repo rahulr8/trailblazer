@@ -75,6 +75,7 @@ const HEALTHKIT_READ_PERMISSIONS = [
   "HKQuantityTypeIdentifierDistanceWalkingRunning",
   "HKQuantityTypeIdentifierDistanceCycling",
   "HKQuantityTypeIdentifierDistanceSwimming",
+  "HKQuantityTypeIdentifierFlightsClimbed",
 ] as const;
 
 // Initialize HealthKit with permissions

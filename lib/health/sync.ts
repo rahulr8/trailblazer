@@ -38,6 +38,10 @@ async function getHealthKitWorkouts(since: Date) {
 async function transformWorkout(workout: Awaited<ReturnType<typeof getHealthKitWorkouts>>[number]) {
   const durationSeconds = workout.duration?.quantity || 0;
 
+  const elapsedTimeSeconds = Math.round(
+    (workout.endDate.getTime() - workout.startDate.getTime()) / 1000
+  );
+
   let distanceKm = 0;
   const distanceTypes = [
     "HKQuantityTypeIdentifierDistanceWalkingRunning",
@@ -57,6 +61,16 @@ async function transformWorkout(workout: Awaited<ReturnType<typeof getHealthKitW
     }
   }
 
+  let elevationGain: number | null = null;
+  try {
+    const flightsStat = await workout.getStatistic("HKQuantityTypeIdentifierFlightsClimbed");
+    if (flightsStat?.sumQuantity?.quantity) {
+      elevationGain = Math.round(flightsStat.sumQuantity.quantity * 3 * 100) / 100;
+    }
+  } catch {
+    // Flights climbed not available for this workout type
+  }
+
   const HealthKit = await import("@kingstinct/react-native-healthkit");
   const activityTypeName = HealthKit.WorkoutActivityType[workout.workoutActivityType] || "Workout";
 
@@ -66,6 +80,8 @@ async function transformWorkout(workout: Awaited<ReturnType<typeof getHealthKitW
     type: mapWorkoutType(workout.workoutActivityType),
     duration: Math.round(durationSeconds),
     distance: Math.round(distanceKm * 100) / 100,
+    elapsed_time: elapsedTimeSeconds,
+    elevation_gain: elevationGain,
     location: null,
     date: workout.startDate.toISOString(),
     name: activityTypeName,

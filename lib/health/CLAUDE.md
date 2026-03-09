@@ -110,6 +110,11 @@ Users can use:
 source: "manual" | "apple_health";
 ```
 
+### Additional HealthKit Fields
+
+- `elapsed_time` (integer, seconds) — Total wall-clock time (endDate - startDate), distinct from `duration` (active time)
+- `elevation_gain` (numeric, meters) — Estimated from flights climbed (× 3m per flight), null if unavailable
+
 ## Sync Flow
 
 1. User taps "Connect Apple Health" in profile
