@@ -2,8 +2,6 @@ import {
   createContext,
   useCallback,
   useContext,
-  useEffect,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -39,61 +37,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<ChatMessage[]>([WELCOME_MESSAGE]);
   const [isTyping, setIsTyping] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
-  const channelRef = useRef<ReturnType<typeof supabase.channel> | null>(null);
-
-  // Subscribe to realtime messages when we have a conversation
-  useEffect(() => {
-    if (!conversationId) return;
-
-    const channel = supabase
-      .channel(`conversation:${conversationId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        (payload) => {
-          const row = payload.new as {
-            id: number;
-            role: string;
-            content: string;
-          };
-          if (row.role === "assistant") {
-            setMessages((prev) => {
-              // Deduplicate by checking if this message ID already exists
-              if (prev.some((m) => m.id === row.id.toString())) return prev;
-              return [
-                ...prev,
-                {
-                  id: row.id.toString(),
-                  role: "assistant",
-                  content: row.content,
-                },
-              ];
-            });
-            setIsTyping(false);
-          }
-        },
-      )
-      .subscribe();
-
-    channelRef.current = channel;
-
-    return () => {
-      supabase.removeChannel(channel);
-      channelRef.current = null;
-    };
-  }, [conversationId]);
 
   const sendMessage = useCallback(
     async (text: string) => {
       const trimmed = text.trim();
-      if (!trimmed) return;
+      if (!trimmed || isTyping) return;
 
-      // Create conversation on first message
       let convId = conversationId;
       if (!convId) {
         convId = await createConversation(uid);
@@ -101,7 +50,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       }
 
       const userMessage: ChatMessage = {
-        id: Date.now().toString(),
+        id: `user-${Date.now()}`,
         role: "user",
         content: trimmed,
       };
@@ -118,25 +67,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         if (error) throw error;
 
-        // Fallback: if realtime hasn't delivered the message yet, add it
-        if (data?.response) {
-          setMessages((prev) => {
-            const hasResponse = prev.some(
-              (m) => m.role === "assistant" && m.content === data.response,
-            );
-            if (hasResponse) return prev;
-            return [
-              ...prev,
-              {
-                id: `fallback-${Date.now()}`,
-                role: "assistant" as const,
-                content: data.response,
-              },
-            ];
-          });
-        }
-      } catch (error) {
-        console.error("[Chat] Send error:", error);
+        const responseText =
+          data?.response ?? "Sorry, I couldn't generate a response.";
+
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: `assistant-${Date.now()}`,
+            role: "assistant",
+            content: responseText,
+          },
+        ]);
+      } catch (err) {
+        console.error("[Chat] Send error:", err);
         setMessages((prev) => [
           ...prev,
           {
@@ -149,21 +92,19 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setIsTyping(false);
       }
     },
-    [uid, conversationId],
+    [uid, conversationId, isTyping],
   );
 
   const clearMessages = useCallback(() => {
-    if (channelRef.current) {
-      supabase.removeChannel(channelRef.current);
-      channelRef.current = null;
-    }
     setConversationId(null);
     setMessages([WELCOME_MESSAGE]);
     setIsTyping(false);
   }, []);
 
   return (
-    <ChatContext.Provider value={{ messages, isTyping, sendMessage, clearMessages }}>
+    <ChatContext.Provider
+      value={{ messages, isTyping, sendMessage, clearMessages }}
+    >
       {children}
     </ChatContext.Provider>
   );
